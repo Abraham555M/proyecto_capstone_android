@@ -17,6 +17,9 @@
 
     <!-- Colores para círculos decorativos -->
     <color name="yellow_circle">#FFE4B5</color>
-    <color name="orange_circle">#FFA500</color>
+    <color name="orange_circle">#FBAE3C</color>
+
+
+
 
 </resources>
