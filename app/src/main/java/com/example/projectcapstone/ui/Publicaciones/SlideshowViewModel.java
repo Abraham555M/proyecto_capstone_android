@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.slideshow;
+package com.example.projectcapstone.ui.Publicaciones;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

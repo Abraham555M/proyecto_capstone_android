@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.gallery;
+package com.example.projectcapstone.ui.Emprendimiento;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

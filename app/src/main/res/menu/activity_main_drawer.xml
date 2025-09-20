@@ -5,16 +5,40 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/menu_home" />
+            android:id="@+id/nav_inicio"
+            android:icon="@drawable/ic_inicio"
+            android:title="Inicio" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:id="@+id/nav_notificaciones"
+            android:icon="@drawable/ic_notificaciones"
+            android:title="Notificaciones" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
+            android:id="@+id/nav_favoritos"
+            android:icon="@drawable/ic_favoritos"
+            android:title="Favoritos" />
+        <item
+            android:id="@+id/nav_perfil"
+            android:icon="@drawable/ic_perfil"
+            android:title="Mi perfil" />
+        <item
+            android:id="@+id/nav_colaboraciones"
+            android:icon="@drawable/ic_colaboraciones"
+            android:title="Colaboraciones" />
+        <item
+            android:id="@+id/nav_emprendimiento"
+            android:icon="@drawable/ic_emprendimiento"
+            android:title="Emprendimiento" />
+        <item
+            android:id="@+id/nav_metricas"
+            android:icon="@drawable/ic_metricas"
+            android:title="Mis métricas" />
+        <item
+            android:id="@+id/nav_publicaciones"
+            android:icon="@drawable/ic_publicaciones"
+            android:title="Publicaciones" />
+        <item
+            android:id="@+id/nav_soporte"
+            android:icon="@drawable/ic_soporte"
+            android:title="Soporte" />
     </group>
 </menu>

@@ -3,25 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_crear_cuenta">
+    app:startDestination="@id/nav_inicio">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.example.projectcapstone.ui.home.HomeFragment"
+        android:id="@+id/nav_metricas"
+        android:name="com.example.projectcapstone.ui.Metricas.MetricasFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_metricas" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.projectcapstone.ui.gallery.GalleryFragment"
+        android:id="@+id/nav_emprendimiento"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_emprendimiento" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.projectcapstone.ui.slideshow.SlideshowFragment"
+        android:id="@+id/nav_publicaciones"
+        android:name="com.example.projectcapstone.ui.Publicaciones.PublicacionesFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_publicaciones" />
     <fragment
         android:id="@+id/nav_crear_cuenta"
         android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.CrearCuenta"
@@ -86,4 +86,29 @@
             android:id="@+id/action_nav_validar_correo_crear_to_nav_inicio"
             app:destination="@id/nav_inicio" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_notificaciones"
+        android:name="com.example.projectcapstone.ui.Notificaciones.NotificacionesFragment"
+        android:label="fragment_notificaciones"
+        tools:layout="@layout/fragment_notificaciones" />
+    <fragment
+        android:id="@+id/nav_favoritos"
+        android:name="com.example.projectcapstone.ui.Favoritos.FavoritosFragment"
+        android:label="fragment_favoritos"
+        tools:layout="@layout/fragment_favoritos" />
+    <fragment
+        android:id="@+id/nav_perfil"
+        android:name="com.example.projectcapstone.ui.Perfil.PerfilFragment"
+        android:label="fragment_perfil"
+        tools:layout="@layout/fragment_perfil" />
+    <fragment
+        android:id="@+id/nav_colaboraciones"
+        android:name="com.example.projectcapstone.ui.Colaboraciones.ColaboracionesFragment"
+        android:label="fragment_colaboraciones"
+        tools:layout="@layout/fragment_colaboraciones" />
+    <fragment
+        android:id="@+id/nav_soporte"
+        android:name="com.example.projectcapstone.ui.Soporte.SoporteFragment"
+        android:label="fragment_soporte"
+        tools:layout="@layout/fragment_soporte" />
 </navigation>

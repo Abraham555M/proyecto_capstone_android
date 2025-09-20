@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.Favoritos;
+package com.example.projectcapstone.ui.Colaboraciones;
 
 import android.os.Bundle;
 
@@ -10,13 +10,12 @@ import android.view.ViewGroup;
 
 import com.example.projectcapstone.R;
 
-public class FavoritosFragment extends Fragment {
+public class ColaboracionesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_favoritos, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_colaboraciones, container, false);
 
-        return rootView;
-    }
+        return rootView;    }
 }
