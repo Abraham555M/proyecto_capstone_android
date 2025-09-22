@@ -1,14 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Autenticacion.InicioSesion.StartUpn">
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    tools:context=".MainActivity">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Contenedor del círculo con el ícono -->
+    <FrameLayout
+        android:layout_width="160dp"
+        android:layout_height="160dp">
+
+        <!-- Imagen del círculo de fondo -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_circle_bg"
+            android:scaleType="fitXY" />
+
+        <!-- Ícono centrado -->
+        <ImageView
+            android:layout_width="81dp"
+            android:layout_height="92dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_shopping_bag"
+            android:scaleType="centerInside" />
+    </FrameLayout>
+
+    <!-- Texto principal START -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/tvStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="START"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="16dp"/>
 
-</FrameLayout>
+    <!-- Texto secundario UPN -->
+    <TextView
+        android:id="@+id/tvUpn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UPN"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- Botón principal -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnComenzar"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="¡Comencemos!"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:backgroundTint="@color/orange_circle"
+        android:textColor="@android:color/white"
+        app:cornerRadius="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Texto y botón de registro -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Eres nuevo? "
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/tvRegistro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Regístrate"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/darker_gray"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnRegistrar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            app:backgroundTint="@color/orange_circle"
+            app:srcCompat="@drawable/ic_arrow_forward"
+            app:tint="@android:color/white"
+            app:elevation="2dp"
+            app:fabSize="mini"/>
+    </LinearLayout>
+
+</LinearLayout>
