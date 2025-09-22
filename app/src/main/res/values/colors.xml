@@ -20,6 +20,22 @@
     <color name="orange_circle">#FBAE3C</color>
     <color name="darker_gray">#757575</color>
 
+        <!-- Colores principales del diseño -->
+        <color name="orange_primary">#FF9500</color>
+        <color name="orange_secondary">#FF6B35</color>
+        <color name="orange_light">#FFB366</color>
+
+        <!-- Colores de texto -->
+
+        <color name="gray_dark">#4A4A4A</color>
+        <color name="gray_medium">#8A8A8A</color>
+        <color name="gray_light">#CCCCCC</color>
+
+        <!-- Colores de fondo -->
+
+        <color name="light_gray">#F5F5F5</color>
+        <color name="background_overlay">#33FF9500</color>
+
 
 
 </resources>
