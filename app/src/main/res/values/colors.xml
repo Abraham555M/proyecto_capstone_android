@@ -19,7 +19,15 @@
     <color name="yellow_circle">#FFE4B5</color>
     <color name="orange_circle">#FBAE3C</color>
 
+    <color name="button_orange">#FF9800</color>
+    <color name="error_color">#F44336</color>
+    <color name="primary_text_color">#212121</color>
+    <color name="secondary_text_color">#757575</color>
+    <color name="dialog_background">#FFFFFF</color>
+    <color name="circle_background">#FFEBEE</color>
+    <color name="circle_green">#01C880</color>
 
-
+    <color name="success_color">#4CAF50</color> <!-- Verde principal -->
+    <color name="circle_success_background">#E8F5E9</color> <!-- Verde clarito de fondo -->
 
 </resources>
