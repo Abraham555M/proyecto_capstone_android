@@ -35,6 +35,13 @@ android {
 }
 
 dependencies {
+    //AsyncHttpClient
+    implementation("com.loopj.android:android-async-http:1.4.9")
+    //Libreria de google para diseño
+    implementation("com.google.android.material:material:1.12.0")
+    //Para cargar imagenes
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -43,6 +50,8 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
