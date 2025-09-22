@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_nav_crear_cuenta_to_nav_validar_correo_crear"
             app:destination="@id/nav_validar_correo_crear" />
+        <action
+            android:id="@+id/action_nav_crear_cuenta_to_nav_start_upn"
+            app:destination="@id/nav_start_upn" />
     </fragment>
     <fragment
         android:id="@+id/nav_inicio_sesion"
@@ -56,7 +59,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_validar_correo_recuperar"
-        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
+        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
         android:label="fragment_confirmar_correo"
         tools:layout="@layout/fragment_validar_correo_recuperar" >
         <action
@@ -79,7 +82,7 @@
         tools:layout="@layout/fragment_inicio" />
     <fragment
         android:id="@+id/nav_validar_correo_crear"
-        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
+        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
         android:label="fragment_validar_correo_password"
         tools:layout="@layout/fragment_validar_correo_crear" >
         <action

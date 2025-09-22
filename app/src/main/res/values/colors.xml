@@ -26,6 +26,7 @@
     <color name="dialog_background">#FFFFFF</color>
     <color name="circle_background">#FFEBEE</color>
     <color name="circle_green">#01C880</color>
+    <color name="circle_backgroung_gris">#C7C7C7</color>
 
     <color name="success_color">#4CAF50</color> <!-- Verde principal -->
     <color name="circle_success_background">#E8F5E9</color> <!-- Verde clarito de fondo -->
