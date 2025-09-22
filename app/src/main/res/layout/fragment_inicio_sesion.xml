@@ -70,16 +70,14 @@
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp" />
 
-        <!-- Olvidé mi contraseña -->
-        <TextView
-            android:id="@+id/tvOlvidePassword"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOlvidePassword"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Olvidé mi contraseña"
             android:textSize="14sp"
             android:textColor="@color/purple_500"
-            android:clickable="true"
-            android:focusable="true"
             app:layout_constraintTop_toBottomOf="@id/etPassword"
             app:layout_constraintEnd_toEndOf="@id/etPassword"
             android:layout_marginTop="8dp" />
@@ -92,7 +90,7 @@
             android:text="Siguiente"
             android:backgroundTint="@color/purple_500"
             android:textColor="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/tvOlvidePassword"
+            app:layout_constraintTop_toBottomOf="@+id/btnOlvidePassword"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="40dp"

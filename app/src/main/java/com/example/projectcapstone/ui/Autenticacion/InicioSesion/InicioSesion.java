@@ -34,7 +34,7 @@ import com.example.projectcapstone.R;
 
 public class InicioSesion extends Fragment {
     EditText etCorreo, etPassword;
-    Button btnSiguiente, btnCancelar;
+    Button btnSiguiente, btnCancelar, btnOlvidePassword;
     String URL_LOGIN = "http://10.0.2.2/proyecto_capstone_php/controlador/estudiante/estudiante_login.php";
     @Nullable
     @Override
@@ -46,9 +46,13 @@ public class InicioSesion extends Fragment {
         etPassword = rootView.findViewById(R.id.etPassword);
         btnSiguiente = rootView.findViewById(R.id.btnSiguiente);
         btnCancelar = rootView.findViewById(R.id.btnCancelar);
-
+        btnOlvidePassword = rootView.findViewById(R.id.btnOlvidePassword);
         btnSiguiente.setOnClickListener(v -> iniciarSesion());
         btnCancelar.setOnClickListener(v -> requireActivity().finish());
+        btnOlvidePassword.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_inicio_sesion_to_nav_validar_correo_recuperar);
+        });
 
         return rootView;
     }
@@ -90,6 +94,7 @@ public class InicioSesion extends Fragment {
                         NavController navController = Navigation.findNavController(requireView());
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_inicio);
 
+
                     } else {
                         mostrarAlerta("Error", json.getString("message"));
                     }
@@ -105,6 +110,7 @@ public class InicioSesion extends Fragment {
             }
         });
     }
+
 
     private void mostrarAlerta(String titulo, String mensaje) {
         new AlertDialog.Builder(requireContext())
