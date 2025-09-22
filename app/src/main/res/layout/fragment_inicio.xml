@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_emprendimiento_inicio" />
+            tools:listitem="@layout/item_publicacion_inicio" />
 
     </LinearLayout>
 
