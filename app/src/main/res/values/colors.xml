@@ -30,4 +30,19 @@
     <color name="success_color">#4CAF50</color> <!-- Verde principal -->
     <color name="circle_success_background">#E8F5E9</color> <!-- Verde clarito de fondo -->
 
+    <!-- Grises -->
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray_medium">#9E9E9E</color>
+    <color name="gray_dark">#424242</color>
+
+    <!-- Colores de categorías -->
+    <color name="pink_light">#FFB3BA</color>
+    <color name="brown_light">#D2B48C</color>
+    <color name="blue_light">#87CEEB</color>
+    <color name="orange_red">#FF6B35</color>
+
+    <!-- Color de fondo amarillo para la imagen -->
+    <color name="yellow_light">#FFF3A0</color>
+    <color name="mint_green">#98FB98</color>
+
 </resources>
