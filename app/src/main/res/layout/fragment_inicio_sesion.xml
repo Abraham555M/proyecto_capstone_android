@@ -1,14 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.Autenticacion.InicioSesion.InicioSesion">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Fondo con formas decorativas -->
+    <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="@drawable/background_shapes" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Inicio"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:gravity="start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="80dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+        <!-- Subtítulo -->
+        <TextView
+            android:id="@+id/tvSubtitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Bienvenido! ♥"
+            android:textSize="16sp"
+            android:textColor="@color/gray_dark"
+            android:gravity="start"
+            app:layout_constraintTop_toBottomOf="@id/tvTitulo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+        <!-- Campo correo (MISMO ID) -->
+        <EditText
+            android:id="@+id/etCorreo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Correo"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/edittext_background_modern"
+            android:padding="16dp"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitulo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="48dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+        <!-- Campo contraseña (MISMO ID) -->
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Contraseña"
+            android:inputType="textPassword"
+            android:background="@drawable/edittext_background_modern"
+            android:padding="16dp"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/etCorreo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+        <!-- Olvidé mi contraseña (MISMO ID) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOlvidePassword"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Olvidé mi contraseña"
+            android:textSize="14sp"
+            android:textColor="@color/purple_500"
+            app:layout_constraintTop_toBottomOf="@id/etPassword"
+            app:layout_constraintEnd_toEndOf="@id/etPassword"
+            android:layout_marginTop="8dp" />
+
+        <!-- Botón siguiente (MISMO ID) -->
+        <Button
+            android:id="@+id/btnSiguiente"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:text="Siguiente"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_orange_background"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/btnOlvidePassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+        <!-- Botón cancelar (MISMO ID) -->
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:background="@android:color/transparent"
+            android:textColor="@color/gray_medium"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/btnSiguiente"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

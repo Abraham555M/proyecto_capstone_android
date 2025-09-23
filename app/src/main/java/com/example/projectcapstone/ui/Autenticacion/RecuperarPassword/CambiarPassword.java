@@ -22,46 +22,52 @@ import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import cz.msebera.android.httpclient.Header;
 
-public class ConfirmarPassword extends Fragment {
-    EditText etCodigo;
-    Button btnValidarCodigo;
-    String correo;
+
+public class CambiarPassword extends Fragment {
+    EditText etNuevaPassword, etRepetirPassword;
+    Button btnCambiarPassword;
+    String correo; // recibido desde ConfirmarCambioPassword
+
     String URL_RECUPERAR = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_recuperar.php";
 
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_confirmar_cambio_password, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_cambiar_password, container, false);
+        etNuevaPassword = rootView.findViewById(R.id.etNuevaPass);
+        etRepetirPassword = rootView.findViewById(R.id.etConfirmarPass);
+        btnCambiarPassword = rootView.findViewById(R.id.btnCambiarPass);
 
-        etCodigo = rootView.findViewById(R.id.etCodigo);
-        btnValidarCodigo = rootView.findViewById(R.id.btnValidarCodigo);
-
-        // 📌 Recuperar correo del fragmento anterior
+        // 📌 Recuperar correo del bundle
         if (getArguments() != null) {
             correo = getArguments().getString("correo");
         }
 
-        btnValidarCodigo.setOnClickListener(v -> validarCodigo());
+        btnCambiarPassword.setOnClickListener(v -> cambiarPassword());
         return rootView;
-
     }
+    private void cambiarPassword() {
+        String pass1 = etNuevaPassword.getText().toString().trim();
+        String pass2 = etRepetirPassword.getText().toString().trim();
 
-    private void validarCodigo() {
-        String codigo = etCodigo.getText().toString().trim();
+        if (pass1.isEmpty() || pass2.isEmpty()) {
+            mostrarAlerta("Error", "Debes ingresar ambas contraseñas");
+            return;
+        }
 
-        if (codigo.isEmpty()) {
-            mostrarAlerta("Error", "Debes ingresar el código recibido");
+        if (!pass1.equals(pass2)) {
+            mostrarAlerta("Error", "Las contraseñas no coinciden");
             return;
         }
 
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
-        params.put("accion", "validar_codigo");
+        params.put("accion", "cambiar_password");
         params.put("ema_estudiante", correo);
-        params.put("codigo", codigo);
+        params.put("nueva_password", pass1);
 
         client.post(URL_RECUPERAR, params, new AsyncHttpResponseHandler() {
             @Override
@@ -71,14 +77,11 @@ public class ConfirmarPassword extends Fragment {
                     JSONObject json = new JSONObject(response);
 
                     if (json.getString("status").equals("success")) {
-                        mostrarAlerta("Éxito", "Código validado correctamente");
+                        mostrarAlerta("Éxito", "Tu contraseña ha sido cambiada");
 
-                        // ✅ Pasar correo al siguiente paso (cambiar contraseña)
-                        Bundle bundle = new Bundle();
-                        bundle.putString("correo", correo);
-
+                        // ✅ Regresar al inicio de sesión
                         NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_nav_confirmar_password_to_nav_cambiar_password, bundle);
+                        navController.navigate(R.id.nav_inicio_sesion);
 
                     } else {
                         mostrarAlerta("Error", json.getString("message"));
