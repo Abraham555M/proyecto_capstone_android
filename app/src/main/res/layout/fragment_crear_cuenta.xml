@@ -38,10 +38,10 @@
             android:padding="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0">
+            app:layout_constraintVertical_bias="0.0">
 
             <!-- Título -->
             <TextView
@@ -70,6 +70,7 @@
                 app:hintTextColor="@color/hint_color">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtNombres"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nombres"
@@ -93,6 +94,7 @@
                 app:hintTextColor="@color/hint_color">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtApellidoPaterno"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Apellido Paterno"
@@ -116,6 +118,7 @@
                 app:hintTextColor="@color/hint_color">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtApellidoMaterno"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Apellido Materno"
@@ -140,6 +143,7 @@
                 app:endIconMode="dropdown_menu">
 
                 <AutoCompleteTextView
+                    android:id="@+id/actvSexo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Sexo"
@@ -164,9 +168,10 @@
                 app:endIconMode="dropdown_menu">
 
                 <AutoCompleteTextView
+                    android:id="@+id/actvSede"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Fecha"
+                    android:hint="Sede"
                     android:inputType="none"
                     android:padding="16dp"
                     android:textSize="16sp" />
@@ -187,6 +192,7 @@
                 app:hintTextColor="@color/hint_color">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtCorreo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Correo"
@@ -211,6 +217,7 @@
                 app:hintTextColor="@color/hint_color">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtContrasena"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Contraseña"
@@ -253,6 +260,7 @@
 
                 <!-- Campo número -->
                 <EditText
+                    android:id="@+id/etNumeroCelular"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -266,6 +274,7 @@
 
             <!-- Botón Hecho -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnListo"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginBottom="16dp"
@@ -278,6 +287,7 @@
 
             <!-- Botón Cancelar -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"

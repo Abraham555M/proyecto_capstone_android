@@ -1,14 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar">
+    tools:context=".ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
+    android:background="@android:color/white">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Imagen usuario/avatar -->
+        <ImageView
+            android:id="@+id/imgAvatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_perfil"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/ic_circle_bg"
+            android:padding="8dp"
+            android:scaleType="centerCrop" />
+
+        <!-- Texto título -->
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirmación Correo"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Texto descripción -->
+        <TextView
+            android:id="@+id/tvDescripcion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingresa el código que hemos enviado a tu correo institucional"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:textColor="@android:color/black"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Texto correo oculto -->
+        <TextView
+            android:id="@+id/tvCorreo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nxxxxxxxx@upn.pe"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Contenedor de 4 dígitos -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="32dp">
+
+            <EditText
+                android:id="@+id/etDigit1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:background="@drawable/edittext_otp_background"
+                android:textSize="20sp"
+                android:imeOptions="actionNext" />
+
+            <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/etDigit2"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:background="@drawable/edittext_otp_background"
+                android:textSize="20sp"
+                android:imeOptions="actionNext" />
+
+            <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/etDigit3"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:background="@drawable/edittext_otp_background"
+                android:textSize="20sp"
+                android:imeOptions="actionNext" />
+
+            <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/etDigit4"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:background="@drawable/edittext_otp_background"
+                android:textSize="20sp"
+                android:imeOptions="actionDone" />
+        </LinearLayout>
+
+        <!-- Botón validar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnValidar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Validar"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:backgroundTint="@color/orange_circle"
+            android:textColor="@android:color/white"
+            app:cornerRadius="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Botón cancelar -->
+        <TextView
+            android:id="@+id/tvCancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
 
 </FrameLayout>

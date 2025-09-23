@@ -27,6 +27,7 @@
     <color name="dialog_background">#FFFFFF</color>
     <color name="circle_background">#FFEBEE</color>
     <color name="circle_green">#01C880</color>
+    <color name="circle_backgroung_gris">#C7C7C7</color>
     <!-- Colores principales del diseño -->
     <color name="orange_primary">#FF9500</color>
     <color name="orange_secondary">#FF6B35</color>

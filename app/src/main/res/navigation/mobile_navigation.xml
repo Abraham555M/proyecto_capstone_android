@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_inicio">
-
+    app:startDestination="@id/nav_start_upn">
 
     <fragment
         android:id="@+id/nav_metricas"
@@ -27,22 +26,22 @@
         android:name="com.example.projectcapstone.ui.Publicaciones.PublicacionesFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_publicaciones" />
-
     <fragment
         android:id="@+id/nav_crear_cuenta"
         android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.CrearCuenta"
-        android:label="CrearCuenta">
+        android:label="CrearCuenta" >
         <action
             android:id="@+id/action_nav_crear_cuenta_to_nav_validar_correo_crear"
             app:destination="@id/nav_validar_correo_crear" />
+        <action
+            android:id="@+id/action_nav_crear_cuenta_to_nav_start_upn"
+            app:destination="@id/nav_start_upn" />
     </fragment>
-
-    <!-- Inicio de sesión -->
     <fragment
         android:id="@+id/nav_inicio_sesion"
         android:name="com.example.projectcapstone.ui.Autenticacion.InicioSesion.InicioSesion"
         android:label="fragment_inicio_sesion"
-        tools:layout="@layout/fragment_inicio_sesion">
+        tools:layout="@layout/fragment_inicio_sesion" >
         <action
             android:id="@+id/action_nav_inicio_sesion_to_nav_inicio"
             app:destination="@id/nav_inicio" />
@@ -50,13 +49,11 @@
             android:id="@+id/action_nav_inicio_sesion_to_nav_validar_correo_recuperar"
             app:destination="@id/nav_validar_correo_recuperar" />
     </fragment>
-
-    <!-- Start -->
     <fragment
         android:id="@+id/nav_start_upn"
         android:name="com.example.projectcapstone.ui.Autenticacion.InicioSesion.StartUpn"
         android:label="fragment_start"
-        tools:layout="@layout/fragment_start">
+        tools:layout="@layout/fragment_start" >
         <action
             android:id="@+id/action_nav_start_upn_to_nav_crear_cuenta"
             app:destination="@id/nav_crear_cuenta" />
@@ -64,14 +61,11 @@
             android:id="@+id/action_nav_start_upn_to_nav_inicio_sesion"
             app:destination="@id/nav_inicio_sesion" />
     </fragment>
-
-    <!-- Recuperar contraseña - paso 1 -->
     <fragment
         android:id="@+id/nav_validar_correo_recuperar"
-        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
-        android:label="fragment_validar_correo_recuperar"
-        tools:layout="@layout/fragment_validar_correo_recuperar">
-
+        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
+        android:label="fragment_confirmar_correo"
+        tools:layout="@layout/fragment_validar_correo_recuperar" >
         <action
             android:id="@+id/action_nav_validar_correo_recuperar_to_nav_confirmar_password"
             app:destination="@id/nav_confirmar_password" />
@@ -99,25 +93,20 @@
             android:id="@+id/action_nav_cambiar_password_to_nav_inicio_sesion"
             app:destination="@id/nav_inicio_sesion" />
     </fragment>
-
-    <!-- Pantalla inicio principal -->
     <fragment
         android:id="@+id/nav_inicio"
         android:name="com.example.projectcapstone.ui.Inicio.InicioFragment"
         android:label="Inicio"
         tools:layout="@layout/fragment_inicio" />
-
-    <!-- Validar correo crear cuenta -->
     <fragment
         android:id="@+id/nav_validar_correo_crear"
         android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
         android:label="fragment_validar_correo_password"
-        tools:layout="@layout/fragment_validar_correo_crear">
+        tools:layout="@layout/fragment_validar_correo_crear" >
         <action
             android:id="@+id/action_nav_validar_correo_crear_to_nav_inicio"
             app:destination="@id/nav_inicio" />
     </fragment>
-
     <fragment
         android:id="@+id/nav_notificaciones"
         android:name="com.example.projectcapstone.ui.Notificaciones.NotificacionesFragment"
