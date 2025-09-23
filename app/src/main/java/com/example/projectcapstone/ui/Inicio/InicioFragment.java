@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projectcapstone.R;
@@ -19,12 +21,15 @@ import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.PublicacionAdapter;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class InicioFragment extends Fragment {
     private CategoriaAdapter categoriaAdapter;
@@ -48,11 +53,16 @@ public class InicioFragment extends Fragment {
 
         // Configuración vertical de publicaciones
         rvPublicaciones.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        publicacionAdapter = new PublicacionAdapter(getContext(), listaPublicacion);
+        publicacionAdapter = new PublicacionAdapter(getContext(), listaPublicacion,
+                (publicacion, ivLike, tvLikes) -> {
+                    registrarLike(publicacion.getIdPublicacion(), 1, publicacion, ivLike, tvLikes);
+                }
+        );
         rvPublicaciones.setAdapter(publicacionAdapter);
 
+
         cargarCategorias();
-        cargarPublicaciones();
+        cargarPublicaciones(1);
 
         return rootView;
     }
@@ -91,8 +101,8 @@ public class InicioFragment extends Fragment {
         });
     }
 
-    private void cargarPublicaciones() {
-        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_inicio.php";
+    private void cargarPublicaciones(int idEstudiante) {
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_inicio.php?idEstudiante=" + idEstudiante;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
@@ -112,8 +122,9 @@ public class InicioFragment extends Fragment {
                         String conPublicacion = obj.getString("con_publicacion");
                         String imgPublicacion = obj.getString("img_publicacion");
                         Integer totalInteracciones = obj.getInt("total_me_gusta");
+                        int dioLike = obj.getInt("dio_like");
 
-                        listaPublicacion.add(new Publicacion(idPublicacion, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones));
+                        listaPublicacion.add(new Publicacion(idPublicacion, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike));
                     }
                     publicacionAdapter.notifyDataSetChanged();
 
@@ -128,4 +139,61 @@ public class InicioFragment extends Fragment {
             }
         });
     }
+
+    public void registrarLike(Integer idPublicacion, int idEstudiante, Publicacion publicacion, ImageView ivLike, TextView tvLikes) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+
+        String url = ServidorConfig.URL_SERVIDOR + "interaccion/interaccion_registrar_like.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("liked")) {
+                        publicacion.setLiked(true);
+                        publicacion.setTotalInteracciones(publicacion.getTotalInteracciones() + 1);
+                        ivLike.setImageResource(R.drawable.ic_corazon_lleno);
+
+                        ivLike.animate()
+                                .scaleX(1.3f).scaleY(1.3f) // aumenta tamaño
+                                .setDuration(150)
+                                .withEndAction(() -> ivLike.animate()
+                                        .scaleX(1f).scaleY(1f) // vuelve a su tamaño original
+                                        .setDuration(150))
+                                .start();
+
+                    } else if (status.equals("unliked")) {
+                        publicacion.setLiked(false);
+                        publicacion.setTotalInteracciones(publicacion.getTotalInteracciones() - 1);
+                        ivLike.setImageResource(R.drawable.ic_corazon);
+                    }
+
+                    // actualizar solo el contador
+                    tvLikes.setText(publicacion.getTotalInteracciones() + " Me gusta");
+
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+
+
 }

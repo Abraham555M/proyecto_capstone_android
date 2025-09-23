@@ -17,13 +17,18 @@ import com.example.projectcapstone.ui.Clases.Publicacion;
 import java.util.List;
 
 public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.ViewHolder> {
-
     private Context context;
     private List<Publicacion> listaPublicaciones;
+    private OnLikeClickListener listener;
 
-    public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones) {
+    public interface OnLikeClickListener {
+        void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
+    }
+
+    public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones, OnLikeClickListener listener) {
         this.context = context;
         this.listaPublicaciones = listaPublicaciones;
+        this.listener = listener;
     }
 
     @NonNull
@@ -55,16 +60,22 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
 
         // Total de likes
         holder.tvLikes.setText(publicacion.getTotalInteracciones() + " Me gusta");
-        // Título de publicación
         holder.tvProductTitle.setText(publicacion.getTitPublicacion());
-        // Precio (opcional, si lo quieres mostrar)
-        holder.tvPrice.setText("S/ " + "20.00"); // 🚨 Si más adelante tu consulta devuelve precio real, lo cambias
-        // Descripción
+        holder.tvPrice.setText("S/ " + "20.00");
         holder.tvProductDescription.setText(publicacion.getConPublicacion());
 
-        // 👉 Aquí puedes agregar listeners a los botones (like, comment, bookmark)
+        // 🚨 Usar dioLike para pintar corazón
+        if (publicacion.isLiked()) {
+            holder.ivLike.setImageResource(R.drawable.ic_corazon_lleno);
+        } else {
+            holder.ivLike.setImageResource(R.drawable.ic_corazon);
+        }
+
+        // Listener del botón like
         holder.ivLike.setOnClickListener(v -> {
-            // Acción para dar like
+            if (listener != null) {
+                listener.onLikeClicked(publicacion, holder.ivLike, holder.tvLikes);
+            }
         });
 
         holder.ivComment.setOnClickListener(v -> {
@@ -75,6 +86,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             // Acción para guardar en favoritos
         });
     }
+
 
     @Override
     public int getItemCount() {
