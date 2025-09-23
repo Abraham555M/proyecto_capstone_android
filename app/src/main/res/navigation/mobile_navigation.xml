@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_start_upn">
+    app:startDestination="@id/nuevoEmprendimientoFragment">
 
     <fragment
         android:id="@+id/nav_metricas"
@@ -14,8 +14,12 @@
     <fragment
         android:id="@+id/nav_emprendimiento"
         android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_emprendimiento" />
+        android:label="@string/menu_emprendimiento"
+        tools:layout="@layout/fragment_emprendimiento" >
+        <action
+            android:id="@+id/action_nav_emprendimiento_to_nuevoEmprendimientoFragment"
+            app:destination="@id/nuevoEmprendimientoFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_publicaciones"
@@ -114,4 +118,9 @@
         android:name="com.example.projectcapstone.ui.Soporte.SoporteFragment"
         android:label="fragment_soporte"
         tools:layout="@layout/fragment_soporte" />
+    <fragment
+        android:id="@+id/nuevoEmprendimientoFragment"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.NuevoEmprendimientoFragment"
+        android:label="fragment_nuevo_emprendimiento"
+        tools:layout="@layout/fragment_nuevo_emprendimiento" />
 </navigation>
