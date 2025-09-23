@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,20 @@ import com.example.projectcapstone.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CrearCuenta extends Fragment {
 
@@ -47,31 +58,17 @@ public class CrearCuenta extends Fragment {
         btnListo = rootView.findViewById(R.id.btnListo);
         btnCancelar = rootView.findViewById(R.id.btnCancelar);
 
+        cargarSexo();
         // Configurar opciones para Sexo
-        String[] opcionesSexo = {"Masculino", "Femenino", "Otro"};
+        /*String[] opcionesSexo = {"Masculino", "Femenino", "Otro"};
         ArrayAdapter<String> adapterSexo = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
                 opcionesSexo
         );
-        actvSexo.setAdapter(adapterSexo);
+        actvSexo.setAdapter(adapterSexo);*/
 
-        // Configurar opciones para Sede UPN
-        String[] opcionesSede = {
-                "Los Olivos",
-                "Comas",
-                "Breña",
-                "San Juan de Lurigancho",
-                "Chorrillos",
-                "Trujillo",
-                "Cajamarca"
-        };
-        ArrayAdapter<String> adapterSede = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                opcionesSede
-        );
-        actvSede.setAdapter(adapterSede);
+        cargarSedes();
 
         // Acción botón "Listo"
         btnListo.setOnClickListener(v -> {
@@ -87,6 +84,53 @@ public class CrearCuenta extends Fragment {
         });
 
         return rootView;
+    }
+
+    private void cargarSexo() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sexo.php"; // cambia por tu URL
+
+        client.get(url, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                List<String> nombresSexo = new ArrayList<>();
+                Map<String, Integer> sexoMap = new HashMap<>(); // Para guardar id y nombre
+
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject sexo = response.getJSONObject(i);
+                        int id = sexo.getInt("id_sexo");
+                        String nombre = sexo.getString("nom_sexo");
+
+                        nombresSexo.add(nombre);
+                        sexoMap.put(nombre, id);
+                    }
+
+                    ArrayAdapter<String> adapterSexo = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_dropdown_item_1line,
+                            nombresSexo
+                    );
+                    actvSexo.setAdapter(adapterSexo);
+
+                    actvSexo.setOnItemClickListener((parent, view, position, id) -> {
+                        String seleccionado = parent.getItemAtPosition(position).toString();
+                        int idSexo = sexoMap.get(seleccionado);
+                        // Aquí puedes guardar idSede en una variable o enviarlo a tu formulario
+                        Log.d("SEXO", "Seleccionaste: " + seleccionado + " con id: " + idSexo);
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Error al procesar datos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(requireContext(), "Error al cargar sexo", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Método para validar campos
@@ -162,6 +206,54 @@ public class CrearCuenta extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(requireContext(), "No se pudo CrearCuenta", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void cargarSedes() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sedes.php"; // cambia por tu URL
+
+        client.get(url, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                List<String> nombresSede = new ArrayList<>();
+                Map<String, Integer> sedeMap = new HashMap<>(); // Para guardar id y nombre
+
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject sede = response.getJSONObject(i);
+                        int id = sede.getInt("id_sede");
+                        String nombre = sede.getString("nom_sede");
+
+                        nombresSede.add(nombre);
+                        sedeMap.put(nombre, id);
+                    }
+
+                    ArrayAdapter<String> adapterSede = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_dropdown_item_1line,
+                            nombresSede
+                    );
+                    actvSede.setAdapter(adapterSede);
+
+                    // Guardar id_sede al seleccionar
+                    actvSede.setOnItemClickListener((parent, view, position, id) -> {
+                        String seleccionado = parent.getItemAtPosition(position).toString();
+                        int idSede = sedeMap.get(seleccionado);
+                        // Aquí puedes guardar idSede en una variable o enviarlo a tu formulario
+                        Log.d("SEDE", "Seleccionaste: " + seleccionado + " con id: " + idSede);
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Error al procesar datos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(requireContext(), "Error al cargar sedes", Toast.LENGTH_SHORT).show();
             }
         });
     }
