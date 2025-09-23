@@ -41,6 +41,8 @@ public class CrearCuenta extends Fragment {
     private EditText etNumeroCelular;
     private AutoCompleteTextView actvSexo, actvSede;
     private Button btnListo, btnCancelar;
+    private Map<String, Integer> sexoMap = new HashMap<>();
+    private Map<String, Integer> sedeMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,7 +96,6 @@ public class CrearCuenta extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 List<String> nombresSexo = new ArrayList<>();
-                Map<String, Integer> sexoMap = new HashMap<>(); // Para guardar id y nombre
 
                 try {
                     for (int i = 0; i < response.length(); i++) {
@@ -169,8 +170,11 @@ public class CrearCuenta extends Fragment {
         String correo = edtCorreo.getText().toString().trim();
         String contraseña = edtContra.getText().toString().trim();
         String celular = etNumeroCelular.getText().toString().trim();
-        String sexo = actvSexo.getText().toString().trim();
-        String sede = actvSede.getText().toString().trim();
+        String sexoTexto = actvSexo.getText().toString().trim();
+        String sedeTexto = actvSede.getText().toString().trim();
+
+        int sexo = sexoMap.getOrDefault(sexoTexto, -1);
+        int sede = sedeMap.getOrDefault(sedeTexto, -1);
 
         if (!validarCampos()) {
             return;
@@ -198,8 +202,10 @@ public class CrearCuenta extends Fragment {
 
                 // 👉 Si el backend responde con "ok", navega al validar correo
                 if (respuesta.contains("ok")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("correo", correo);
                     NavController navController = Navigation.findNavController(requireView());
-                    navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear);
+                    navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear, bundle);
                 }
             }
 
@@ -218,7 +224,6 @@ public class CrearCuenta extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 List<String> nombresSede = new ArrayList<>();
-                Map<String, Integer> sedeMap = new HashMap<>(); // Para guardar id y nombre
 
                 try {
                     for (int i = 0; i < response.length(); i++) {
