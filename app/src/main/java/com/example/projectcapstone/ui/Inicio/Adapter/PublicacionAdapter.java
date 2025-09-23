@@ -1,13 +1,16 @@
 package com.example.projectcapstone.ui.Inicio.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -19,16 +22,24 @@ import java.util.List;
 public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.ViewHolder> {
     private Context context;
     private List<Publicacion> listaPublicaciones;
-    private OnLikeClickListener listener;
+    private OnLikeClickListener likeListener;
+    private OnReportClickListener reportListener;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
     }
 
-    public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones, OnLikeClickListener listener) {
+    public interface OnReportClickListener {
+        void onReportClicked(Publicacion publicacion);
+    }
+
+    public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
+                              OnLikeClickListener likeListener,
+                              OnReportClickListener reportListener) {
         this.context = context;
         this.listaPublicaciones = listaPublicaciones;
-        this.listener = listener;
+        this.likeListener = likeListener;
+        this.reportListener = reportListener;
     }
 
     @NonNull
@@ -71,10 +82,10 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             holder.ivLike.setImageResource(R.drawable.ic_corazon);
         }
 
-        // Listener del botón like
+        // Listener del botón Me gusta
         holder.ivLike.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onLikeClicked(publicacion, holder.ivLike, holder.tvLikes);
+            if (likeListener != null) {
+                likeListener.onLikeClicked(publicacion, holder.ivLike, holder.tvLikes);
             }
         });
 
@@ -85,8 +96,25 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         holder.ivBookmark.setOnClickListener(v -> {
             // Acción para guardar en favoritos
         });
-    }
 
+        // Listener del botón Mas opciones
+        holder.ivMoreOptions.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(v.getContext(), v);
+            popup.inflate(R.menu.menu_publicacion);
+
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_reportar) {
+                    if (reportListener != null) {
+                        reportListener.onReportClicked(publicacion);
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            popup.show();
+        });
+    }
 
     @Override
     public int getItemCount() {
@@ -112,6 +140,8 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             tvProductTitle = itemView.findViewById(R.id.tvProductTitle);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
+
+
         }
     }
 }
