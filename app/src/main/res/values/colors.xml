@@ -18,6 +18,7 @@
     <!-- Colores para círculos decorativos -->
     <color name="yellow_circle">#FFE4B5</color>
     <color name="orange_circle">#FBAE3C</color>
+    <color name="darker_gray">#757575</color>
 
     <color name="button_orange">#FF9800</color>
     <color name="error_color">#F44336</color>
@@ -26,10 +27,15 @@
     <color name="dialog_background">#FFFFFF</color>
     <color name="circle_background">#FFEBEE</color>
     <color name="circle_green">#01C880</color>
+    <!-- Colores principales del diseño -->
+    <color name="orange_primary">#FF9500</color>
+    <color name="orange_secondary">#FF6B35</color>
+    <color name="orange_light">#FFB366</color>
 
     <color name="success_color">#4CAF50</color> <!-- Verde principal -->
     <color name="circle_success_background">#E8F5E9</color> <!-- Verde clarito de fondo -->
-
+    <color name="light_gray">#F5F5F5</color>
+    <color name="background_overlay">#33FF9500</color>
     <!-- Grises -->
     <color name="gray_light">#F5F5F5</color>
     <color name="gray_medium">#9E9E9E</color>
