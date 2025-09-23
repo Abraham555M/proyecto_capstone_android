@@ -63,8 +63,8 @@
     </fragment>
     <fragment
         android:id="@+id/nav_validar_correo_recuperar"
-        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
-        android:label="fragment_confirmar_correo"
+        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
+        android:label="fragment_validar_correo_recuperar"
         tools:layout="@layout/fragment_validar_correo_recuperar" >
         <action
             android:id="@+id/action_nav_validar_correo_recuperar_to_nav_confirmar_password"
@@ -100,13 +100,14 @@
         tools:layout="@layout/fragment_inicio" />
     <fragment
         android:id="@+id/nav_validar_correo_crear"
-        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
-        android:label="fragment_validar_correo_password"
+        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
+        android:label="fragment_validar_correo_crear"
         tools:layout="@layout/fragment_validar_correo_crear" >
         <action
             android:id="@+id/action_nav_validar_correo_crear_to_nav_inicio"
             app:destination="@id/nav_inicio" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_notificaciones"
         android:name="com.example.projectcapstone.ui.Notificaciones.NotificacionesFragment"
