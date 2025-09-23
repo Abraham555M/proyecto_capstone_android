@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="280dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Contenedor del ícono circular -->
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/circle_background_pink">
+
+            <ImageView
+                android:id="@+id/ivIcon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_warning"
+                app:tint="@color/gray_dark"
+                android:contentDescription="Ícono" />
+
+        </FrameLayout>
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="¿Estás seguro que quieres reportar esta publicación?"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.2" />
+
+        <!-- Mensaje (opcional) -->
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:textColor="@color/gray_dark"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:lineSpacingMultiplier="1.3" />
+
+        <!-- Contenedor de botones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2">
+
+            <!-- Botón positivo (Sí) -->
+            <Button
+                android:id="@+id/btnPositive"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Sí"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:background="@drawable/button_positive_background"
+                android:backgroundTint="@color/red_background"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false" />
+
+            <!-- Botón negativo (No) -->
+            <Button
+                android:id="@+id/btnNegative"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="No"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:background="@drawable/button_negative_background"
+                android:backgroundTint="@color/orange_red"
+                android:elevation="0dp"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
