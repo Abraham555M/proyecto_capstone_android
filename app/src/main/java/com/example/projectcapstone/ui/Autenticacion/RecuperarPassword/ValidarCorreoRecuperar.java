@@ -51,7 +51,6 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
         String url = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_recuperar.php";
         String correo = etCorreoRecuperar.getText().toString().trim();
 
-        // 🔹 Validación de campo vacío
         if (correo.isEmpty()) {
             mostrarAlerta("Campo requerido", "Por favor, ingresa tu correo electrónico.");
             return;
@@ -73,7 +72,7 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
                         mostrarAlertaSucces("Código enviado",
                                 "Hemos enviado un código de verificación a tu correo electrónico.");
 
-                        // Pasar el correo al siguiente fragmento
+                        // ✅ Pasar el correo al siguiente fragmento (Confirmar código)
                         Bundle bundle = new Bundle();
                         bundle.putString("correo", correo);
 

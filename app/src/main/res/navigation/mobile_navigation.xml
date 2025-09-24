@@ -14,11 +14,11 @@
     <fragment
         android:id="@+id/nav_emprendimiento"
         android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoFragment"
-        android:label="Emprendimiento"
+        android:label="@string/menu_emprendimiento"
         tools:layout="@layout/fragment_emprendimiento" >
         <action
-            android:id="@+id/action_nav_emprendimiento_to_nav_emprendimiento_lista"
-            app:destination="@id/nav_emprendimiento_lista" />
+            android:id="@+id/action_nav_emprendimiento_to_nuevoEmprendimientoFragment"
+            app:destination="@id/nuevoEmprendimientoFragment" />
     </fragment>
 
     <fragment
@@ -26,17 +26,21 @@
         android:name="com.example.projectcapstone.ui.Publicaciones.PublicacionesFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_publicaciones" />
+
     <fragment
         android:id="@+id/nav_crear_cuenta"
         android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.CrearCuenta"
-        android:label="CrearCuenta" >
+        android:label="CrearCuenta"
+        tools:layout="@layout/fragment_crear_cuenta" >
+
         <action
-            android:id="@+id/action_nav_crear_cuenta_to_nav_validar_correo_crear"
-            app:destination="@id/nav_validar_correo_crear" />
+                android:id="@+id/action_nav_crear_cuenta_to_nav_validar_correo_crear"
+                app:destination="@id/nav_validar_correo_crear" />
         <action
             android:id="@+id/action_nav_crear_cuenta_to_nav_start_upn"
             app:destination="@id/nav_start_upn" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_inicio_sesion"
         android:name="com.example.projectcapstone.ui.Autenticacion.InicioSesion.InicioSesion"
@@ -52,6 +56,7 @@
             android:id="@+id/action_nav_inicio_sesion_to_nav_start_upn"
             app:destination="@id/nav_start_upn" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_start_upn"
         android:name="com.example.projectcapstone.ui.Autenticacion.InicioSesion.StartUpn"
@@ -64,6 +69,7 @@
             android:id="@+id/action_nav_start_upn_to_nav_inicio_sesion"
             app:destination="@id/nav_inicio_sesion" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_validar_correo_recuperar"
         android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
@@ -75,9 +81,10 @@
         <action
             android:id="@+id/action_nav_validar_correo_recuperar_to_nav_inicio_sesion"
             app:destination="@id/nav_inicio_sesion" />
+
+
     </fragment>
 
-    <!-- Recuperar contraseña - paso 2 -->
     <fragment
         android:id="@+id/nav_confirmar_password"
         android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ConfirmarPassword"
@@ -89,21 +96,13 @@
             app:destination="@id/nav_cambiar_password" />
     </fragment>
 
-    <!-- Recuperar contraseña - paso 3 -->
-    <fragment
-        android:id="@+id/nav_cambiar_password"
-        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.CambiarPassword"
-        android:label="fragment_cambiar_password"
-        tools:layout="@layout/fragment_cambiar_password">
-        <action
-            android:id="@+id/action_nav_cambiar_password_to_nav_inicio_sesion"
-            app:destination="@id/nav_inicio_sesion" />
-    </fragment>
+
     <fragment
         android:id="@+id/nav_inicio"
         android:name="com.example.projectcapstone.ui.Inicio.InicioFragment"
-        android:label="Inicio"
+        android:label="fragment_inicio"
         tools:layout="@layout/fragment_inicio" />
+
     <fragment
         android:id="@+id/nav_validar_correo_crear"
         android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
@@ -140,11 +139,18 @@
         android:label="fragment_soporte"
         tools:layout="@layout/fragment_soporte" />
     <fragment
-        android:id="@+id/nav_emprendimiento_lista"
-        android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoLista"
-        android:label="fragment_emprendimiento_lista"
-        tools:layout="@layout/fragment_emprendimiento_lista" />
+        android:id="@+id/nuevoEmprendimientoFragment"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.NuevoEmprendimientoFragment"
+        android:label="fragment_nuevo_emprendimiento"
+        tools:layout="@layout/fragment_nuevo_emprendimiento" />
+
+    <fragment
+        android:id="@+id/nav_cambiar_password"
+        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.CambiarPassword"
+        android:label="fragment_cambiar_password"
+        tools:layout="@layout/fragment_cambiar_password">
+        <action
+            android:id="@+id/action_nav_cambiar_password_to_nav_inicio_sesion"
+            app:destination="@id/nav_inicio_sesion" />
+    </fragment>
 </navigation>
-
-
-
