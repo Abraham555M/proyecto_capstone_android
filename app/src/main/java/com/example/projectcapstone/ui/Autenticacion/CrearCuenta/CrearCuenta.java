@@ -375,7 +375,7 @@ public class CrearCuenta extends Fragment {
                                 "Este correo ya esta registrado",
                                 false
                         );
-                        Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

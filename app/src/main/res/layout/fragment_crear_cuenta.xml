@@ -36,12 +36,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <!-- Título -->
             <TextView
@@ -49,7 +45,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="80dp"
                 android:layout_marginBottom="40dp"
-                android:lineSpacingExtra="4dp"
                 android:text="Crear\nCuenta"
                 android:textColor="@color/black"
                 android:textSize="32sp"
@@ -57,88 +52,99 @@
 
             <!-- Campo Nombres -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNombres"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Nombres"
+                android:layout_marginBottom="10dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
-                app:hintTextColor="@color/hint_color">
+                app:hintTextColor="#9CA3AF">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtNombres"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nombres"
                     android:inputType="textPersonName"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Apellido Paterno -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilApellidoPaterno"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Apellido Paterno"
+                android:layout_marginBottom="10dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
-                app:hintTextColor="@color/hint_color">
+                app:hintTextColor="#9CA3AF">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtApellidoPaterno"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Apellido Paterno"
                     android:inputType="textPersonName"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Apellido Materno -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilApellidoMaterno"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Apellido Materno"
+                android:layout_marginBottom="10dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
-                app:hintTextColor="@color/hint_color">
+                app:hintTextColor="#9CA3AF">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtApellidoMaterno"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Apellido Materno"
                     android:inputType="textPersonName"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Spinner Sexo -->
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                android:id="@+id/tilSexo"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Sexo"
+                android:layout_marginBottom="10dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
                 app:endIconMode="dropdown_menu">
 
@@ -146,24 +152,25 @@
                     android:id="@+id/actvSexo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Sexo"
-                    android:inputType="none"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Spinner Fecha -->
+            <!-- Spinner Sede -->
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+                android:id="@+id/tilSede"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Sede"
+                android:layout_marginBottom="10dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
                 app:endIconMode="dropdown_menu">
 
@@ -171,58 +178,63 @@
                     android:id="@+id/actvSede"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Sede"
-                    android:inputType="none"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Correo -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCorreo"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Correo"
+                android:layout_marginBottom="10dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
-                app:hintTextColor="@color/hint_color">
+                app:hintTextColor="#9CA3AF">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtCorreo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Correo"
                     android:inputType="textEmailAddress"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Contraseña -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilContrasena"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:boxBackgroundColor="@color/input_background"
-                app:boxBackgroundMode="filled"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
+                android:hint="Contraseña"
+                android:layout_marginBottom="15dp"
+                app:boxBackgroundColor="#F3F4F6"
                 app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxStrokeColor="#E5E7EB"
                 app:boxStrokeWidth="0dp"
                 app:endIconMode="password_toggle"
-                app:hintTextColor="@color/hint_color">
+                app:hintTextColor="#9CA3AF">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtContrasena"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Contraseña"
                     android:inputType="textPassword"
                     android:padding="16dp"
+                    android:textColor="#1F2937"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
