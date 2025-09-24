@@ -4,131 +4,191 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8F9FA"
     tools:context=".ui.Autenticacion.InicioSesion.InicioSesion">
 
-    <!-- Fondo con formas decorativas -->
+    <!-- Formas decorativas de fondo -->
     <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background_shapes" />
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="-50dp"
+        android:layout_marginStart="-50dp"
+        android:background="@drawable/circle_orange" />
+
+    <View
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="80dp"
+        android:layout_marginStart="100dp"
+        android:background="@drawable/circle_yellow_medium" />
+
+    <View
+        android:layout_width="80dp"
+        android:layout_height="75dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="-20dp"
+        android:layout_marginBottom="450dp"
+        android:background="@drawable/bg_mancha" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:layout_height="match_parent">
 
         <!-- Título -->
         <TextView
             android:id="@+id/tvTitulo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Inicio"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="120dp"
+            android:layout_marginEnd="32dp"
+            android:fontFamily="sans-serif-medium"
             android:gravity="start"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="Inicio"
+            android:textColor="#1A1A1A"
+            android:textSize="40sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="80dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Subtítulo -->
         <TextView
             android:id="@+id/tvSubtitulo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Bienvenido! ♥"
-            android:textSize="16sp"
-            android:textColor="@color/gray_dark"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="32dp"
             android:gravity="start"
-            app:layout_constraintTop_toBottomOf="@id/tvTitulo"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="Bienvenido! ♥"
+            android:textColor="#6B7280"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitulo" />
 
-        <!-- Campo correo (MISMO ID) -->
-        <EditText
-            android:id="@+id/etCorreo"
+        <!-- Campo correo -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCorreo"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginEnd="32dp"
             android:hint="Correo"
-            android:inputType="textEmailAddress"
-            android:background="@drawable/edittext_background_modern"
-            android:padding="16dp"
-            android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitulo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:boxBackgroundColor="#F3F4F6"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="#E5E7EB"
+            app:boxStrokeWidth="0dp"
+            app:hintTextColor="#9CA3AF"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="48dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitulo">
 
-        <!-- Campo contraseña (MISMO ID) -->
-        <EditText
-            android:id="@+id/etPassword"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCorreo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:padding="16dp"
+                android:textColor="#1F2937"
+                android:textSize="16sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Campo contraseña -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPassword"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
             android:hint="Contraseña"
-            android:inputType="textPassword"
-            android:background="@drawable/edittext_background_modern"
-            android:padding="16dp"
-            android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/etCorreo"
-            app:layout_constraintStart_toStartOf="parent"
+            app:boxBackgroundColor="#F3F4F6"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="#E5E7EB"
+            app:boxStrokeWidth="0dp"
+            app:hintTextColor="#9CA3AF"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilCorreo"
+            app:passwordToggleEnabled="true"
+            app:passwordToggleTint="#9CA3AF">
 
-        <!-- Olvidé mi contraseña (MISMO ID) -->
-        <com.google.android.material.button.MaterialButton
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:textColor="#1F2937"
+                android:textSize="16sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Olvidé mi contraseña -->
+        <TextView
             android:id="@+id/btnOlvidePassword"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
             android:text="Olvidé mi contraseña"
+            android:textColor="#6B7280"
             android:textSize="14sp"
-            android:textColor="@color/purple_500"
-            app:layout_constraintTop_toBottomOf="@id/etPassword"
-            app:layout_constraintEnd_toEndOf="@id/etPassword"
-            android:layout_marginTop="8dp" />
+            app:layout_constraintEnd_toEndOf="@id/tilPassword"
+            app:layout_constraintTop_toBottomOf="@id/tilPassword" />
 
-        <!-- Botón siguiente (MISMO ID) -->
-        <Button
+        <!-- Botón siguiente -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSiguiente"
             android:layout_width="0dp"
             android:layout_height="56dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="32dp"
+            android:backgroundTint="#FBAE3C"
             android:text="Siguiente"
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:background="@drawable/button_orange_background"
-            android:textColor="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/btnOlvidePassword"
-            app:layout_constraintStart_toStartOf="parent"
+            app:cornerRadius="12dp"
+            app:elevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="40dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnOlvidePassword" />
 
-        <!-- Botón cancelar (MISMO ID) -->
-        <Button
+        <!-- Botón cancelar -->
+        <TextView
             android:id="@+id/btnCancelar"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancelar"
-            android:background="@android:color/transparent"
-            android:textColor="@color/gray_medium"
-            android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/btnSiguiente"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="16dp"
+            android:text="Cancelar"
+            android:textColor="#6B7280"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSiguiente" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

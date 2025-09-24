@@ -17,6 +17,10 @@ import androidx.navigation.Navigation;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -28,8 +32,9 @@ import cz.msebera.android.httpclient.Header;
 import com.example.projectcapstone.R;
 
 public class InicioSesion extends Fragment {
-    EditText etCorreo, etPassword;
-    Button btnSiguiente, btnCancelar, btnOlvidePassword;
+    TextInputEditText etCorreo, etPassword;
+    MaterialButton btnSiguiente;
+    TextView btnOlvidePassword, btnCancelar;
     String URL_LOGIN = "http://10.0.2.2/proyecto_capstone_php/controlador/estudiante/estudiante_login.php";
     @Nullable
     @Override
