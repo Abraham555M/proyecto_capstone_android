@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.projectcapstone.R;
@@ -32,6 +33,7 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
     TextInputEditText etCorreoRecuperar;
     MaterialButton btnEnviarCodigo;
     TextView btnVolver;
+    private View loader;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,10 +43,21 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
         etCorreoRecuperar = rootView.findViewById(R.id.etCorreoRecuperar);
         btnEnviarCodigo = rootView.findViewById(R.id.btnEnviarCodigo);
         btnVolver = rootView.findViewById(R.id.btnVolver);
+        loader = rootView.findViewById(R.id.includeLoader);
 
         btnVolver.setOnClickListener(this);
         btnEnviarCodigo.setOnClickListener(v -> enviarCodigo());
         return rootView;
+    }
+
+    private void showLoader() {
+        loader.setVisibility(View.VISIBLE);
+        btnEnviarCodigo.setEnabled(false);
+    }
+
+    private void hideLoader() {
+        loader.setVisibility(View.GONE);
+        btnEnviarCodigo.setEnabled(true);
     }
 
     private void enviarCodigo() {
@@ -56,6 +69,8 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
             return;
         }
 
+        showLoader();
+
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("accion", "enviar_codigo");
@@ -64,6 +79,8 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                hideLoader();
+
                 try {
                     String response = new String(responseBody);
                     JSONObject json = new JSONObject(response);
@@ -96,6 +113,8 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                hideLoader();
+
                 if (statusCode == 0) {
                     mostrarAlertaPersonalizada("Sin conexión",
                             "No se pudo conectar con el servidor. Revisa tu conexión a Internet.", false);
@@ -106,7 +125,6 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
             }
         });
     }
-
 
     private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
