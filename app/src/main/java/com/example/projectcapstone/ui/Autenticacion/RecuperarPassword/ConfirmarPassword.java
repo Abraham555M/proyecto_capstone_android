@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -156,12 +157,12 @@ public class ConfirmarPassword extends Fragment {
         String codigo = etCodigo.getText().toString().trim();
 
         if (codigo.isEmpty()) {
-            mostrarAlerta("Error", "Debes ingresar el código recibido");
+            mostrarAlertaPersonalizada("Error", "Debes ingresar el código recibido",false);
             return;
         }
 
         if (codigo.length() != 4) {
-            mostrarAlerta("Error", "El código debe tener 4 dígitos");
+            mostrarAlertaPersonalizada("Error", "El código debe tener 4 dígitos",false);
             return;
         }
 
@@ -183,7 +184,7 @@ public class ConfirmarPassword extends Fragment {
                     JSONObject json = new JSONObject(response);
 
                     if (json.getString("status").equals("success")) {
-                        mostrarAlerta("Éxito", "Código validado correctamente");
+                        mostrarAlertaPersonalizada("Éxito", "Código validado correctamente",true);
 
                         // ✅ Pasar correo al siguiente paso (cambiar contraseña)
                         Bundle bundle = new Bundle();
@@ -193,12 +194,12 @@ public class ConfirmarPassword extends Fragment {
                         navController.navigate(R.id.action_nav_confirmar_password_to_nav_cambiar_password, bundle);
 
                     } else {
-                        mostrarAlerta("Error", json.getString("message"));
+                        mostrarAlertaPersonalizada("Error", json.getString("message"),false);
                         limpiarCodigo();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    mostrarAlerta("Error", "Error al procesar respuesta");
+                    mostrarAlertaPersonalizada("Error", "Error al procesar respuesta",false);
                     limpiarCodigo();
                 } finally {
                     restaurarBoton();
@@ -207,7 +208,7 @@ public class ConfirmarPassword extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                mostrarAlerta("Error", "No se pudo conectar con el servidor");
+                mostrarAlertaPersonalizada("Error", "No se pudo conectar con el servidor",false);
                 limpiarCodigo();
                 restaurarBoton();
             }
@@ -250,11 +251,43 @@ public class ConfirmarPassword extends Fragment {
         return censored + "@" + domain;
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle(titulo)
-                .setMessage(mensaje)
-                .setPositiveButton("Aceptar", null)
-                .show();
+    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView;
+
+        if (esPositivo) {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+        } else {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+        }
+
+        TextView tvTitulo, tvMensaje;
+        Button btnAceptar;
+
+        if (esPositivo) {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+        } else {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+        }
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 }

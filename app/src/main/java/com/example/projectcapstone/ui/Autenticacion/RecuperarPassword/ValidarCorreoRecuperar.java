@@ -52,7 +52,7 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
         String correo = etCorreoRecuperar.getText().toString().trim();
 
         if (correo.isEmpty()) {
-            mostrarAlerta("Campo requerido", "Por favor, ingresa tu correo electrónico.");
+            mostrarAlertaPersonalizada("Campo requerido", "Por favor, ingresa tu correo electrónico.", false);
             return;
         }
 
@@ -69,8 +69,8 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
                     JSONObject json = new JSONObject(response);
 
                     if (json.getString("status").equals("success")) {
-                        mostrarAlertaSucces("Código enviado",
-                                "Hemos enviado un código de verificación a tu correo electrónico.");
+                        mostrarAlertaPersonalizada("Código enviado",
+                                "Hemos enviado un código de verificación a tu correo electrónico.", true);
 
                         // ✅ Pasar el correo al siguiente fragmento (Confirmar código)
                         Bundle bundle = new Bundle();
@@ -83,36 +83,53 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
                         );
 
                     } else {
-                        mostrarAlerta("No encontrado",
-                                "El correo ingresado no está registrado en el sistema.");
+                        mostrarAlertaPersonalizada("No encontrado",
+                                "El correo ingresado no está registrado en el sistema.", false);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    mostrarAlerta("Error inesperado",
-                            "Ocurrió un problema al procesar la respuesta. Intenta nuevamente.");
+                    mostrarAlertaPersonalizada("Error inesperado",
+                            "Ocurrió un problema al procesar la respuesta. Intenta nuevamente.", false);
+
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 if (statusCode == 0) {
-                    mostrarAlerta("Sin conexión",
-                            "No se pudo conectar con el servidor. Revisa tu conexión a Internet.");
+                    mostrarAlertaPersonalizada("Sin conexión",
+                            "No se pudo conectar con el servidor. Revisa tu conexión a Internet.", false);
                 } else {
-                    mostrarAlerta("Error de servidor",
-                            "Hubo un problema al procesar tu solicitud. Código de error: " + statusCode);
+                    mostrarAlertaPersonalizada("Error de servidor",
+                            "Hubo un problema al procesar tu solicitud. Código de error: " + statusCode, false);
                 }
             }
         });
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-        View dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
 
-        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
-        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
-        Button btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView;
+
+        if (esPositivo) {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+        } else {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+        }
+
+        TextView tvTitulo, tvMensaje;
+        Button btnAceptar;
+
+        if (esPositivo) {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+        } else {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+        }
 
         tvTitulo.setText(titulo);
         tvMensaje.setText(mensaje);
@@ -123,36 +140,11 @@ public class ValidarCorreoRecuperar extends Fragment implements View.OnClickList
                 .create();
 
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
 
         btnAceptar.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-    }
-
-    private void mostrarAlertaSucces(String titulo, String mensaje) {
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-        View dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
-
-        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
-        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
-        Button btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
-
-        tvTitulo.setText(titulo);
-        tvMensaje.setText(mensaje);
-
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setView(dialogView)
-                .setCancelable(false)
-                .create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-        }
-
-        btnAceptar.setOnClickListener(v -> dialog.dismiss());
-
         dialog.show();
     }
 

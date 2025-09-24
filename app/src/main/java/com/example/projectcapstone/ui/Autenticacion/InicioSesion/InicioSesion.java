@@ -16,7 +16,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
@@ -32,7 +31,8 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 import com.example.projectcapstone.R;
 
-public class InicioSesion extends Fragment implements View.OnClickListener{
+public class InicioSesion extends Fragment implements View.OnClickListener {
+
     TextInputEditText etCorreo, etPassword;
     MaterialButton btnSiguiente;
     TextView btnOlvidePassword, btnCancelar;
@@ -49,7 +49,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener{
         btnCancelar = rootView.findViewById(R.id.btnCancelar);
         btnOlvidePassword = rootView.findViewById(R.id.btnOlvidePassword);
 
-         btnCancelar.setOnClickListener(this);
+        btnCancelar.setOnClickListener(this);
 
         btnSiguiente.setOnClickListener(v -> iniciarSesion());
 
@@ -57,6 +57,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener{
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_nav_inicio_sesion_to_nav_validar_correo_recuperar);
         });
+
         return rootView;
     }
 
@@ -68,7 +69,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener{
 
         // Validaciones previas
         if (correo.isEmpty() || password.isEmpty()) {
-            mostrarAlerta("Campos incompletos", "Por favor, ingresa tu correo y contraseña.");
+            mostrarAlertaPersonalizada("Campos incompletos",
+                    "Por favor, ingresa tu correo y contraseña.", false);
             return;
         }
 
@@ -100,30 +102,44 @@ public class InicioSesion extends Fragment implements View.OnClickListener{
                         NavController navController = Navigation.findNavController(requireView());
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_inicio);
 
+                        // Opcional: mostrar mensaje positivo
+                        mostrarAlertaPersonalizada("Bienvenido", "Inicio de sesión exitoso", true);
+
                     } else {
                         // Mensaje de error enviado desde el servidor
-                        mostrarAlerta("Acceso denegado", "El correo no se encuentra registrado");
+                        mostrarAlertaPersonalizada("Acceso denegado",
+                                "El correo no se encuentra registrado", false);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    mostrarAlerta("Error inesperado", "Ocurrió un problema al procesar la respuesta del servidor. Intenta nuevamente.");
+                    mostrarAlertaPersonalizada("Error inesperado",
+                            "Ocurrió un problema al procesar la respuesta del servidor. Intenta nuevamente.", false);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 if (statusCode == 0) {
-                    mostrarAlerta("Sin conexión", "No se pudo conectar con el servidor. Revisa tu conexión a Internet.");
+                    mostrarAlertaPersonalizada("Sin conexión",
+                            "No se pudo conectar con el servidor. Revisa tu conexión a Internet.", false);
                 } else {
-                    mostrarAlerta("Error de servidor", "Hubo un problema al intentar iniciar sesión. Código: " + statusCode);
+                    mostrarAlertaPersonalizada("Error de servidor",
+                            "Hubo un problema al intentar iniciar sesión. Código: " + statusCode, false);
                 }
             }
         });
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
+    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        View dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+        View dialogView;
+
+        // Elegimos el layout según el tipo de alerta
+        if (esPositivo) {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+        } else {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+        }
 
         TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
         TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
@@ -137,9 +153,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener{
                 .setCancelable(false)
                 .create();
 
-        // Fondo transparente (para que se respete el CardView con esquinas redondeadas)
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
 
         btnAceptar.setOnClickListener(v -> dialog.dismiss());
@@ -149,7 +165,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        if(v == btnCancelar){
+        if (v == btnCancelar) {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_nav_inicio_sesion_to_nav_start_upn);
         }

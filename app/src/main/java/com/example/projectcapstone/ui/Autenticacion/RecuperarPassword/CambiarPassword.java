@@ -55,12 +55,21 @@ public class CambiarPassword extends Fragment {
         String pass2 = etRepetirPassword.getText().toString().trim();
 
         if (pass1.isEmpty() || pass2.isEmpty()) {
-            mostrarAlerta("Error", "Debes ingresar ambas contraseñas");
+            mostrarAlertaPersonalizada("Error", "Debes ingresar ambas contraseñas", false);
             return;
         }
 
         if (!pass1.equals(pass2)) {
-            mostrarAlerta("Error", "Las contraseñas no coinciden");
+            mostrarAlertaPersonalizada("Error", "Las contraseñas no coinciden", false);
+            return;
+        }
+
+        // ✅ Validación de contraseña: 1 mayúscula, 1 número y 1 carácter especial
+        String passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).+$";
+        if (!pass1.matches(passwordPattern)) {
+            mostrarAlertaPersonalizada("Error",
+                    "La contraseña debe contener al menos una letra mayúscula, un número y un carácter especial (@#$%^&+=!)",
+                    false);
             return;
         }
 
@@ -78,33 +87,65 @@ public class CambiarPassword extends Fragment {
                     JSONObject json = new JSONObject(response);
 
                     if (json.getString("status").equals("success")) {
-                        mostrarAlerta("Éxito", "Tu contraseña ha sido cambiada");
+                        mostrarAlertaPersonalizada("Éxito", "Tu contraseña ha sido cambiada", true);
 
-                        // ✅ Regresar al inicio de sesión
                         NavController navController = Navigation.findNavController(requireView());
                         navController.navigate(R.id.nav_inicio_sesion);
 
                     } else {
-                        mostrarAlerta("Error", json.getString("message"));
+                        mostrarAlertaPersonalizada("Error", json.getString("message"), false);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    mostrarAlerta("Error", "Error al procesar respuesta");
+                    mostrarAlertaPersonalizada("Error", "Error al procesar respuesta", false);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                mostrarAlerta("Error", "No se pudo conectar con el servidor");
+                mostrarAlertaPersonalizada("Error", "No se pudo conectar con el servidor", false);
             }
         });
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle(titulo)
-                .setMessage(mensaje)
-                .setPositiveButton("Aceptar", null)
-                .show();
+    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView;
+
+        if (esPositivo) {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+        } else {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+        }
+
+        TextView tvTitulo, tvMensaje;
+        Button btnAceptar;
+
+        if (esPositivo) {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+        } else {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+        }
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 }
+
