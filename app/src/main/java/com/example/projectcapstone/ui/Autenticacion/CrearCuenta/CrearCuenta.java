@@ -1,5 +1,6 @@
 package com.example.projectcapstone.ui.Autenticacion.CrearCuenta;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projectcapstone.R;
@@ -79,11 +81,10 @@ public class CrearCuenta extends Fragment {
             }
         });*/
 
-        // Acción botón "Listo"
         btnListo.setOnClickListener(v -> {
             if (validarCampos()) {
-                // Enviar solo correo para generar el código
-                enviarCodigoVerificacion();
+                String correo = edtCorreo.getText().toString().trim();
+                verificarCorreo(correo);
             }
         });
 
@@ -166,6 +167,16 @@ public class CrearCuenta extends Fragment {
         }
         if (edtContra.getText().toString().trim().isEmpty()) {
             edtContra.setError("Ingrese su contraseña");
+            return false;
+        }
+        String pass1 = edtContra.getText().toString().trim();
+        String passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).+$";
+        if (!pass1.matches(passwordPattern)) {
+            mostrarAlertaPersonalizada(
+                    "Error",
+                    "La contraseña debe contener al menos una letra mayúscula, un número y un carácter especial (@#$%^&+=!)",
+                    false
+            );
             return false;
         }
 
@@ -339,5 +350,82 @@ public class CrearCuenta extends Fragment {
                 Toast.makeText(requireContext(), "Fallo en el envío del código", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void verificarCorreo(String correo){
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/verificar_correo.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("correo", correo);
+
+        client.post(url, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    boolean success = response.getBoolean("success");
+                    String mensaje = response.getString("mensaje");
+
+                    if (success) {
+                        enviarCodigoVerificacion();
+                    } else {
+                        // Ya existe, mostramos error
+                        mostrarAlertaPersonalizada(
+                                "Error",
+                                "Este correo ya esta registrado",
+                                false
+                        );
+                        Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(getContext(), "Error en el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView;
+
+        if (esPositivo) {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+        } else {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+        }
+
+        TextView tvTitulo, tvMensaje;
+        Button btnAceptar;
+
+        if (esPositivo) {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+        } else {
+            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+        }
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
 }

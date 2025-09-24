@@ -54,7 +54,7 @@ public class ValidarCorreoCrear extends Fragment {
        int sede = getArguments().getInt("sede");         // <- usar getInt()
        String contraseña = getArguments().getString("contraseña");
 
-       Toast.makeText(getContext(), "Código enviado: " + codigoEnviado, Toast.LENGTH_SHORT).show();
+       Toast.makeText(getContext(), "Código enviado:", Toast.LENGTH_SHORT).show();
 
        // Mover cursor automáticamente al siguiente campo
        setupOtpInputs();
@@ -174,8 +174,6 @@ public class ValidarCorreoCrear extends Fragment {
 
     private void verificarCodigo(String codigo, String codigoEnviado, String nombres, String apePat, String apeMat, String celular, int sexo, int sede, String contraseña, String correo) {
 
-       Toast.makeText(getContext(), "Código enviado: " + codigoEnviado + "Código ingresado: " + codigo, Toast.LENGTH_SHORT).show();
-
         if(codigo.equals(codigoEnviado)) {
             // Código correcto, crear cuenta
             // Inflar tu layout personalizado
@@ -232,7 +230,6 @@ public class ValidarCorreoCrear extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String respuesta = new String(responseBody);
-                Toast.makeText(requireContext(), "Respuesta: " + respuesta, Toast.LENGTH_LONG).show();
 
                 // 👉 Si el backend responde con "ok", navega al validar correo
                 if (respuesta.contains("ok")) {
