@@ -108,7 +108,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     } else {
                         // Mensaje de error enviado desde el servidor
                         mostrarAlertaPersonalizada("Acceso denegado",
-                                "El correo no se encuentra registrado", false);
+                                "Correo o contraseña incorrectos. Inténtalo nuevamente.", false);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -134,16 +134,21 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View dialogView;
 
-        // Elegimos el layout según el tipo de alerta
+        TextView tvTitulo;
+        TextView tvMensaje;
+        Button btnAceptar;
+
         if (esPositivo) {
             dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
         } else {
             dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
         }
-
-        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
-        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
-        Button btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
 
         tvTitulo.setText(titulo);
         tvMensaje.setText(mensaje);
