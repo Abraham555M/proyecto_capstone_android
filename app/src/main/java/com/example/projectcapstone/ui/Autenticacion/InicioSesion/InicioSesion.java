@@ -36,6 +36,7 @@ public class InicioSesion extends Fragment {
     MaterialButton btnSiguiente;
     TextView btnOlvidePassword, btnCancelar;
     String URL_LOGIN = "http://10.0.2.2/proyecto_capstone_php/controlador/estudiante/estudiante_login.php";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,7 +110,6 @@ public class InicioSesion extends Fragment {
             }
         });
     }
-
 
     private void mostrarAlerta(String titulo, String mensaje) {
         new AlertDialog.Builder(requireContext())

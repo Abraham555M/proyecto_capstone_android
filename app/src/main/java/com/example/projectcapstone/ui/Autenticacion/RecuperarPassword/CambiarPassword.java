@@ -13,9 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -26,8 +29,9 @@ import cz.msebera.android.httpclient.Header;
 
 
 public class CambiarPassword extends Fragment {
-    EditText etNuevaPassword, etRepetirPassword;
-    Button btnCambiarPassword;
+    TextInputEditText etNuevaPassword, etRepetirPassword;
+    MaterialButton btnCambiarPassword;
+    TextView btnCancelarPass;
     String correo; // recibido desde ConfirmarCambioPassword
 
     String URL_RECUPERAR = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_recuperar.php";
