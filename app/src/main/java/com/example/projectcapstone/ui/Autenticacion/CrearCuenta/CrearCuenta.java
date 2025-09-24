@@ -73,9 +73,17 @@ public class CrearCuenta extends Fragment {
         cargarSedes();
 
         // Acción botón "Listo"
-        btnListo.setOnClickListener(v -> {
+        /*btnListo.setOnClickListener(v -> {
             if (validarCampos()) {
                 crearCuenta();
+            }
+        });*/
+
+        // Acción botón "Listo"
+        btnListo.setOnClickListener(v -> {
+            if (validarCampos()) {
+                // Enviar solo correo para generar el código
+                enviarCodigoVerificacion();
             }
         });
 
@@ -158,6 +166,15 @@ public class CrearCuenta extends Fragment {
         }
         if (edtContra.getText().toString().trim().isEmpty()) {
             edtContra.setError("Ingrese su contraseña");
+            return false;
+        }
+
+        String celular = etNumeroCelular.getText().toString().trim();
+        if (celular.isEmpty()) {
+            etNumeroCelular.setError("Ingrese su número de celular");
+            return false;
+        } else if (!celular.matches("^9\\d{8}$")) {
+            etNumeroCelular.setError("El número debe iniciar con 9 y tener 9 dígitos");
             return false;
         }
         if (actvSexo.getText().toString().trim().isEmpty()) {
@@ -267,6 +284,59 @@ public class CrearCuenta extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Toast.makeText(requireContext(), "Error al cargar sedes", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void enviarCodigoVerificacion() {
+        String correo = edtCorreo.getText().toString().trim();
+        String nombres = edtNombres.getText().toString().trim();
+
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/enviar_codigo.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("correo", correo);
+        params.put("nombres", nombres);
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuestaStr = new String(responseBody);
+
+                    // Parsear JSON
+                    JSONObject respuestaJson = new JSONObject(respuestaStr);
+
+                    if (respuestaJson.getString("status").equalsIgnoreCase("ok")) {
+                        String codigo = respuestaJson.getString("codigo"); // <-- Guardamos el código
+
+                        // Enviar TODOS los datos en el bundle para luego crear la cuenta
+                        Bundle bundle = new Bundle();
+                        bundle.putString("nombres", edtNombres.getText().toString().trim());
+                        bundle.putString("apePat", edtApellidoPaterno.getText().toString().trim());
+                        bundle.putString("apeMat", edtApellidoMaterno.getText().toString().trim());
+                        bundle.putString("correo", edtCorreo.getText().toString().trim());
+                        bundle.putString("contrasena", edtContra.getText().toString().trim());
+                        bundle.putString("celular", etNumeroCelular.getText().toString().trim());
+                        bundle.putInt("sexo", sexoMap.get(actvSexo.getText().toString().trim()));
+                        bundle.putInt("sede", sedeMap.get(actvSede.getText().toString().trim()));
+                        bundle.putString("codigo", codigo);
+
+                        NavController navController = Navigation.findNavController(requireView());
+                        navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear, bundle);
+                    } else {
+                        Toast.makeText(requireContext(), "Error al enviar código", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(), "Fallo en el envío del código", Toast.LENGTH_SHORT).show();
             }
         });
     }

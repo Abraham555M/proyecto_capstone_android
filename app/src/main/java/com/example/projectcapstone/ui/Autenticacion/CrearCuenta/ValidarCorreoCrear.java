@@ -45,6 +45,16 @@ public class ValidarCorreoCrear extends Fragment {
        tvCancelar = rootView.findViewById(R.id.tvCancelar);
 
        String correo = getArguments().getString("correo");
+       String codigoEnviado = getArguments().getString("codigo");
+       String nombres = getArguments().getString("nombres");
+       String apePat = getArguments().getString("apePat");
+       String apeMat = getArguments().getString("apeMat");
+       String celular = getArguments().getString("celular");
+       int sexo = getArguments().getInt("sexo");         // <- usar getInt()
+       int sede = getArguments().getInt("sede");         // <- usar getInt()
+       String contraseña = getArguments().getString("contraseña");
+
+       Toast.makeText(getContext(), "Código enviado: " + codigoEnviado, Toast.LENGTH_SHORT).show();
 
        // Mover cursor automáticamente al siguiente campo
        setupOtpInputs();
@@ -57,8 +67,7 @@ public class ValidarCorreoCrear extends Fragment {
                    etDigit4.getText().toString();
 
            if (codigo.length() == 4) {
-               // Aquí validas el código con tu backend
-               validarCodigoEnServidor(correo, codigo);
+               verificarCodigo(codigo, codigoEnviado, nombres, apePat, apeMat, celular, sexo, sede, contraseña, correo);
            } else {
                Toast.makeText(getContext(), "Debes ingresar los 4 dígitos", Toast.LENGTH_SHORT).show();
            }
@@ -161,5 +170,81 @@ public class ValidarCorreoCrear extends Fragment {
                 nextView.requestFocus();
             }
         }
+    }
+
+    private void verificarCodigo(String codigo, String codigoEnviado, String nombres, String apePat, String apeMat, String celular, int sexo, int sede, String contraseña, String correo) {
+
+       Toast.makeText(getContext(), "Código enviado: " + codigoEnviado + "Código ingresado: " + codigo, Toast.LENGTH_SHORT).show();
+
+        if(codigo.equals(codigoEnviado)) {
+            // Código correcto, crear cuenta
+            // Inflar tu layout personalizado
+            LayoutInflater inflater = LayoutInflater.from(requireContext());
+            View dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+
+            // Referencias a los elementos del layout
+            TextView tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+
+            // Cambiar dinámicamente título y mensaje
+            tvTitulo.setText("Validación Exitosa");
+            tvMensaje.setText("Tu cuenta fue activada correctamente 🎉");
+
+            // Crear el diálogo
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setView(dialogView);
+
+            // Evitar que se cierre tocando afuera
+            AlertDialog alertDialog = builder.create();
+            alertDialog.setCancelable(false);
+
+            // Acción del botón
+            btnAceptar.setOnClickListener(v -> {
+                alertDialog.dismiss();
+                crearCuenta(nombres, apePat, apeMat, celular, sexo, sede, contraseña, correo, codigo);
+            });
+
+            // Mostrar el diálogo
+            alertDialog.show();
+        } else {
+            Toast.makeText(requireContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void crearCuenta(String nombres, String apePat, String apeMat, String celular, int sexo, int sede, String contraseña, String correo, String codigo) {
+        // URL de tu backend (PHP o API)
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/crear_cuenta.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("nombres", nombres);
+        params.put("apePat", apePat);
+        params.put("apeMat", apeMat);
+        params.put("correo", correo);
+        params.put("contrasena", contraseña);
+        params.put("celular", celular);
+        params.put("sexo", sexo);
+        params.put("sede", sede);
+        params.put("codigo", codigo);
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String respuesta = new String(responseBody);
+                Toast.makeText(requireContext(), "Respuesta: " + respuesta, Toast.LENGTH_LONG).show();
+
+                // 👉 Si el backend responde con "ok", navega al validar correo
+                if (respuesta.contains("ok")) {
+                    NavController navController = Navigation.findNavController(requireView());
+                    navController.navigate(R.id.action_nav_validar_correo_crear_to_nav_inicio);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(), "No se pudo CrearCuenta", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
