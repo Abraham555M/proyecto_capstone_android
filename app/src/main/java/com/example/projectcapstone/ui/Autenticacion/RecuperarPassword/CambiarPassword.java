@@ -27,13 +27,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 
-
 public class CambiarPassword extends Fragment {
     TextInputEditText etNuevaPassword, etRepetirPassword;
     MaterialButton btnCambiarPassword;
-    TextView btnCancelarPass;
-    String correo; // recibido desde ConfirmarCambioPassword
-
+    String correo;
     String URL_RECUPERAR = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_recuperar.php";
 
     @Nullable

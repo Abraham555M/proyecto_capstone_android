@@ -28,11 +28,10 @@ import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
-public class ValidarCorreoRecuperar extends Fragment {
+public class ValidarCorreoRecuperar extends Fragment implements View.OnClickListener{
     TextInputEditText etCorreoRecuperar;
     MaterialButton btnEnviarCodigo;
     TextView btnVolver;
-    String URL_RECUPERAR = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_recuperar.php";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,16 +40,20 @@ public class ValidarCorreoRecuperar extends Fragment {
 
         etCorreoRecuperar = rootView.findViewById(R.id.etCorreoRecuperar);
         btnEnviarCodigo = rootView.findViewById(R.id.btnEnviarCodigo);
+        btnVolver = rootView.findViewById(R.id.btnVolver);
 
+        btnVolver.setOnClickListener(this);
         btnEnviarCodigo.setOnClickListener(v -> enviarCodigo());
         return rootView;
     }
 
     private void enviarCodigo() {
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_recuperar.php";
         String correo = etCorreoRecuperar.getText().toString().trim();
 
+        // 🔹 Validación de campo vacío
         if (correo.isEmpty()) {
-            mostrarAlerta("Error", "Debes ingresar tu correo");
+            mostrarAlerta("Campo requerido", "Por favor, ingresa tu correo electrónico.");
             return;
         }
 
@@ -59,7 +62,7 @@ public class ValidarCorreoRecuperar extends Fragment {
         params.put("accion", "enviar_codigo");
         params.put("ema_estudiante", correo);
 
-        client.post(URL_RECUPERAR, params, new AsyncHttpResponseHandler() {
+        client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
@@ -67,36 +70,98 @@ public class ValidarCorreoRecuperar extends Fragment {
                     JSONObject json = new JSONObject(response);
 
                     if (json.getString("status").equals("success")) {
-                        mostrarAlerta("Éxito", "Se envió un código a tu correo");
+                        mostrarAlertaSucces("Código enviado",
+                                "Hemos enviado un código de verificación a tu correo electrónico.");
 
-                        // ✅ Pasar el correo al siguiente fragmento (Confirmar código)
+                        // Pasar el correo al siguiente fragmento
                         Bundle bundle = new Bundle();
                         bundle.putString("correo", correo);
 
                         NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_nav_validar_correo_recuperar_to_nav_confirmar_password, bundle);
+                        navController.navigate(
+                                R.id.action_nav_validar_correo_recuperar_to_nav_confirmar_password,
+                                bundle
+                        );
 
                     } else {
-                        mostrarAlerta("Error", json.getString("message"));
+                        mostrarAlerta("No encontrado",
+                                "El correo ingresado no está registrado en el sistema.");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    mostrarAlerta("Error", "Error al procesar respuesta");
+                    mostrarAlerta("Error inesperado",
+                            "Ocurrió un problema al procesar la respuesta. Intenta nuevamente.");
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                mostrarAlerta("Error", "No se pudo conectar con el servidor");
+                if (statusCode == 0) {
+                    mostrarAlerta("Sin conexión",
+                            "No se pudo conectar con el servidor. Revisa tu conexión a Internet.");
+                } else {
+                    mostrarAlerta("Error de servidor",
+                            "Hubo un problema al procesar tu solicitud. Código de error: " + statusCode);
+                }
             }
         });
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle(titulo)
-                .setMessage(mensaje)
-                .setPositiveButton("Aceptar", null)
-                .show();
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+        Button btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void mostrarAlertaSucces(String titulo, String mensaje) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+        Button btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == btnVolver){
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_validar_correo_recuperar_to_nav_inicio_sesion);
+        }
     }
 }

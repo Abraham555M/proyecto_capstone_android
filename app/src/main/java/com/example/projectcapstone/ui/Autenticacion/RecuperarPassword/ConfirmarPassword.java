@@ -44,7 +44,7 @@ public class ConfirmarPassword extends Fragment {
 
     // Botones
     private MaterialButton btnValidarCodigo;
-    private TextView btnCancelarCodigo, btnReenviarCodigo;
+    private TextView btnCancelarCodigo;
 
     // Variables
     private String correo;
@@ -80,7 +80,6 @@ public class ConfirmarPassword extends Fragment {
         tvEmail = rootView.findViewById(R.id.tvEmail);
         btnValidarCodigo = rootView.findViewById(R.id.btnValidarCodigo);
         btnCancelarCodigo = rootView.findViewById(R.id.btnCancelarCodigo);
-        btnReenviarCodigo = rootView.findViewById(R.id.btnReenviarCodigo);
     }
 
     private void configurarCorreo() {
@@ -134,10 +133,6 @@ public class ConfirmarPassword extends Fragment {
                 NavController navController = Navigation.findNavController(requireView());
                 navController.popBackStack();
             });
-        }
-
-        if (btnReenviarCodigo != null) {
-            btnReenviarCodigo.setOnClickListener(v -> reenviarCodigo());
         }
     }
 
@@ -215,48 +210,6 @@ public class ConfirmarPassword extends Fragment {
                 mostrarAlerta("Error", "No se pudo conectar con el servidor");
                 limpiarCodigo();
                 restaurarBoton();
-            }
-        });
-    }
-
-    private void reenviarCodigo() {
-        if (correo == null) return;
-
-        btnReenviarCodigo.setEnabled(false);
-        btnReenviarCodigo.setText("Reenviando...");
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        RequestParams params = new RequestParams();
-        params.put("accion", "reenviar_codigo");
-        params.put("ema_estudiante", correo);
-
-        client.post(URL_RECUPERAR, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    String response = new String(responseBody);
-                    JSONObject json = new JSONObject(response);
-
-                    if (json.getString("status").equals("success")) {
-                        mostrarAlerta("Éxito", "Código reenviado correctamente");
-                        limpiarCodigo();
-                    } else {
-                        mostrarAlerta("Error", json.getString("message"));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    mostrarAlerta("Error", "Error al procesar respuesta");
-                } finally {
-                    btnReenviarCodigo.setEnabled(true);
-                    btnReenviarCodigo.setText("Reenviar código");
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                mostrarAlerta("Error", "No se pudo conectar con el servidor");
-                btnReenviarCodigo.setEnabled(true);
-                btnReenviarCodigo.setText("Reenviar código");
             }
         });
     }

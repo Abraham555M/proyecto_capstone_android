@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
@@ -31,11 +32,10 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 import com.example.projectcapstone.R;
 
-public class InicioSesion extends Fragment {
+public class InicioSesion extends Fragment implements View.OnClickListener{
     TextInputEditText etCorreo, etPassword;
     MaterialButton btnSiguiente;
     TextView btnOlvidePassword, btnCancelar;
-    String URL_LOGIN = "http://10.0.2.2/proyecto_capstone_php/controlador/estudiante/estudiante_login.php";
 
     @Nullable
     @Override
@@ -48,8 +48,11 @@ public class InicioSesion extends Fragment {
         btnSiguiente = rootView.findViewById(R.id.btnSiguiente);
         btnCancelar = rootView.findViewById(R.id.btnCancelar);
         btnOlvidePassword = rootView.findViewById(R.id.btnOlvidePassword);
+
+         btnCancelar.setOnClickListener(this);
+
         btnSiguiente.setOnClickListener(v -> iniciarSesion());
-        btnCancelar.setOnClickListener(v -> requireActivity().finish());
+
         btnOlvidePassword.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_nav_inicio_sesion_to_nav_validar_correo_recuperar);
@@ -58,11 +61,14 @@ public class InicioSesion extends Fragment {
     }
 
     private void iniciarSesion() {
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_login.php";
+
         String correo = etCorreo.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
+        // Validaciones previas
         if (correo.isEmpty() || password.isEmpty()) {
-            mostrarAlerta("Error", "Debes ingresar todos los campos");
+            mostrarAlerta("Campos incompletos", "Por favor, ingresa tu correo y contraseña.");
             return;
         }
 
@@ -71,7 +77,7 @@ public class InicioSesion extends Fragment {
         params.put("ema_estudiante", correo);
         params.put("pas_estudiante", password);
 
-        client.post(URL_LOGIN, params, new AsyncHttpResponseHandler() {
+        client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
@@ -90,32 +96,62 @@ public class InicioSesion extends Fragment {
                         editor.putInt("tipo_usuario", user.getInt("tipo_usuario"));
                         editor.apply();
 
-                        // Navegamos al home (ajusta el id al de tu nav_graph.xml)
+                        // Navegamos al home
                         NavController navController = Navigation.findNavController(requireView());
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_inicio);
 
-
                     } else {
-                        mostrarAlerta("Error", json.getString("message"));
+                        // Mensaje de error enviado desde el servidor
+                        mostrarAlerta("Acceso denegado", "El correo no se encuentra registrado");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    mostrarAlerta("Error", "Error al procesar respuesta");
+                    mostrarAlerta("Error inesperado", "Ocurrió un problema al procesar la respuesta del servidor. Intenta nuevamente.");
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                mostrarAlerta("Error", "No se pudo conectar con el servidor");
+                if (statusCode == 0) {
+                    mostrarAlerta("Sin conexión", "No se pudo conectar con el servidor. Revisa tu conexión a Internet.");
+                } else {
+                    mostrarAlerta("Error de servidor", "Hubo un problema al intentar iniciar sesión. Código: " + statusCode);
+                }
             }
         });
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {
-        new AlertDialog.Builder(requireContext())
-                .setTitle(titulo)
-                .setMessage(mensaje)
-                .setPositiveButton("Aceptar", null)
-                .show();
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+        Button btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Fondo transparente (para que se respete el CardView con esquinas redondeadas)
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == btnCancelar){
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_inicio_sesion_to_nav_start_upn);
+        }
     }
 }

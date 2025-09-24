@@ -48,6 +48,9 @@
         <action
             android:id="@+id/action_nav_inicio_sesion_to_nav_validar_correo_recuperar"
             app:destination="@id/nav_validar_correo_recuperar" />
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_start_upn"
+            app:destination="@id/nav_start_upn" />
     </fragment>
     <fragment
         android:id="@+id/nav_start_upn"
@@ -69,6 +72,9 @@
         <action
             android:id="@+id/action_nav_validar_correo_recuperar_to_nav_confirmar_password"
             app:destination="@id/nav_confirmar_password" />
+        <action
+            android:id="@+id/action_nav_validar_correo_recuperar_to_nav_inicio_sesion"
+            app:destination="@id/nav_inicio_sesion" />
     </fragment>
 
     <!-- Recuperar contraseña - paso 2 -->
