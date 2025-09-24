@@ -140,12 +140,20 @@ public class CrearCuenta extends Fragment {
             edtNombres.setError("Ingrese su nombre");
             return false;
         }
+
         if (edtApellidoPaterno.getText().toString().trim().isEmpty()) {
             edtApellidoPaterno.setError("Ingrese su apellido paterno");
             return false;
         }
-        if (edtCorreo.getText().toString().trim().isEmpty()) {
+
+        String correo = edtCorreo.getText().toString().trim();
+        String regex = "^[A-Za-z0-9._%+-]+@upn\\.pe$";
+
+        if (correo.isEmpty()) {
             edtCorreo.setError("Ingrese su correo");
+            return false;
+        } else if (!correo.matches(regex)) {
+            edtCorreo.setError("Ingrese un correo válido con dominio @upn.pe");
             return false;
         }
         if (edtContra.getText().toString().trim().isEmpty()) {
@@ -157,7 +165,7 @@ public class CrearCuenta extends Fragment {
             return false;
         }
         if (actvSede.getText().toString().trim().isEmpty()) {
-            actvSede.setError("Seleccione su fecha");
+            actvSede.setError("Seleccione su sede");
             return false;
         }
         return true;

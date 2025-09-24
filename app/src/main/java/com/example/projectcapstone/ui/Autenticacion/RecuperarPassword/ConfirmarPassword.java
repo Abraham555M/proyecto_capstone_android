@@ -77,8 +77,8 @@ public class ConfirmarPassword extends Fragment {
                         Bundle bundle = new Bundle();
                         bundle.putString("correo", correo);
 
-                        NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_nav_confirmar_password_to_nav_cambiar_password, bundle);
+                        /*NavController navController = Navigation.findNavController(requireView());
+                        navController.navigate(R.id.action_nav_confirmar_password_to_nav_cambiar_password, bundle);*/
 
                     } else {
                         mostrarAlerta("Error", json.getString("message"));

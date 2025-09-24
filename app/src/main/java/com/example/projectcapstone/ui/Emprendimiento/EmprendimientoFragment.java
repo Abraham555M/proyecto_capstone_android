@@ -29,8 +29,8 @@ public class EmprendimientoFragment extends Fragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         if(v == btnMisEmprendimientos){
-            NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
-            navController.navigate(R.id.action_nav_emprendimiento_to_nav_emprendimiento_lista);
+            /*NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.action_nav_emprendimiento_to_nav_emprendimiento_lista);*/
         }
     }
 }
