@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <!-- Nombre de la categoría -->
+    <TextView
+        android:id="@+id/txt_category_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Categoría"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- RecyclerView hijo con publicaciones -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_posts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_post_perfil" />
+
+</LinearLayout>

@@ -59,7 +59,9 @@ public class MainActivity extends AppCompatActivity {
                     destination.getId() == R.id.nav_validar_correo_crear ||
                     destination.getId() == R.id.nav_start_upn ||
                     destination.getId() == R.id.nav_confirmar_password ||
-                    destination.getId() == R.id.nav_validar_correo_recuperar) {
+                    destination.getId() == R.id.nav_validar_correo_recuperar ||
+                    destination.getId() == R.id.nav_cambiar_password) {
+
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // Desactiva swipe
                 binding.appBarMain.fab.setVisibility(View.GONE); //Quitar el flotante
@@ -69,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
                 binding.appBarMain.fab.setVisibility(View.VISIBLE); // Reactivar el flotante
             }
         });
-
-
     }
 
     @Override

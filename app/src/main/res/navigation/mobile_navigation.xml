@@ -126,7 +126,7 @@
     <fragment
         android:id="@+id/nav_perfil"
         android:name="com.example.projectcapstone.ui.Perfil.PerfilFragment"
-        android:label="fragment_perfil"
+        android:label="Mi perfil"
         tools:layout="@layout/fragment_perfil" />
     <fragment
         android:id="@+id/nav_colaboraciones"
