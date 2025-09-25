@@ -4,5 +4,7 @@
     <item
         android:id="@+id/action_reportar"
         android:title="Reportar" />
-
+    <item
+        android:id="@+id/action_solicitud"
+        android:title="Colaborar" />
 </menu>

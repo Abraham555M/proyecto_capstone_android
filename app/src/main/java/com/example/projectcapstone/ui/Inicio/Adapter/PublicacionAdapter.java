@@ -24,6 +24,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     private List<Publicacion> listaPublicaciones;
     private OnLikeClickListener likeListener;
     private OnReportClickListener reportListener;
+    private OnSolicitudClickListener solicitudListener;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
@@ -32,14 +33,19 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public interface OnReportClickListener {
         void onReportClicked(Publicacion publicacion);
     }
+    public interface OnSolicitudClickListener {
+        void onSolicitudClicked(Publicacion publicacion);
+    }
 
     public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
                               OnLikeClickListener likeListener,
-                              OnReportClickListener reportListener) {
+                              OnReportClickListener reportListener,
+                              OnSolicitudClickListener solicitudListener) {
         this.context = context;
         this.listaPublicaciones = listaPublicaciones;
         this.likeListener = likeListener;
         this.reportListener = reportListener;
+        this.solicitudListener = solicitudListener;
     }
 
     @NonNull
@@ -106,6 +112,11 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
                 if (item.getItemId() == R.id.action_reportar) {
                     if (reportListener != null) {
                         reportListener.onReportClicked(publicacion);
+                    }
+                    return true;
+                } else if (item.getItemId() == R.id.action_solicitud) {
+                    if (solicitudListener != null) {
+                        solicitudListener.onSolicitudClicked(publicacion);
                     }
                     return true;
                 }

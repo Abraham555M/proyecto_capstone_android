@@ -24,10 +24,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingVertical="4dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:paddingVertical="4dp">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="40dp"
@@ -55,13 +52,19 @@
                 android:textColor="@color/gray_dark"
                 tools:text="Nombre emprendimiento" />
 
-            <ImageView
-                android:id="@+id/ivMoreOptions"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_opciones"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="4dp" />
+            <!-- Botón toggle de seguir -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFollow"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="Seguir"
+                android:textSize="10sp"
+                android:paddingHorizontal="12dp"
+                app:cornerRadius="16dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/gray_light"
+                android:textColor="@color/gray_dark" />
         </LinearLayout>
 
         <!-- Imagen del producto principal -->
@@ -105,6 +108,16 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:src="@drawable/ic_comentario"
+                android:layout_marginEnd="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp" />
+
+            <!-- More Options movido aquí -->
+            <ImageView
+                android:id="@+id/ivMoreOptions"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_opciones"
                 android:layout_marginEnd="12dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp" />

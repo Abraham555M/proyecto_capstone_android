@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.PublicacionAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.TipoReporteAdapter;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -63,15 +65,29 @@ public class InicioFragment extends Fragment {
         // Configuración vertical de publicaciones
         rvPublicaciones.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         publicacionAdapter = new PublicacionAdapter(
-                getContext(),
+                requireContext(),
                 listaPublicacion,
                 (publicacion, ivLike, tvLikes) -> {
-                    registrarLike(publicacion.getIdPublicacion(), 1, publicacion, ivLike, tvLikes);
+                    registrarLike(
+                            publicacion.getIdPublicacion(),
+                            1, // ID del estudiante logueado, cámbialo según tu sesión
+                            publicacion,
+                            ivLike,
+                            tvLikes
+                    );
                 },
-                (publicacion) -> { // 👈 Aquí capturas el evento "Reportar"
-                    mostrarDialogoReportar(getContext(), publicacion.getIdPublicacion());
+                publicacion -> {
+                    // lógica de reportar
+                    mostrarDialogoReportar(requireContext(), publicacion.getIdPublicacion());
+                },
+                publicacion -> {
+                    // 👇 aquí abres tu diálogo de solicitud
+                    mostrarDialogoSolicitud(requireContext(),
+                            1,  // lo tomas de tu sesión/logged user
+                            publicacion.getIdPublicacion()); // asegúrate de que sea el id correcto
                 }
         );
+
         rvPublicaciones.setAdapter(publicacionAdapter);
 
         cargarCategorias();
@@ -277,6 +293,30 @@ public class InicioFragment extends Fragment {
         });
     }
 
+    private void registrarSolicitud(Context context, int idEstudiante, int idPublicacion, String mensaje, AlertDialog dialog) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+        params.put("menSolicitud", mensaje);
+
+        String url = ServidorConfig.URL_SERVIDOR + "solicitud/solicitud_registrar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                dialog.dismiss();
+                Toast.makeText(context, "Solicitud enviada con éxito", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(context, "Error al enviar solicitud", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     private void mostrarDialogoExito(String titulo, String mensaje) {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_res_positiva, null);
 
@@ -298,6 +338,36 @@ public class InicioFragment extends Fragment {
 
         // Acción del botón
         btnAceptar.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    private void mostrarDialogoSolicitud(Context context, int idEstudiante, int idPublicacion) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_solicitud_colaboracion, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Referencias a las vistas
+        TextInputEditText etMensaje = dialogView.findViewById(R.id.etMensajeSolicitud);
+        MaterialButton btnEnviar = dialogView.findViewById(R.id.btnEnviar);
+        ImageButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
+        // Acción botón cerrar
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+        // Acción enviar
+        btnEnviar.setOnClickListener(v -> {
+            String mensaje = etMensaje.getText().toString().trim();
+            if (mensaje.isEmpty()) {
+                Toast.makeText(context, "Por favor ingresa un mensaje", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            registrarSolicitud(context, idEstudiante, idPublicacion, mensaje, dialog);
+        });
     }
 
     private void mostrarDialogoReportar(Context context, int idPublicacion) {

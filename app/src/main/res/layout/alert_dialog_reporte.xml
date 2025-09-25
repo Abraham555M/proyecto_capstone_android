@@ -58,7 +58,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:text="¿Por qué estás reportando este comentario?"
+            android:text="¿Por qué estás reportando esta publicación?"
             android:textColor="@color/secondary_text_color"
             android:textSize="14sp"
             android:fontFamily="sans-serif"/>
