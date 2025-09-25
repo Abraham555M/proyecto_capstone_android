@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ public class CrearCuenta extends Fragment {
     private Button btnListo, btnCancelar;
     private Map<String, Integer> sexoMap = new HashMap<>();
     private Map<String, Integer> sedeMap = new HashMap<>();
+    private FrameLayout loaderContainer; // 👈 Agregar esta variable
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +63,7 @@ public class CrearCuenta extends Fragment {
         actvSede = rootView.findViewById(R.id.actvSede);
         btnListo = rootView.findViewById(R.id.btnListo);
         btnCancelar = rootView.findViewById(R.id.btnCancelar);
+        loaderContainer = rootView.findViewById(R.id.loaderContainer);
 
         cargarSexo();
         // Configurar opciones para Sexo
@@ -199,6 +202,8 @@ public class CrearCuenta extends Fragment {
         return true;
     }
 
+
+
     private void crearCuenta() {
         String nombres = edtNombres.getText().toString().trim();
         String apePat = edtApellidoPaterno.getText().toString().trim();
@@ -252,6 +257,7 @@ public class CrearCuenta extends Fragment {
         });
     }
 
+
     private void cargarSedes() {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sedes.php"; // cambia por tu URL
@@ -299,7 +305,20 @@ public class CrearCuenta extends Fragment {
         });
     }
 
+    private void mostrarLoader() {
+        if (loaderContainer != null) {
+            loaderContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void ocultarLoader() {
+        if (loaderContainer != null) {
+            loaderContainer.setVisibility(View.GONE);
+        }
+    }
+
     private void enviarCodigoVerificacion() {
+        mostrarLoader();
         String correo = edtCorreo.getText().toString().trim();
         String nombres = edtNombres.getText().toString().trim();
 
@@ -313,6 +332,7 @@ public class CrearCuenta extends Fragment {
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                ocultarLoader();
                 try {
                     String respuestaStr = new String(responseBody);
 
@@ -347,12 +367,14 @@ public class CrearCuenta extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                ocultarLoader();
                 Toast.makeText(requireContext(), "Fallo en el envío del código", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void verificarCorreo(String correo){
+        mostrarLoader();
         String url = ServidorConfig.URL_SERVIDOR + "estudiante/verificar_correo.php";
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -362,6 +384,7 @@ public class CrearCuenta extends Fragment {
         client.post(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                ocultarLoader();
                 try {
                     boolean success = response.getBoolean("success");
                     String mensaje = response.getString("mensaje");
@@ -384,11 +407,12 @@ public class CrearCuenta extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                ocultarLoader();
                 Toast.makeText(getContext(), "Error en el servidor", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
+
     private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View dialogView;
