@@ -321,6 +321,7 @@ public class CrearCuenta extends Fragment {
 
                     if (respuestaJson.getString("status").equalsIgnoreCase("ok")) {
                         String codigo = respuestaJson.getString("codigo"); // <-- Guardamos el código
+                        String expira = respuestaJson.getString("expira");
 
                         // Enviar TODOS los datos en el bundle para luego crear la cuenta
                         Bundle bundle = new Bundle();
@@ -333,6 +334,7 @@ public class CrearCuenta extends Fragment {
                         bundle.putInt("sexo", sexoMap.get(actvSexo.getText().toString().trim()));
                         bundle.putInt("sede", sedeMap.get(actvSede.getText().toString().trim()));
                         bundle.putString("codigo", codigo);
+                        bundle.putString("expira", expira);
 
                         NavController navController = Navigation.findNavController(requireView());
                         navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear, bundle);
