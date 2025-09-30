@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -149,33 +150,6 @@ public class InicioFragment extends Fragment {
         });
     }
 
-    private void mostrarDialogoComentarios(Context context, int idPublicacion) {
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_comentarios, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
-        // Referencias a vistas
-        RecyclerView recyclerComments = dialogView.findViewById(R.id.recycler_comments);
-        LinearLayout layoutEmpty = dialogView.findViewById(R.id.layout_empty_state);
-        ImageView btnClose = dialogView.findViewById(R.id.btn_close);
-
-        // Configuración del RecyclerView
-        recyclerComments.setLayoutManager(new LinearLayoutManager(context));
-        List<Comentario> listaComentarios = new ArrayList<>();
-        ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
-        recyclerComments.setAdapter(comentarioAdapter);
-
-        // Botón cerrar
-        btnClose.setOnClickListener(v -> dialog.dismiss());
-
-        // Cargar comentarios del backend
-        cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
-
-        dialog.show();
-    }
 
     private void cargarCategorias() {
         String url = ServidorConfig.URL_SERVIDOR + "categoria/categoria_listar.php";
@@ -247,6 +221,40 @@ public class InicioFragment extends Fragment {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void registrarComentario(Integer idPublicacion, int idEstudiante, String conComentario) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+        params.put("conComentario", conComentario);
+
+        String url = ServidorConfig.URL_SERVIDOR + "comentario/comentario_registrar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    if (json.getString("status").equals("success")) {
+                        Toast.makeText(getContext(), "Comentario agregado", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -468,6 +476,50 @@ public class InicioFragment extends Fragment {
 
             registrarSolicitud(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
         });
+    }
+
+    private void mostrarDialogoComentarios(Context context, int idPublicacion) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_comentarios, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Referencias a vistas
+        RecyclerView recyclerComments = dialogView.findViewById(R.id.recycler_comments);
+        LinearLayout layoutEmpty = dialogView.findViewById(R.id.layout_empty_state);
+        ImageView btnClose = dialogView.findViewById(R.id.btn_close);
+        ImageView btnEnviarComentario = dialogView.findViewById(R.id.btnEnviarComentario);
+        EditText etComentario = dialogView.findViewById(R.id.etComentario);
+
+
+        // Configuración del RecyclerView
+        recyclerComments.setLayoutManager(new LinearLayoutManager(context));
+        List<Comentario> listaComentarios = new ArrayList<>();
+        ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
+        recyclerComments.setAdapter(comentarioAdapter);
+
+        // Botón cerrar
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Cargar comentarios del backend
+        cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
+
+        btnEnviarComentario.setOnClickListener(v -> {
+            String textoComentario = etComentario.getText().toString().trim();
+            if (!textoComentario.isEmpty()) {
+                registrarComentario(idPublicacion, 1, textoComentario); // 1 = ID de estudiante logueado
+                etComentario.setText(""); // limpiar input
+
+                // recargar comentarios
+                cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
+            } else {
+                Toast.makeText(context, "Escribe un comentario primero", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
     }
 
     private void mostrarDialogoReportar(Context context, int idPublicacion) {

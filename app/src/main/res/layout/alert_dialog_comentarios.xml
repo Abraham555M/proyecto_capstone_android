@@ -109,7 +109,7 @@
 
             <!-- EditText -->
             <EditText
-                android:id="@+id/edit_comment"
+                android:id="@+id/etComentario"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -128,7 +128,7 @@
 
             <!-- Send Button -->
             <ImageView
-                android:id="@+id/btn_send"
+                android:id="@+id/btnEnviarComentario"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:src="@drawable/ic_enviar"
