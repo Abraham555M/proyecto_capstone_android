@@ -5,12 +5,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -25,6 +26,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     private OnLikeClickListener likeListener;
     private OnReportClickListener reportListener;
     private OnSolicitudClickListener solicitudListener;
+    private OnCommentClickListener commentListener;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
@@ -33,19 +35,26 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public interface OnReportClickListener {
         void onReportClicked(Publicacion publicacion);
     }
+
     public interface OnSolicitudClickListener {
         void onSolicitudClicked(Publicacion publicacion);
+    }
+
+    public interface OnCommentClickListener {
+        void onCommentClicked(Publicacion publicacion);
     }
 
     public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
                               OnLikeClickListener likeListener,
                               OnReportClickListener reportListener,
-                              OnSolicitudClickListener solicitudListener) {
+                              OnSolicitudClickListener solicitudListener,
+                              OnCommentClickListener commentListener) {
         this.context = context;
         this.listaPublicaciones = listaPublicaciones;
         this.likeListener = likeListener;
         this.reportListener = reportListener;
         this.solicitudListener = solicitudListener;
+        this.commentListener = commentListener;
     }
 
     @NonNull
@@ -95,15 +104,19 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             }
         });
 
+        // 🚨 AlertDialog al presionar comentar
         holder.ivComment.setOnClickListener(v -> {
-            // Acción para comentar
+            if (commentListener != null) {
+                commentListener.onCommentClicked(publicacion);
+            }
         });
+
 
         holder.ivBookmark.setOnClickListener(v -> {
             // Acción para guardar en favoritos
         });
 
-        // Listener del botón Mas opciones
+        // Listener del botón Más opciones
         holder.ivMoreOptions.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
             popup.inflate(R.menu.menu_publicacion);
@@ -151,8 +164,6 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             tvProductTitle = itemView.findViewById(R.id.tvProductTitle);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
-
-
         }
     }
 }

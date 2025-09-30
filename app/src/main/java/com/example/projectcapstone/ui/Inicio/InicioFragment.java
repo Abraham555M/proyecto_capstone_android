@@ -15,15 +15,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.Categoria;
+import com.example.projectcapstone.ui.Clases.Comentario;
 import com.example.projectcapstone.ui.Clases.Publicacion;
 import com.example.projectcapstone.ui.Clases.TipoReporte;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
+import com.example.projectcapstone.ui.Inicio.Adapter.ComentarioAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.PublicacionAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.TipoReporteAdapter;
 import com.google.android.material.button.MaterialButton;
@@ -86,6 +89,10 @@ public class InicioFragment extends Fragment {
                             1,  // lo tomas de tu sesión/logged user
                             publicacion.getIdPublicacion(),
                             publicacion.getIdEmprendimiento()); // asegúrate de que sea el id correcto
+                },
+                publicacion -> {
+                    // 👉 abrir diálogo de comentarios
+                    mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion());
                 }
         );
 
@@ -95,6 +102,79 @@ public class InicioFragment extends Fragment {
         cargarPublicaciones(1);
 
         return rootView;
+    }
+
+
+    private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments) {
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaComentarios.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int idComentario = obj.getInt("id_comentario");
+                        String conComentario = obj.getString("con_comentario");
+                        String fchComentario = obj.getString("fch_comentario");
+                        String nomEstudiante = obj.getString("estudiante");
+
+                        listaComentarios.add(new Comentario(idComentario, conComentario, fchComentario, nomEstudiante));
+                    }
+
+                    if (listaComentarios.isEmpty()) {
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                        recyclerComments.setVisibility(View.GONE);
+                    } else {
+                        layoutEmpty.setVisibility(View.GONE);
+                        recyclerComments.setVisibility(View.VISIBLE);
+                    }
+
+                    comentarioAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void mostrarDialogoComentarios(Context context, int idPublicacion) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_comentarios, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Referencias a vistas
+        RecyclerView recyclerComments = dialogView.findViewById(R.id.recycler_comments);
+        LinearLayout layoutEmpty = dialogView.findViewById(R.id.layout_empty_state);
+        ImageView btnClose = dialogView.findViewById(R.id.btn_close);
+
+        // Configuración del RecyclerView
+        recyclerComments.setLayoutManager(new LinearLayoutManager(context));
+        List<Comentario> listaComentarios = new ArrayList<>();
+        ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
+        recyclerComments.setAdapter(comentarioAdapter);
+
+        // Botón cerrar
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Cargar comentarios del backend
+        cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
+
+        dialog.show();
     }
 
     private void cargarCategorias() {

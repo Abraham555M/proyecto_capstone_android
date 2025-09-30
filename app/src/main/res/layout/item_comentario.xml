@@ -7,50 +7,62 @@
     android:padding="12dp"
     android:background="?android:attr/selectableItemBackground">
 
-    <!-- User Avatar -->
+    <!-- Avatar del usuario -->
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_comment_avatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:src="@drawable/ic_user_avatar"
-        app:tint="@color/black"
-        app:civ_border_width="1dp"
-        app:civ_border_color="#33FFFFFF"
-        android:layout_marginEnd="12dp" />
+        app:civ_border_width="2dp"
+        app:civ_border_color="@color/purple_200"
+        android:layout_marginEnd="10dp" />
 
-    <!-- Comment Content -->
+    <!-- Contenedor del comentario -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <!-- Username and Comment Text -->
+        <!-- Nombre del estudiante -->
+        <TextView
+            android:id="@+id/text_comment_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="usuario_ejemplo"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <!-- Contenido del comentario -->
         <TextView
             android:id="@+id/text_comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:layout_marginTop="2dp"
+            android:text="Este es un comentario de ejemplo para tu diseño."
+            android:textColor="#DDDDDD"
             android:textSize="14sp"
-            android:lineSpacingMultiplier="1.2"
-            android:text="usuario_ejemplo Esta es una publicación increíble, me encanta el diseño y los colores que usaste. ¡Excelente trabajo!" />
+            android:lineSpacingMultiplier="1.2" />
 
-        <!-- Time and Actions -->
+        <!-- Fecha y acciones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:gravity="center_vertical">
 
+            <!-- Fecha -->
             <TextView
                 android:id="@+id/text_comment_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2h"
+                android:text="Hace 2h"
                 android:textSize="12sp"
                 android:textColor="#999999" />
 
+            <!-- Botón responder -->
             <TextView
                 android:id="@+id/text_reply"
                 android:layout_width="wrap_content"
@@ -58,17 +70,18 @@
                 android:layout_marginStart="16dp"
                 android:text="Responder"
                 android:textSize="12sp"
-                android:textColor="#999999"
+                android:textColor="@color/purple_200"
+                android:textStyle="bold"
                 android:background="?android:attr/selectableItemBackground"
-                android:padding="4dp"
-                android:textStyle="bold" />
+                android:padding="4dp" />
 
+            <!-- Separador flexible -->
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <!-- Like Button and Count -->
+            <!-- Like -->
             <LinearLayout
                 android:id="@+id/layout_like"
                 android:layout_width="wrap_content"
@@ -80,8 +93,8 @@
 
                 <ImageView
                     android:id="@+id/img_like"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_corazon"
                     app:tint="#999999" />
 
@@ -96,38 +109,6 @@
                     android:visibility="gone" />
 
             </LinearLayout>
-
         </LinearLayout>
-
-        <!-- Replies Indicator -->
-        <LinearLayout
-            android:id="@+id/layout_replies"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:visibility="gone"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="4dp">
-
-            <View
-                android:layout_width="24dp"
-                android:layout_height="1dp"
-                android:background="#333333" />
-
-            <TextView
-                android:id="@+id/text_view_replies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Ver 3 respuestas"
-                android:textSize="12sp"
-                android:textColor="#999999"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
     </LinearLayout>
-
 </LinearLayout>

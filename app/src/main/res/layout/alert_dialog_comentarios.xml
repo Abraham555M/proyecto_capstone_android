@@ -1,161 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/dialog_background"
-    android:padding="0dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    android:backgroundTint="@android:color/transparent"
+    android:layout_margin="16dp">
 
-    <!-- Header -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="20dp"
-        android:background="@drawable/header_background">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Comentarios"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:gravity="center" />
-
-        <ImageView
-            android:id="@+id/btn_close"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_close"
-            app:tint="#FFFFFF"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:padding="4dp" />
-
-    </LinearLayout>
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#33FFFFFF" />
-
-    <!-- Comments RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_comments"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:maxHeight="400dp"
-        android:padding="16dp"
-        android:clipToPadding="false"
-        android:scrollbars="none"
-        android:overScrollMode="never" />
-
-    <!-- Empty State -->
-    <LinearLayout
-        android:id="@+id/layout_empty_state"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        android:padding="32dp">
-
-        <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:src="@drawable/ic_comentario"
-            app:tint="#666666" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Aún no hay comentarios"
-            android:textSize="16sp"
-            android:textColor="#999999"
-            android:gravity="center" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Sé el primero en comentar"
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:gravity="center" />
-
-    </LinearLayout>
-
-    <!-- Input Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical"
-        android:background="@drawable/input_section_background">
+        android:orientation="vertical"
+        android:background="@drawable/rounded_background"
+        android:padding="0dp">
 
-        <!-- User Avatar -->
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_user_avatar"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_user_avatar"
-            app:civ_border_width="1dp"
-            app:civ_border_color="#33FFFFFF" />
-
-        <!-- Input Container -->
+        <!-- Header -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:background="#FF3797F0">
 
-            <EditText
-                android:id="@+id/edit_comment"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp"
-                android:maxHeight="120dp"
-                android:background="@drawable/edit_text_background"
-                android:hint="Agrega un comentario..."
-                android:textColorHint="#666666"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:padding="12dp"
-                android:inputType="textMultiLine|textCapSentences"
-                android:maxLines="4"
-                android:scrollbars="vertical"
-                android:gravity="top" />
-
-        </LinearLayout>
-
-        <!-- Send Button -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/btn_send"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#FF3797F0"
-            app:cardElevation="0dp"
-            android:foreground="?android:attr/selectableItemBackground">
+                android:layout_weight="1"
+                android:text="Comentarios"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_comentario"
-                app:tint="#FFFFFF" />
+                android:id="@+id/btn_close"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_close"
+                app:tint="#FFFFFF"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:padding="4dp" />
+        </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_comments"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            tools:listitem="@layout/item_comentario" />
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/layout_empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="32dp">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_comentario"
+                app:tint="#666666" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Aún no hay comentarios"
+                android:textSize="16sp"
+                android:textColor="#999999"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sé el primero en comentar"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- Input Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <!-- Avatar -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/img_user_avatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_user_avatar"
+                app:civ_border_width="1dp"
+                app:civ_border_color="#33FFFFFF" />
+
+            <!-- EditText -->
+            <EditText
+                android:id="@+id/edit_comment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:minHeight="40dp"
+                android:background="@drawable/edit_text_background"
+                android:hint="Agrega un comentario..."
+                android:textColorHint="#999999"
+                android:textColor="#FFFFFF"
+                android:padding="10dp"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLines="3"
+                android:gravity="top"
+                android:scrollbars="vertical" />
+
+            <!-- Send Button -->
+            <ImageView
+                android:id="@+id/btn_send"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_enviar"
+                android:background="@drawable/circle_accent_background"
+                android:padding="8dp"
+                app:tint="#FFFFFF" />
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.cardview.widget.CardView>
