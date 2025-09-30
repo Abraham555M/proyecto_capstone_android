@@ -2,6 +2,7 @@ package com.example.projectcapstone.ui.Clases;
 
 public class Publicacion {
     private Integer idPublicacion;
+    private Integer idEmprendimiento;
     private String nomEmprendimiento;
     private String imgEmprendimiento;
     private String titPublicacion;
@@ -10,10 +11,11 @@ public class Publicacion {
     private Integer totalInteracciones;
     private Integer dioLike; // 1 si dio like, 0 si no
 
-    public Publicacion(Integer idPublicacion, String nomEmprendimiento, String imgEmprendimiento,
+    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
                        String titPublicacion, String conPublicacion, String imgPublicacion,
                        Integer totalInteracciones, Integer dioLike) {
         this.idPublicacion = idPublicacion;
+        this.idEmprendimiento = idEmprendimiento;
         this.nomEmprendimiento = nomEmprendimiento;
         this.imgEmprendimiento = imgEmprendimiento;
         this.titPublicacion = titPublicacion;
@@ -21,6 +23,14 @@ public class Publicacion {
         this.imgPublicacion = imgPublicacion;
         this.totalInteracciones = totalInteracciones;
         this.dioLike = dioLike;
+    }
+
+    public Integer getIdEmprendimiento() {
+        return idEmprendimiento;
+    }
+
+    public void setIdEmprendimiento(Integer idEmprendimiento) {
+        this.idEmprendimiento = idEmprendimiento;
     }
 
     public Integer getDioLike() {

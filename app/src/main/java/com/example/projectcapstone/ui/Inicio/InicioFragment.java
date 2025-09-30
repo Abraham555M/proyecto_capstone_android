@@ -84,7 +84,8 @@ public class InicioFragment extends Fragment {
                     // 👇 aquí abres tu diálogo de solicitud
                     mostrarDialogoSolicitud(requireContext(),
                             1,  // lo tomas de tu sesión/logged user
-                            publicacion.getIdPublicacion()); // asegúrate de que sea el id correcto
+                            publicacion.getIdPublicacion(),
+                            publicacion.getIdEmprendimiento()); // asegúrate de que sea el id correcto
                 }
         );
 
@@ -145,6 +146,7 @@ public class InicioFragment extends Fragment {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         int idPublicacion = obj.getInt("id_publicacion");
+                        int idEmprendimiento = obj.getInt("id_emprendimiento");
                         String nomEmprendimiento = obj.getString("nom_emprendimiento");
                         String imgEmprendimiento = obj.getString("img_per_emprendimiento");
                         String titPublicacion = obj.getString("tit_publicacion");
@@ -153,7 +155,7 @@ public class InicioFragment extends Fragment {
                         Integer totalInteracciones = obj.getInt("total_me_gusta");
                         int dioLike = obj.getInt("dio_like");
 
-                        listaPublicacion.add(new Publicacion(idPublicacion, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike));
+                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike));
                     }
                     publicacionAdapter.notifyDataSetChanged();
 
@@ -293,29 +295,47 @@ public class InicioFragment extends Fragment {
         });
     }
 
-    private void registrarSolicitud(Context context, int idEstudiante, int idPublicacion, String mensaje, AlertDialog dialog) {
+    private void registrarSolicitud(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento, String mensaje, AlertDialog dialog) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("idEstudiante", idEstudiante);
         params.put("idPublicacion", idPublicacion);
+        params.put("idEmprendimiento", idEmprendimiento);
         params.put("menSolicitud", mensaje);
 
-        String url = ServidorConfig.URL_SERVIDOR + "solicitud/solicitud_registrar.php";
+        String url = ServidorConfig.URL_SERVIDOR + "solicitud/solicitud_registrar_colaboracion.php";
 
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 dialog.dismiss();
-                Toast.makeText(context, "Solicitud enviada con éxito", Toast.LENGTH_SHORT).show();
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    String status = json.optString("status");
+
+                    if ("success".equals(status)) {
+                        // Mensaje personalizado de éxito
+                        mostrarDialogoExito(
+                                "Solicitud enviada",
+                                "Tu solicitud ha sido enviada correctamente. El emprendedor recibirá tu mensaje y podrá contactarse contigo."
+                        );
+                    } else {
+                        String msg = json.has("message") ? json.getString("message") : "Error desconocido";
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(context, "Error al enviar solicitud", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
 
     private void mostrarDialogoExito(String titulo, String mensaje) {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_res_positiva, null);
@@ -340,7 +360,7 @@ public class InicioFragment extends Fragment {
         btnAceptar.setOnClickListener(v -> dialog.dismiss());
     }
 
-    private void mostrarDialogoSolicitud(Context context, int idEstudiante, int idPublicacion) {
+    private void mostrarDialogoSolicitud(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_solicitud_colaboracion, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -366,7 +386,7 @@ public class InicioFragment extends Fragment {
                 return;
             }
 
-            registrarSolicitud(context, idEstudiante, idPublicacion, mensaje, dialog);
+            registrarSolicitud(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
         });
     }
 
@@ -390,8 +410,9 @@ public class InicioFragment extends Fragment {
 
         // Adapter con callback de selección
         tipoReporteAdapter = new TipoReporteAdapter(listaTipoReporte, tipo -> {
-            registrarReporte(idPublicacion, tipo.getIdTipoReporte());
-            dialog.dismiss();
+            // 👉 en vez de registrar directamente, mostramos confirmación
+            mostrarDialogoConfirmar(context, idPublicacion, tipo.getIdTipoReporte());
+            dialog.dismiss(); // cerramos el dialogo de opciones
         });
 
         rvReportOptions.setAdapter(tipoReporteAdapter);
@@ -399,4 +420,33 @@ public class InicioFragment extends Fragment {
         // Cargar opciones desde el backend
         cargarTiposReporte(context);
     }
+
+    private void mostrarDialogoConfirmar(Context context, int idPublicacion, int idTipoReporte) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_opciones, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Referencias a vistas
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btnNo);
+        MaterialButton btnSi = dialogView.findViewById(R.id.btnSi);
+
+        // Personalizar título
+        tvTitulo.setText("¿Seguro que deseas reportar esta publicación?");
+
+        // Botón No → cerrar
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        // Botón Sí → confirmar acción
+        btnSi.setOnClickListener(v -> {
+            registrarReporte(idPublicacion, idTipoReporte);
+            dialog.dismiss();
+        });
+    }
+
 }
