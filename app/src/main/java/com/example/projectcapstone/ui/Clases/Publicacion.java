@@ -10,10 +10,9 @@ public class Publicacion {
     private String imgPublicacion;
     private Integer totalInteracciones;
     private Integer dioLike; // 1 si dio like, 0 si no
+    private Integer dioSeguimiento;
 
-    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
-                       String titPublicacion, String conPublicacion, String imgPublicacion,
-                       Integer totalInteracciones, Integer dioLike) {
+    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento, String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones, Integer dioLike, Integer dioSeguimiento) {
         this.idPublicacion = idPublicacion;
         this.idEmprendimiento = idEmprendimiento;
         this.nomEmprendimiento = nomEmprendimiento;
@@ -23,6 +22,15 @@ public class Publicacion {
         this.imgPublicacion = imgPublicacion;
         this.totalInteracciones = totalInteracciones;
         this.dioLike = dioLike;
+        this.dioSeguimiento = dioSeguimiento;
+    }
+
+    public Integer getDioSeguimiento() {
+        return dioSeguimiento;
+    }
+
+    public void setDioSeguimiento(Integer dioSeguimiento) {
+        this.dioSeguimiento = dioSeguimiento;
     }
 
     public Integer getIdEmprendimiento() {

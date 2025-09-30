@@ -2,6 +2,7 @@ package com.example.projectcapstone.ui.Inicio;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -71,31 +72,29 @@ public class InicioFragment extends Fragment {
         publicacionAdapter = new PublicacionAdapter(
                 requireContext(),
                 listaPublicacion,
-                (publicacion, ivLike, tvLikes) -> {
-                    registrarLike(
-                            publicacion.getIdPublicacion(),
-                            1, // ID del estudiante logueado, cámbialo según tu sesión
-                            publicacion,
-                            ivLike,
-                            tvLikes
-                    );
-                },
-                publicacion -> {
-                    // lógica de reportar
-                    mostrarDialogoReportar(requireContext(), publicacion.getIdPublicacion());
-                },
-                publicacion -> {
-                    // 👇 aquí abres tu diálogo de solicitud
-                    mostrarDialogoSolicitud(requireContext(),
-                            1,  // lo tomas de tu sesión/logged user
-                            publicacion.getIdPublicacion(),
-                            publicacion.getIdEmprendimiento()); // asegúrate de que sea el id correcto
-                },
-                publicacion -> {
-                    // 👉 abrir diálogo de comentarios
-                    mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion());
-                }
+                (publicacion, ivLike, tvLikes) -> registrarLike(
+                        publicacion.getIdPublicacion(),
+                        1, // ID del estudiante logueado
+                        publicacion,
+                        ivLike,
+                        tvLikes
+                ),
+                publicacion -> mostrarDialogoReportar(requireContext(), publicacion.getIdPublicacion()),
+                publicacion -> mostrarDialogoSolicitud(requireContext(),
+                        1,  // estudiante logueado
+                        publicacion.getIdPublicacion(),
+                        publicacion.getIdEmprendimiento()),
+                publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion())
         );
+
+        // 👇 Listener para el botón SEGUIR
+        publicacionAdapter.setFollowListener((publicacion, btnFollow) -> {
+            registrarSeguimiento(
+                    1, // id estudiante logueado
+                    publicacion.getIdEmprendimiento(),
+                    btnFollow
+            );
+        });
 
         rvPublicaciones.setAdapter(publicacionAdapter);
 
@@ -208,8 +207,9 @@ public class InicioFragment extends Fragment {
                         String imgPublicacion = obj.getString("img_publicacion");
                         Integer totalInteracciones = obj.getInt("total_me_gusta");
                         int dioLike = obj.getInt("dio_like");
+                        int siguiendo = obj.getInt("siguiendo");
 
-                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike));
+                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo));
                     }
                     publicacionAdapter.notifyDataSetChanged();
 
@@ -344,6 +344,60 @@ public class InicioFragment extends Fragment {
             }
         });
     }
+
+    private void registrarSeguimiento(int idEstudiante, int idEmprendimiento, MaterialButton btnFollow) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idEmprendimiento", idEmprendimiento);
+
+        String url = ServidorConfig.URL_SERVIDOR + "seguimiento/seguimiento_registrar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("seguido")) {
+                        // Cuando se sigue
+                        btnFollow.setText("Siguiendo");
+                        btnFollow.setBackgroundColor(getResources().getColor(R.color.teal_700));
+                        btnFollow.setStrokeWidth(0); // quitar borde
+                        btnFollow.setTextColor(Color.WHITE);
+
+                        Toast.makeText(getContext(), "Ahora sigues este emprendimiento", Toast.LENGTH_SHORT).show();
+
+                    } else if (status.equals("no_seguido")) {
+                        // Cuando se deja de seguir → vuelve al estilo XML original
+                        btnFollow.setText("Seguir");
+                        btnFollow.setBackgroundColor(Color.TRANSPARENT); // fondo transparente
+                        btnFollow.setStrokeWidth(1); // vuelve a borde gris
+                        btnFollow.setStrokeColor(ColorStateList.valueOf(getResources().getColor(R.color.gray_light)));
+                        btnFollow.setTextColor(getResources().getColor(R.color.gray_dark));
+
+                        Toast.makeText(getContext(), "Has dejado de seguir", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     private void registrarReporte(int idPublicacion, int idTipoReporte) {
         int idEstudiante = 1;
