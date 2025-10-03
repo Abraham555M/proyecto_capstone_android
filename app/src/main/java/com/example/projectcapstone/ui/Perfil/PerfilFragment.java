@@ -17,6 +17,8 @@ public class PerfilFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_perfil, container, false);
 
+
+
         return rootView;
     }
 }

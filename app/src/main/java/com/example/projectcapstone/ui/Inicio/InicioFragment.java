@@ -84,7 +84,13 @@ public class InicioFragment extends Fragment {
                         1,  // estudiante logueado
                         publicacion.getIdPublicacion(),
                         publicacion.getIdEmprendimiento()),
-                publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion())
+                publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion()),
+                (publicacion, ivBookmark) -> registrarFavorito(
+                        publicacion.getIdPublicacion(),
+                        1, // estudiante logueado
+                        publicacion,
+                        ivBookmark
+                )
         );
 
         // 👇 Listener para el botón SEGUIR
@@ -208,8 +214,9 @@ public class InicioFragment extends Fragment {
                         Integer totalInteracciones = obj.getInt("total_me_gusta");
                         int dioLike = obj.getInt("dio_like");
                         int siguiendo = obj.getInt("siguiendo");
+                        int esFavorito = obj.getInt("es_favorito");
 
-                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo));
+                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo, esFavorito));
                     }
                     publicacionAdapter.notifyDataSetChanged();
 
@@ -245,6 +252,52 @@ public class InicioFragment extends Fragment {
                         Toast.makeText(getContext(), "Comentario agregado", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void registrarFavorito(Integer idPublicacion, int idEstudiante, Publicacion publicacion, ImageView ivFavorito) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+
+        String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_registrar_publicacion.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("favorited")) {
+                        publicacion.setFavorito(true);
+                        ivFavorito.setImageResource(R.drawable.ic_favoritos_lleno);
+
+                        ivFavorito.animate()
+                                .scaleX(1.3f).scaleY(1.3f) // aumenta tamaño
+                                .setDuration(150)
+                                .withEndAction(() -> ivFavorito.animate()
+                                        .scaleX(1f).scaleY(1f) // vuelve a su tamaño original
+                                        .setDuration(150))
+                                .start();
+
+                    } else if (status.equals("unfavorited")) {
+                        publicacion.setFavorito(false);
+                        ivFavorito.setImageResource(R.drawable.ic_favoritos);
                     }
 
                 } catch (Exception e) {

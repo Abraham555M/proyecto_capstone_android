@@ -31,7 +31,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     private OnSolicitudClickListener solicitudListener;
     private OnCommentClickListener commentListener;
     private OnFollowClickListener followListener;
-
+    private OnFavoriteClickListener favoriteListener;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
@@ -52,21 +52,33 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public interface OnFollowClickListener {
         void onFollowClicked(Publicacion publicacion, MaterialButton btnFollow);
     }
+
     public void setFollowListener(OnFollowClickListener followListener) {
         this.followListener = followListener;
     }
+
+    public interface OnFavoriteClickListener {
+        void onFavoriteClicked(Publicacion publicacion, ImageView ivBookmark);
+    }
+
+    public void setFavoriteListener(OnFavoriteClickListener favoriteListener) {
+        this.favoriteListener = favoriteListener;
+    }
+
 
     public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
                               OnLikeClickListener likeListener,
                               OnReportClickListener reportListener,
                               OnSolicitudClickListener solicitudListener,
-                              OnCommentClickListener commentListener) {
+                              OnCommentClickListener commentListener,
+                              OnFavoriteClickListener favoriteClickListener) {
         this.context = context;
         this.listaPublicaciones = listaPublicaciones;
         this.likeListener = likeListener;
         this.reportListener = reportListener;
         this.solicitudListener = solicitudListener;
         this.commentListener = commentListener;
+        this.favoriteListener = favoriteClickListener;
     }
 
     @NonNull
@@ -107,6 +119,13 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             holder.ivLike.setImageResource(R.drawable.ic_corazon_lleno);
         } else {
             holder.ivLike.setImageResource(R.drawable.ic_corazon);
+        }
+
+        // 🚨 Usar favorito para pintar el ícono
+        if (publicacion.isFavorito()) {
+            holder.ivBookmark.setImageResource(R.drawable.ic_favoritos_lleno);
+        } else {
+            holder.ivBookmark.setImageResource(R.drawable.ic_favoritos);
         }
 
         if (publicacion.getDioSeguimiento() != null && publicacion.getDioSeguimiento() == 1) {
@@ -158,7 +177,9 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         });
 
         holder.ivBookmark.setOnClickListener(v -> {
-            // Acción para guardar en favoritos
+            if (favoriteListener != null) {
+                favoriteListener.onFavoriteClicked(publicacion, holder.ivBookmark);
+            }
         });
 
         // Listener del botón Más opciones

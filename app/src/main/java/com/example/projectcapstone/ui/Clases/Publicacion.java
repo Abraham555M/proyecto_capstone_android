@@ -11,8 +11,9 @@ public class Publicacion {
     private Integer totalInteracciones;
     private Integer dioLike; // 1 si dio like, 0 si no
     private Integer dioSeguimiento;
+    private Integer esFavorito;
 
-    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento, String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones, Integer dioLike, Integer dioSeguimiento) {
+    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento, String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones, Integer dioLike, Integer dioSeguimiento, Integer esFavorito){
         this.idPublicacion = idPublicacion;
         this.idEmprendimiento = idEmprendimiento;
         this.nomEmprendimiento = nomEmprendimiento;
@@ -23,6 +24,24 @@ public class Publicacion {
         this.totalInteracciones = totalInteracciones;
         this.dioLike = dioLike;
         this.dioSeguimiento = dioSeguimiento;
+        this.esFavorito = esFavorito;
+    }
+
+    public Integer getEsFavorito() {
+        return esFavorito;
+    }
+
+    public void setEsFavorito(Integer esFavorito) {
+        this.esFavorito = esFavorito;
+    }
+
+    // 🔥 útil en el adapter
+    public boolean isFavorito() {
+        return esFavorito != null && esFavorito == 1;
+    }
+
+    public void setFavorito(boolean favorito) {
+        this.esFavorito = favorito ? 1 : 0;
     }
 
     public Integer getDioSeguimiento() {

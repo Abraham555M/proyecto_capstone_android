@@ -4,18 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="12dp"
+    android:padding="16dp"
     android:background="?android:attr/selectableItemBackground">
 
     <!-- Avatar del usuario -->
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_comment_avatar"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:src="@drawable/ic_user_avatar"
         app:civ_border_width="2dp"
         app:civ_border_color="@color/purple_200"
-        android:layout_marginEnd="10dp" />
+        android:layout_marginEnd="12dp"
+        android:layout_gravity="top" />
 
     <!-- Contenedor del comentario -->
     <LinearLayout
@@ -24,33 +25,56 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <!-- Nombre del estudiante -->
-        <TextView
-            android:id="@+id/text_comment_username"
-            android:layout_width="wrap_content"
+        <!-- Encabezado: Nombre y opciones -->
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="usuario_ejemplo"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="14sp" />
+            android:layout_marginBottom="4dp">
+
+            <!-- Nombre del estudiante -->
+            <TextView
+                android:id="@+id/text_comment_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/img_options"
+                android:text="usuario_ejemplo"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Botón de opciones (tres puntos) -->
+            <ImageView
+                android:id="@+id/img_options"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_opciones"
+                android:contentDescription="Opciones"
+                app:tint="#999999"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:padding="6dp" />
+        </RelativeLayout>
 
         <!-- Contenido del comentario -->
         <TextView
             android:id="@+id/text_comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp"
             android:text="Este es un comentario de ejemplo para tu diseño."
             android:textColor="#DDDDDD"
             android:textSize="14sp"
-            android:lineSpacingMultiplier="1.2" />
+            android:lineSpacingMultiplier="1.3" />
 
-        <!-- Fecha y acciones -->
+        <!-- Footer: Fecha y acciones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="6dp"
             android:gravity="center_vertical">
 
             <!-- Fecha -->
@@ -60,26 +84,8 @@
                 android:layout_height="wrap_content"
                 android:text="Hace 2h"
                 android:textSize="12sp"
-                android:textColor="#999999" />
-
-            <!-- Botón responder -->
-            <TextView
-                android:id="@+id/text_reply"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Responder"
-                android:textSize="12sp"
-                android:textColor="@color/purple_200"
-                android:textStyle="bold"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="4dp" />
-
-            <!-- Separador flexible -->
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
+                android:textColor="#999999"
+                android:layout_marginEnd="16dp" />
 
             <!-- Like -->
             <LinearLayout
@@ -89,12 +95,16 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:background="?android:attr/selectableItemBackground"
-                android:padding="4dp">
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:minWidth="48dp">
 
                 <ImageView
                     android:id="@+id/img_like"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/ic_corazon"
                     app:tint="#999999" />
 
@@ -102,13 +112,18 @@
                     android:id="@+id/text_like_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="6dp"
                     android:text="12"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textColor="#999999"
                     android:visibility="gone" />
-
             </LinearLayout>
+
+            <!-- Separador flexible al final -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
