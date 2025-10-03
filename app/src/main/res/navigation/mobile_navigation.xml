@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_nav_emprendimiento_to_nuevoEmprendimientoFragment"
             app:destination="@id/nuevoEmprendimientoFragment" />
+        <action
+            android:id="@+id/action_nav_emprendimiento_to_nav_emprendimiento_lista"
+            app:destination="@id/nav_emprendimiento_lista" />
     </fragment>
 
     <fragment
@@ -153,4 +156,10 @@
             android:id="@+id/action_nav_cambiar_password_to_nav_inicio_sesion"
             app:destination="@id/nav_inicio_sesion" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_emprendimiento_lista"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoLista"
+        android:label="Lista de Emprendimientos"
+        tools:layout="@layout/fragment_emprendimiento_lista" />
 </navigation>
