@@ -5,12 +5,32 @@ public class Comentario {
     private String conComentario;
     private String fchComentario;
     private String nomEstudiante;
+    private boolean liked;
+    private int totalLikes;
 
-    public Comentario(int idComentario, String conComentario, String fchComentario, String nomEstudiante) {
+    public Comentario(int idComentario, String conComentario, String fchComentario, String nomEstudiante, boolean liked, int totalLikes) {
         this.idComentario = idComentario;
         this.conComentario = conComentario;
         this.fchComentario = fchComentario;
         this.nomEstudiante = nomEstudiante;
+        this.liked = liked;
+        this.totalLikes = totalLikes;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
+    public int getTotalLikes() {
+        return totalLikes;
+    }
+
+    public void setTotalLikes(int totalLikes) {
+        this.totalLikes = totalLikes;
     }
 
     public int getIdComentario() {

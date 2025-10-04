@@ -150,7 +150,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             }
         });
 
-        // 🚨 AlertDialog al presionar comentar
+        // AlertDialog al presionar comentar
         holder.ivComment.setOnClickListener(v -> {
             if (commentListener != null) {
                 commentListener.onCommentClicked(publicacion);
