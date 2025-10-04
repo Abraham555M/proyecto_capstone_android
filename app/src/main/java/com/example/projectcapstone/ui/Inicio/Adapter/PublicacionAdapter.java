@@ -65,6 +65,15 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         this.favoriteListener = favoriteListener;
     }
 
+    public interface OnEntrepreneurClickListener {
+        void onEntrepreneurClicked(Publicacion publicacion);
+    }
+
+    private OnEntrepreneurClickListener entrepreneurClickListener;
+
+    public void setEntrepreneurClickListener(OnEntrepreneurClickListener listener) {
+        this.entrepreneurClickListener = listener;
+    }
 
     public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
                               OnLikeClickListener likeListener,
@@ -181,6 +190,14 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
                 favoriteListener.onFavoriteClicked(publicacion, holder.ivBookmark);
             }
         });
+
+        // Redirigir al presionar el nombre del emprendmiento
+        holder.tvEntrepreneurName.setOnClickListener(v -> {
+            if (entrepreneurClickListener != null) {
+                entrepreneurClickListener.onEntrepreneurClicked(publicacion);
+            }
+        });
+
 
         // Listener del botón Más opciones
         holder.ivMoreOptions.setOnClickListener(v -> {

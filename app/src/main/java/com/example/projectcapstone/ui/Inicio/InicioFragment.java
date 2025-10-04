@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -102,6 +104,17 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     btnFollow
             );
         });
+
+        // 🚨 Listener para cuando se presiona el nombre del emprendedor
+        publicacionAdapter.setEntrepreneurClickListener(publicacion -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("idEmprendimiento", publicacion.getImgEmprendimiento());
+
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_inicio_to_nav_publicaciones_del_emprendimiento, bundle);
+        });
+
+        rvPublicaciones.setAdapter(publicacionAdapter);
 
         rvPublicaciones.setAdapter(publicacionAdapter);
 
