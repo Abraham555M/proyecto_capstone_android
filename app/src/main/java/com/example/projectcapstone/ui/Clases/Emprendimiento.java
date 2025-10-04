@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.Emprendimiento;
+package com.example.projectcapstone.ui.Clases;
 
 public class Emprendimiento {
     private String id_emprendimiento;

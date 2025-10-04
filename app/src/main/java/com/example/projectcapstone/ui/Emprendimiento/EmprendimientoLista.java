@@ -27,7 +27,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projectcapstone.R;
+import com.example.projectcapstone.ui.Clases.Emprendimiento;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Emprendimiento.Adapter.EmprendimientoAdapter;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.loopj.android.http.AsyncHttpClient;

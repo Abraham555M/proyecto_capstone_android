@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.Emprendimiento;
+package com.example.projectcapstone.ui.Emprendimiento.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

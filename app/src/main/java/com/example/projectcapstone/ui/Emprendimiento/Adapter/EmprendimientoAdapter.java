@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.Emprendimiento;
+package com.example.projectcapstone.ui.Emprendimiento.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projectcapstone.R;
+import com.example.projectcapstone.ui.Clases.Emprendimiento;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
