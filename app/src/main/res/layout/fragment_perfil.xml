@@ -43,52 +43,67 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="16dp"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <!-- Nombre con icono de editar -->
+                <!-- Bloque de información de texto -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/txt_name"
-                        android:layout_width="0dp"
+                        android:id="@+id/tvNombre"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:text="Andrés F. Espitia"
                         android:textColor="@android:color/white"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/btn_edit_name"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginStart="8dp"
-                        android:src="@drawable/ic_editar_perfil"
-                        app:tint="@android:color/white" />
+                    <TextView
+                        android:id="@+id/tvSede"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Sede"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvTelefono"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="999999999999"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp" />
+
                 </LinearLayout>
 
-
-                <TextView
-                    android:id="@+id/txt_business_description"
+                <!-- Bloque de iconos -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Descripción del negocio"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
+                    android:layout_marginStart="8dp"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                <TextView
-                    android:id="@+id/txt_collaboration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="✨ Colaboración activa con 'Nombre Negocio'"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp" />
+                    <ImageView
+                        android:id="@+id/ivEditar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_editar_perfil"
+                        app:tint="@android:color/white" />
+
+                    <ImageView
+                        android:id="@+id/ivColaboraciones"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginTop="8dp"
+                        android:src="@drawable/ic_colaboraciones"
+                        app:tint="@android:color/white" />
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -113,7 +128,7 @@
                 android:gravity="center">
 
                 <TextView
-                    android:id="@+id/txt_publications_count"
+                    android:id="@+id/tvCantidadPublicaciones"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="56"
@@ -144,7 +159,7 @@
                 android:gravity="center">
 
                 <TextView
-                    android:id="@+id/txt_followers_count"
+                    android:id="@+id/tvCantidadSeguidores"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1.5K"
@@ -175,7 +190,7 @@
                 android:gravity="center">
 
                 <TextView
-                    android:id="@+id/txt_following_count"
+                    android:id="@+id/tvCantidadSeguidos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1K"
