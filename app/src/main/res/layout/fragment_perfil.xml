@@ -229,12 +229,12 @@
 
             <!-- RecyclerView de categorías (padre) -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_categories"
+                android:id="@+id/rvEmprendimientosPerfil"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="16dp"
                 android:clipToPadding="false"
-                tools:listitem="@layout/item_categoria_perfil" />
+                tools:listitem="@layout/item_emprendimiento_perfil" />
         </LinearLayout>
 
     </LinearLayout>

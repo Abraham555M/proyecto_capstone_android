@@ -116,8 +116,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         rvPublicaciones.setAdapter(publicacionAdapter);
 
-        rvPublicaciones.setAdapter(publicacionAdapter);
-
         cargarCategorias();
         cargarPublicaciones(1);
 

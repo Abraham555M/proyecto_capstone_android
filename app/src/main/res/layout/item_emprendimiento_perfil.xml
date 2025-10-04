@@ -3,16 +3,17 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:paddingBottom="16dp">
+    android:paddingBottom="16dp"
+    android:paddingHorizontal="8dp">
 
     <!-- Nombre de la categoría -->
     <TextView
-        android:id="@+id/txt_category_name"
+        android:id="@+id/tvEmprendimientos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Categoría"
+        android:text="Emprendimientos"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -25,6 +26,6 @@
         android:orientation="horizontal"
         android:overScrollMode="never"
         android:clipToPadding="false"
-        tools:listitem="@layout/item_post_perfil" />
+        tools:listitem="@layout/item_publicaciones_perfil" />
 
 </LinearLayout>
