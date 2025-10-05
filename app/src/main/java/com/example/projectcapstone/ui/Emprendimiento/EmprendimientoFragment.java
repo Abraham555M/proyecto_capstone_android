@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projectcapstone.R;
-import com.example.projectcapstone.ui.Clases.ItemOffsetDecoration;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
-import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
+//import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
+import com.example.projectcapstone.ui.Emprendimiento.Adapter.CategoriaAdapter;
 import com.example.projectcapstone.ui.Clases.Categoria;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -44,11 +44,21 @@ public class EmprendimientoFragment extends Fragment implements View.OnClickList
         recyclerCategorias = rootView.findViewById(R.id.recyclerCategorias);
         recyclerCategorias.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        // Espaciado uniforme de 16dp
-        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.recycler_spacing);
-        recyclerCategorias.addItemDecoration(new ItemOffsetDecoration(spacingInPixels));
+        adapter = new CategoriaAdapter(listaCategorias, new CategoriaAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Categoria categoria) {
+                // Aquí navegas a tu fragmento de crear emprendimiento
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
 
-        adapter = new CategoriaAdapter(getContext(), listaCategorias);
+                // Si quieres pasar datos (ej. id de la categoría)
+                Bundle bundle = new Bundle();
+                bundle.putInt("id_categoria", categoria.getIdCategoria());
+                bundle.putString("nombre_categoria", categoria.getNomCategoria());
+
+                navController.navigate(R.id.action_nav_emprendimiento_to_nuevoEmprendimientoFragment, bundle);
+            }
+        });
+
         recyclerCategorias.setAdapter(adapter);
 
         btnMisEmprendimientos = rootView.findViewById(R.id.btnMisEmprendimientos);
