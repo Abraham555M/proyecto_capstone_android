@@ -39,24 +39,38 @@ public class EmprendimientoAdapter extends RecyclerView.Adapter<EmprendimientoAd
         View view = LayoutInflater.from(context).inflate(R.layout.item_emprendimiento_grid, parent, false);
         return new ViewHolder(view);
     }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Emprendimiento empr = lista.get(position);
 
-        // Nombre
+        // Nombre del emprendimiento
         holder.tvNombre.setText(empr.getNom_emprendimiento());
 
-        Picasso.get()
-                .load(empr.getImg_per_emprendimiento())
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_placeholder)
-                .into(holder.imgEm);
+        // Cargar imagen de portada (img_por_emprendimiento)
+        String urlImagen = empr.getImg_por_emprendimiento();
 
-        // Botones solo asignan acción, el texto se mantiene igual que en XML
+        if (urlImagen != null && !urlImagen.isEmpty()) {
+            Picasso.get()
+                    .load(urlImagen)
+                    .placeholder(R.drawable.ic_placeholder) // Mientras carga
+                    .error(R.drawable.ic_placeholder)       // Si falla
+                    .fit()
+                    .centerCrop()
+                    .into(holder.imgEm);
+
+            // Quitar el tint cuando hay imagen real
+            holder.imgEm.setColorFilter(null);
+        } else {
+            // Si no hay imagen, mostrar placeholder con tint
+            holder.imgEm.setImageResource(R.drawable.ic_placeholder);
+            holder.imgEm.setColorFilter(context.getResources().getColor(R.color.gray_dark));
+        }
+
+        // Botones de acción
         holder.btnEditar.setOnClickListener(v -> listener.onEditarClick(empr));
         holder.btnEliminar.setOnClickListener(v -> listener.onEliminarClick(empr));
     }
-
 
     @Override
     public int getItemCount() {

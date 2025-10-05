@@ -27,13 +27,14 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/circle_gray_background" />
 
-            <!-- Ícono del emprendimiento -->
             <ImageView
                 android:id="@+id/ivEmprendimientoIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_centerInParent="true"
-                app:tint="@color/gray_dark" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/image_border"
+                android:contentDescription="Imagen del emprendimiento" />
 
         </RelativeLayout>
 
