@@ -17,9 +17,14 @@ import java.util.List;
 
 public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.ViewHolder>{
     private List<Categoria> lista;
+    private OnItemClickListener listener;
+    public interface OnItemClickListener {
+        void onItemClick(Categoria categoria);
+    }
 
-    public CategoriaAdapter(List<Categoria> lista) {
-        this.lista = lista;
+    public CategoriaAdapter(List<Categoria> listaCategorias, OnItemClickListener listener) {
+        this.lista = listaCategorias;
+        this.listener = listener;
     }
 
     @NonNull
@@ -32,13 +37,8 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Categoria cat = lista.get(position);
-        holder.txtNombre.setText(cat.getNomCategoria());
-
-        // Cargar imagen desde URL (Glide o Picasso)
-        Glide.with(holder.itemView.getContext())
-                .load(cat.getImgCategoria())
-                .into(holder.imgCategoria);
+        Categoria categoria = lista .get(position);
+        holder.bind(categoria, listener);
     }
 
     @Override
@@ -54,6 +54,17 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.View
             super(itemView);
             txtNombre = itemView.findViewById(R.id.txtNombreCategoria);
             imgCategoria = itemView.findViewById(R.id.imgCategoria);
+        }
+
+        public void bind(final Categoria categoria, final OnItemClickListener listener) {
+            txtNombre.setText(categoria.getNomCategoria());
+            // Cargar la imagen con Glide (si usas URL)
+            Glide.with(itemView.getContext())
+                    .load(categoria.getImgCategoria())
+                    .into(imgCategoria);
+
+            // evento de clic
+            itemView.setOnClickListener(v -> listener.onItemClick(categoria));
         }
     }
 }

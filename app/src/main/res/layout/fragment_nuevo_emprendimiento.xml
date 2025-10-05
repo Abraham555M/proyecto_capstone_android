@@ -16,7 +16,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Contenido centrado -->
+        <!-- Imagen que ocupará todo el contenedor -->
+        <ImageView
+            android:id="@+id/imgUpload"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:contentDescription="Imagen seleccionada" />
+
+        <!-- Texto que se verá solo cuando NO haya imagen -->
         <LinearLayout
             android:id="@+id/uploadSection"
             android:layout_width="match_parent"
@@ -25,13 +34,14 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/imgUpload"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@android:drawable/ic_menu_upload"
-                android:tint="@android:color/darker_gray" />
+                android:tint="@android:color/darker_gray"
+                android:contentDescription="Icono de subir foto" />
 
             <TextView
+                android:id="@+id/txtUpload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
