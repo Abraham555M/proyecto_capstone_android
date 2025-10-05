@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
@@ -31,17 +33,17 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 import com.example.projectcapstone.R;
 
-public class InicioSesion extends Fragment implements View.OnClickListener {
 
+public class InicioSesion extends Fragment implements View.OnClickListener {
     TextInputEditText etCorreo, etPassword;
     MaterialButton btnSiguiente;
     TextView btnOlvidePassword, btnCancelar;
+    View rootView;
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_inicio_sesion, container, false);
+        rootView = inflater.inflate(R.layout.fragment_inicio_sesion, container, false);
 
         etCorreo = rootView.findViewById(R.id.etCorreo);
         etPassword = rootView.findViewById(R.id.etPassword);
@@ -86,30 +88,29 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     String response = new String(responseBody);
                     JSONObject json = new JSONObject(response);
 
+                    Log.d("LOGIN_RESPONSE", response); // ✅ Para ver la respuesta completa del servidor
+
                     if (json.getString("status").equals("success")) {
+                        // ✅ Obtenemos el objeto usuario del JSON
                         JSONObject user = json.getJSONObject("usuario");
 
-                        // Guardamos datos de sesión
-                        SharedPreferences prefs = requireContext().getSharedPreferences("usuario", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("id_estudiante", user.getInt("id_estudiante"));
-                        editor.putString("nombre", user.getString("nombre"));
-                        editor.putString("apellidos", user.getString("apellidos"));
-                        editor.putInt("tipo_usuario", user.getInt("tipo_usuario"));
-                        editor.apply();
+                        // ✅ Guardamos la sesión
+                        SessionManager sessionManager = new SessionManager(requireContext());
+                        sessionManager.guardarSesion(user);
 
-                        // Navegamos al home
+                        Log.d("SESION", "Sesión guardada con éxito para: " + user.getString("nombre"));
+
+                        // ✅ Navegamos al Home
                         NavController navController = Navigation.findNavController(requireView());
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_inicio);
 
-                        // Opcional: mostrar mensaje positivo
                         mostrarAlertaPersonalizada("Bienvenido", "Inicio de sesión exitoso", true);
 
                     } else {
-                        // Mensaje de error enviado desde el servidor
                         mostrarAlertaPersonalizada("Acceso denegado",
                                 "Correo o contraseña incorrectos. Inténtalo nuevamente.", false);
                     }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                     mostrarAlertaPersonalizada("Error inesperado",

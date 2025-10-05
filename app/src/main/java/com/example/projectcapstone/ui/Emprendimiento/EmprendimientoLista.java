@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.Emprendimiento;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Emprendimiento.Adapter.EmprendimientoAdapter;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -49,7 +50,6 @@ import java.util.UUID;
 import cz.msebera.android.httpclient.Header;
 
 public class EmprendimientoLista extends Fragment {
-
     RecyclerView recyclerView;
     ProgressBar progressBar;
     LinearLayout layoutEmpty;
@@ -66,6 +66,8 @@ public class EmprendimientoLista extends Fragment {
 
     // Lanzador para seleccionar imagen
     private ActivityResultLauncher<Intent> imagePickerLauncher;
+    // Para el SharePreference
+    private SessionManager session;
 
     @Nullable
     @Override
@@ -105,6 +107,7 @@ public class EmprendimientoLista extends Fragment {
             }
         });
 
+        session = new SessionManager(requireContext());
         recyclerView.setAdapter(adapter);
         cargarEmprendimientos();
 
@@ -400,9 +403,7 @@ public class EmprendimientoLista extends Fragment {
     }
     private void cargarEmprendimientos() {
         progressBar.setVisibility(View.VISIBLE);
-
-        SharedPreferences prefs = requireActivity().getSharedPreferences("usuario", Context.MODE_PRIVATE);
-        int idEstudiante = prefs.getInt("id_estudiante", -1);
+        int idEstudiante = session.getIdEstudiante();
 
         if (idEstudiante == -1) {
             progressBar.setVisibility(View.GONE);

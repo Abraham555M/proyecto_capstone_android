@@ -24,6 +24,7 @@ import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.EmprendimientoPerfil;
 import com.example.projectcapstone.ui.Clases.PublicacionPerfil;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Perfil.Adapter.EmprendimientoPerfilAdapter;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -43,6 +44,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
     private List<EmprendimientoPerfil> listaEmprendimientos;
     private LinearLayout layoutEmptyMessage;
     private Button btnCrearEmprendimiento;
+    private SessionManager session;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,6 +58,8 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
         rvEmprendimientosPerfil = rootView.findViewById(R.id.rvEmprendimientosPerfil);
         layoutEmptyMessage = rootView.findViewById(R.id.layoutEmptyMessage);
         btnCrearEmprendimiento = rootView.findViewById(R.id.btnCrearEmprendimiento);
+
+        session = new SessionManager(requireContext());
 
         btnCrearEmprendimiento.setOnClickListener(this);
 
@@ -81,7 +85,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
     }
 
     private void cargarCantidadPublicaciones() {
-        int idEstudiante = 1;
+        int idEstudiante = session.getIdEstudiante();
         String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_cantidad_publicaciones.php?idEstudiante=" + idEstudiante;
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -109,7 +113,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
     }
 
     private void cargarEmprendimientosConPublicaciones() {
-        int idEstudiante = 1;
+        int idEstudiante = session.getIdEstudiante();
         String url = ServidorConfig.URL_SERVIDOR + "emprendimiento/emprendimiento_listar_perfil.php?idEstudiante=" + idEstudiante;
 
         AsyncHttpClient client = new AsyncHttpClient();

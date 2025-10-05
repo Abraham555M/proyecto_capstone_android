@@ -1,6 +1,7 @@
 package com.example.projectcapstone;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -14,6 +15,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -33,32 +35,42 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inicializar SessionManager
-        session = new SessionManager(this);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(R.id.fab).show();
-            }
-        });
+        binding.appBarMain.fab.setOnClickListener(view ->
+                Snackbar.make(view, "Acción rápida", Snackbar.LENGTH_LONG)
+                        .setAction("Ok", null)
+                        .setAnchorView(R.id.fab)
+                        .show()
+        );
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_metricas, R.id.nav_emprendimiento, R.id.nav_publicaciones, R.id.nav_inicio, R.id.nav_notificaciones, R.id.nav_colaboraciones, R.id.nav_favoritos, R.id.nav_perfil, R.id.nav_soporte)
+                R.id.nav_metricas, R.id.nav_emprendimiento, R.id.nav_publicaciones,
+                R.id.nav_inicio, R.id.nav_notificaciones, R.id.nav_colaboraciones,
+                R.id.nav_favoritos, R.id.nav_perfil, R.id.nav_soporte)
                 .setOpenableLayout(drawer)
                 .build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        session = new SessionManager(this);
+        if (!session.isSesionActiva()) {
+            // Navegar al fragmento de inicio de sesión después de que el NavHost esté listo
+            binding.getRoot().post(() -> {
+                NavController navControllere = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setPopUpTo(navControllere.getGraph().getStartDestinationId(), true)
+                        .build();
+                navControllere.navigate(R.id.nav_inicio, null, navOptions);
+            });
+        }
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta ||
@@ -93,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {

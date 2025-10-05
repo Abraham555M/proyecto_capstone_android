@@ -29,6 +29,7 @@ import com.example.projectcapstone.ui.Clases.Comentario;
 import com.example.projectcapstone.ui.Clases.Publicacion;
 import com.example.projectcapstone.ui.Clases.TipoReporte;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.ComentarioAdapter;
 import com.example.projectcapstone.ui.Inicio.Adapter.PublicacionAdapter;
@@ -56,12 +57,14 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     private List<TipoReporte> listaTipoReporte = new ArrayList<>();
     private List<Comentario> listaComentarios = new ArrayList<>();
     private RecyclerView rvCategoria, rvPublicaciones;
+    private SessionManager session;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_inicio, container, false);
 
+        session = new SessionManager(requireContext());
         rvCategoria = rootView.findViewById(R.id.rvCategoria);
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
 
@@ -77,29 +80,29 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                 listaPublicacion,
                 (publicacion, ivLike, tvLikes) -> registrarLike(
                         publicacion.getIdPublicacion(),
-                        1, // ID del estudiante logueado
+                        session.getIdEstudiante(), // ID del estudiante logueado
                         publicacion,
                         ivLike,
                         tvLikes
                 ),
                 publicacion -> mostrarDialogoReportar(requireContext(), publicacion.getIdPublicacion()),
                 publicacion -> mostrarDialogoSolicitud(requireContext(),
-                        1,  // estudiante logueado
+                        session.getIdEstudiante(),  // estudiante logueado
                         publicacion.getIdPublicacion(),
                         publicacion.getIdEmprendimiento()),
                 publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion()),
                 (publicacion, ivBookmark) -> registrarFavorito(
                         publicacion.getIdPublicacion(),
-                        1, // estudiante logueado
+                        session.getIdEstudiante(), // estudiante logueado
                         publicacion,
                         ivBookmark
                 )
         );
 
-        // 👇 Listener para el botón SEGUIR
+        // Listener para el botón SEGUIR
         publicacionAdapter.setFollowListener((publicacion, btnFollow) -> {
             registrarSeguimiento(
-                    1, // id estudiante logueado
+                    session.getIdEstudiante(), // id estudiante logueado
                     publicacion.getIdEmprendimiento(),
                     btnFollow
             );
@@ -117,13 +120,13 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         rvPublicaciones.setAdapter(publicacionAdapter);
 
         cargarCategorias();
-        cargarPublicaciones(1);
+        cargarPublicaciones(session.getIdEstudiante());
 
         return rootView;
     }
 
-    private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments) {
-        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion + "&idEstudiante=1";
+    private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments, int idEstudiante) {
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion + "&idEstudiante=" + idEstudiante;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
@@ -422,7 +425,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-
     public void cargarTiposReporte(Context context) {
         String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_listar_tipos.php";
 
@@ -512,7 +514,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
 
     private void registrarReporte(int idPublicacion, int idTipoReporte) {
-        int idEstudiante = 1;
+        int idEstudiante = session.getIdEstudiante();
 
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
@@ -663,11 +665,11 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         listaComentarios.clear();
         ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
 
-        // ✅ AGREGAR ESTO: Asignar el listener al adapter
+        // Asignar el listener al adapter
         comentarioAdapter.setOnCommentLikeClickListener((comentario, imgLike, textLikeCount) -> {
             registrarLikeComentario(
                     comentario.getIdComentario(),
-                    1, // estudiante logueado
+                    session.getIdEstudiante(), // estudiante logueado
                     comentario,
                     imgLike,
                     textLikeCount
@@ -681,14 +683,14 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
         // Cargar comentarios desde backend
-        cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
+        cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments, session.getIdEstudiante());
 
         btnEnviarComentario.setOnClickListener(v -> {
             String textoComentario = etComentario.getText().toString().trim();
             if (!textoComentario.isEmpty()) {
-                registrarComentario(idPublicacion, 1, textoComentario);
+                registrarComentario(idPublicacion, session.getIdEstudiante(), textoComentario);
                 etComentario.setText("");
-                cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
+                cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments, session.getIdEstudiante());
             } else {
                 Toast.makeText(context, "Escribe un comentario primero", Toast.LENGTH_SHORT).show();
             }
@@ -696,7 +698,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         dialog.show();
     }
-
 
     private void mostrarDialogoReportar(Context context, int idPublicacion) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte, null);
