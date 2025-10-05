@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -13,54 +14,102 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Emprendimientos"
+        android:text="Emprendimiento"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <!-- RecyclerView hijo con publicaciones -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_posts"
+    <!-- Contenedor de publicaciones con overlay -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:overScrollMode="never"
-        android:clipToPadding="false"
-        tools:listitem="@layout/item_publicaciones_perfil" />
+        android:layout_height="wrap_content">
 
-    <!-- Mensaje cuando no hay publicaciones -->
-    <LinearLayout
-        android:id="@+id/layoutEmptyPosts"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/ic_corazon"
-            android:layout_marginBottom="8dp"
-            android:alpha="0.6" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- RecyclerView de publicaciones -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_posts"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sin publicaciones"
-            android:textColor="@color/darker_gray"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:overScrollMode="never"
+            android:clipToPadding="false"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="16dp"
+            tools:listitem="@layout/item_publicaciones_perfil" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Layout de placeholders cuando no hay publicaciones -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyPosts"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Aún no has publicado nada en este emprendimiento."
-            android:textColor="@color/darker_gray"
-            android:textSize="12sp"
+            android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="2dp" />
-    </LinearLayout>
+            android:paddingHorizontal="16dp"
+            android:visibility="gone">
+
+            <!-- Recuadro 1 -->
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_placeholder_publicacion">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_vacio_publicacion"
+                    app:tint="@color/darker_gray" />
+            </LinearLayout>
+
+            <!-- Recuadro 2 -->
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:layout_marginEnd="12dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_placeholder_publicacion">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_vacio_publicacion"
+                    app:tint="@color/darker_gray" />
+            </LinearLayout>
+
+            <!-- Recuadro 3 -->
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_placeholder_publicacion">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_vacio_publicacion"
+                    app:tint="@color/darker_gray" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Etiqueta de +N publicaciones -->
+        <TextView
+            android:id="@+id/tvMasPublicaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_etiqueta_mas_publicaciones"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="+5"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </LinearLayout>

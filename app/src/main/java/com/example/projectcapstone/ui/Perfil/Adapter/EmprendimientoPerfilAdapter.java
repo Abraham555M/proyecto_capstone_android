@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.projectcapstone.databinding.ItemEmprendimientoPerfilBinding;
 import com.example.projectcapstone.ui.Clases.EmprendimientoPerfil;
 import com.example.projectcapstone.R;
+import com.example.projectcapstone.ui.Clases.PublicacionPerfil;
 
 import java.util.List;
 
 public class EmprendimientoPerfilAdapter extends RecyclerView.Adapter<EmprendimientoPerfilAdapter.EmprendimientoViewHolder> {
-
     private List<EmprendimientoPerfil> emprendimientos;
     private Context context;
 
@@ -53,35 +53,45 @@ public class EmprendimientoPerfilAdapter extends RecyclerView.Adapter<Emprendimi
         }
 
         public void bind(EmprendimientoPerfil emprendimiento) {
-            // Nombre del emprendimiento
             binding.tvEmprendimientos.setText(emprendimiento.getNombreCategoria());
 
-            // Publicaciones
-            if (emprendimiento.getPublicaciones() == null || emprendimiento.getPublicaciones().isEmpty()) {
-                // Si no hay publicaciones, mostramos el mensaje vacío
+            List<PublicacionPerfil> publicaciones = emprendimiento.getPublicaciones();
+
+            if (publicaciones == null || publicaciones.isEmpty()) {
+                // Mostrar placeholders cuando no hay publicaciones
                 binding.recyclerPosts.setVisibility(View.GONE);
                 binding.layoutEmptyPosts.setVisibility(View.VISIBLE);
+                binding.tvMasPublicaciones.setVisibility(View.GONE);
+                return;
+            }
+
+            // Ocultar placeholders y mostrar publicaciones reales
+            binding.recyclerPosts.setVisibility(View.VISIBLE);
+            binding.layoutEmptyPosts.setVisibility(View.GONE);
+
+            // ✅ Mostrar solo las primeras 3 publicaciones
+            List<PublicacionPerfil> primerasTres = publicaciones.size() > 3
+                    ? publicaciones.subList(0, 3)
+                    : publicaciones;
+
+            // Configurar el RecyclerView
+            LinearLayoutManager layoutManager = new LinearLayoutManager(
+                    context,
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+            );
+            binding.recyclerPosts.setLayoutManager(layoutManager);
+            binding.recyclerPosts.setAdapter(new PublicacionesPerfilAdapter(primerasTres));
+            binding.recyclerPosts.setHasFixedSize(true);
+            binding.recyclerPosts.setNestedScrollingEnabled(false);
+
+            // Mostrar etiqueta +N si hay más publicaciones
+            int restantes = publicaciones.size() - 3;
+            if (restantes > 0) {
+                binding.tvMasPublicaciones.setText("+" + restantes);
+                binding.tvMasPublicaciones.setVisibility(View.VISIBLE);
             } else {
-                // Si hay publicaciones, mostramos el RecyclerView
-                binding.recyclerPosts.setVisibility(View.VISIBLE);
-                binding.layoutEmptyPosts.setVisibility(View.GONE);
-
-                // Configurar RecyclerView hijo
-                LinearLayoutManager layoutManager = new LinearLayoutManager(
-                        context,
-                        LinearLayoutManager.HORIZONTAL,
-                        false
-                );
-                binding.recyclerPosts.setLayoutManager(layoutManager);
-
-                // Crear y asignar adapter hijo
-                PublicacionesPerfilAdapter publicacionesAdapter =
-                        new PublicacionesPerfilAdapter(emprendimiento.getPublicaciones());
-                binding.recyclerPosts.setAdapter(publicacionesAdapter);
-
-                // Mejoras de performance
-                binding.recyclerPosts.setHasFixedSize(true);
-                binding.recyclerPosts.setNestedScrollingEnabled(false);
+                binding.tvMasPublicaciones.setVisibility(View.GONE);
             }
         }
     }
