@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,13 +47,14 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
-public class InicioFragment extends Fragment {
+public class InicioFragment extends Fragment implements View.OnClickListener {
     private CategoriaAdapter categoriaAdapter;
     private PublicacionAdapter publicacionAdapter;
     private TipoReporteAdapter tipoReporteAdapter;
     private List<Categoria> listaCategoria = new ArrayList<>();
     private List<Publicacion> listaPublicacion = new ArrayList<>();
     private List<TipoReporte> listaTipoReporte = new ArrayList<>();
+    private List<Comentario> listaComentarios = new ArrayList<>();
     private RecyclerView rvCategoria, rvPublicaciones;
 
     @Override
@@ -84,7 +87,13 @@ public class InicioFragment extends Fragment {
                         1,  // estudiante logueado
                         publicacion.getIdPublicacion(),
                         publicacion.getIdEmprendimiento()),
-                publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion())
+                publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion()),
+                (publicacion, ivBookmark) -> registrarFavorito(
+                        publicacion.getIdPublicacion(),
+                        1, // estudiante logueado
+                        publicacion,
+                        ivBookmark
+                )
         );
 
         // 👇 Listener para el botón SEGUIR
@@ -96,6 +105,17 @@ public class InicioFragment extends Fragment {
             );
         });
 
+        // 🚨 Listener para cuando se presiona el nombre del emprendedor
+        publicacionAdapter.setEntrepreneurClickListener(publicacion -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("idEmprendimiento", publicacion.getImgEmprendimiento());
+
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_inicio_to_nav_publicaciones_del_emprendimiento, bundle);
+        });
+
+        rvPublicaciones.setAdapter(publicacionAdapter);
+
         rvPublicaciones.setAdapter(publicacionAdapter);
 
         cargarCategorias();
@@ -106,7 +126,7 @@ public class InicioFragment extends Fragment {
 
 
     private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments) {
-        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion;
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion + "&idEstudiante=1";
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
@@ -123,8 +143,10 @@ public class InicioFragment extends Fragment {
                         String conComentario = obj.getString("con_comentario");
                         String fchComentario = obj.getString("fch_comentario");
                         String nomEstudiante = obj.getString("estudiante");
+                        int totalLikes = obj.getInt("total_likes");
+                        boolean dioLike = obj.getInt("dio_like") == 1;
 
-                        listaComentarios.add(new Comentario(idComentario, conComentario, fchComentario, nomEstudiante));
+                        listaComentarios.add(new Comentario(idComentario, conComentario, fchComentario, nomEstudiante, dioLike, totalLikes));
                     }
 
                     if (listaComentarios.isEmpty()) {
@@ -148,7 +170,6 @@ public class InicioFragment extends Fragment {
             }
         });
     }
-
 
     private void cargarCategorias() {
         String url = ServidorConfig.URL_SERVIDOR + "categoria/categoria_listar.php";
@@ -208,8 +229,9 @@ public class InicioFragment extends Fragment {
                         Integer totalInteracciones = obj.getInt("total_me_gusta");
                         int dioLike = obj.getInt("dio_like");
                         int siguiendo = obj.getInt("siguiendo");
+                        int esFavorito = obj.getInt("es_favorito");
 
-                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo));
+                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo, esFavorito));
                     }
                     publicacionAdapter.notifyDataSetChanged();
 
@@ -245,6 +267,52 @@ public class InicioFragment extends Fragment {
                         Toast.makeText(getContext(), "Comentario agregado", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void registrarFavorito(Integer idPublicacion, int idEstudiante, Publicacion publicacion, ImageView ivFavorito) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+
+        String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_registrar_publicacion.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("favorited")) {
+                        publicacion.setFavorito(true);
+                        ivFavorito.setImageResource(R.drawable.ic_favoritos_lleno);
+
+                        ivFavorito.animate()
+                                .scaleX(1.3f).scaleY(1.3f) // aumenta tamaño
+                                .setDuration(150)
+                                .withEndAction(() -> ivFavorito.animate()
+                                        .scaleX(1f).scaleY(1f) // vuelve a su tamaño original
+                                        .setDuration(150))
+                                .start();
+
+                    } else if (status.equals("unfavorited")) {
+                        publicacion.setFavorito(false);
+                        ivFavorito.setImageResource(R.drawable.ic_favoritos);
                     }
 
                 } catch (Exception e) {
@@ -310,6 +378,53 @@ public class InicioFragment extends Fragment {
             }
         });
     }
+
+    public void registrarLikeComentario(int idComentario, int idEstudiante, Comentario comentario, ImageView imgLike, TextView textLikeCount) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idComentario", idComentario);
+
+        String url = ServidorConfig.URL_SERVIDOR + "comentario/comentario_registrar_like.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+                    String status = json.getString("status");
+
+                    if (status.equals("liked")) {
+                        comentario.setLiked(true);
+                        comentario.setTotalLikes(comentario.getTotalLikes() + 1);
+                        imgLike.setImageResource(R.drawable.ic_corazon_lleno);
+                    } else if (status.equals("unliked")) {
+                        comentario.setLiked(false);
+                        comentario.setTotalLikes(comentario.getTotalLikes() - 1);
+                        imgLike.setImageResource(R.drawable.ic_corazon);
+                    }
+
+                    // Actualizar contador
+                    if (comentario.getTotalLikes() > 0) {
+                        textLikeCount.setVisibility(View.VISIBLE);
+                        textLikeCount.setText(String.valueOf(comentario.getTotalLikes()));
+                    } else {
+                        textLikeCount.setVisibility(View.GONE);
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     public void cargarTiposReporte(Context context) {
         String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_listar_tipos.php";
@@ -547,26 +662,35 @@ public class InicioFragment extends Fragment {
         ImageView btnEnviarComentario = dialogView.findViewById(R.id.btnEnviarComentario);
         EditText etComentario = dialogView.findViewById(R.id.etComentario);
 
-
-        // Configuración del RecyclerView
-        recyclerComments.setLayoutManager(new LinearLayoutManager(context));
-        List<Comentario> listaComentarios = new ArrayList<>();
+        // Lista y adapter
+        listaComentarios.clear();
         ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
+
+        // ✅ AGREGAR ESTO: Asignar el listener al adapter
+        comentarioAdapter.setOnCommentLikeClickListener((comentario, imgLike, textLikeCount) -> {
+            registrarLikeComentario(
+                    comentario.getIdComentario(),
+                    1, // estudiante logueado
+                    comentario,
+                    imgLike,
+                    textLikeCount
+            );
+        });
+
+        // Layout manager y adapter
+        recyclerComments.setLayoutManager(new LinearLayoutManager(context));
         recyclerComments.setAdapter(comentarioAdapter);
 
-        // Botón cerrar
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
-        // Cargar comentarios del backend
+        // Cargar comentarios desde backend
         cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
 
         btnEnviarComentario.setOnClickListener(v -> {
             String textoComentario = etComentario.getText().toString().trim();
             if (!textoComentario.isEmpty()) {
-                registrarComentario(idPublicacion, 1, textoComentario); // 1 = ID de estudiante logueado
-                etComentario.setText(""); // limpiar input
-
-                // recargar comentarios
+                registrarComentario(idPublicacion, 1, textoComentario);
+                etComentario.setText("");
                 cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
             } else {
                 Toast.makeText(context, "Escribe un comentario primero", Toast.LENGTH_SHORT).show();
@@ -575,6 +699,7 @@ public class InicioFragment extends Fragment {
 
         dialog.show();
     }
+
 
     private void mostrarDialogoReportar(Context context, int idPublicacion) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte, null);
@@ -635,4 +760,8 @@ public class InicioFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onClick(View v) {
+
+    }
 }

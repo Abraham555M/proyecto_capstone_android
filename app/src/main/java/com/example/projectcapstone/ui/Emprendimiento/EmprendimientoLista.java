@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -27,7 +29,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projectcapstone.R;
+import com.example.projectcapstone.ui.Clases.Emprendimiento;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Emprendimiento.Adapter.EmprendimientoAdapter;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.loopj.android.http.AsyncHttpClient;
@@ -117,9 +121,9 @@ public class EmprendimientoLista extends Fragment {
         imgEditarPortada = dialogView.findViewById(R.id.imgEditarPortada);
         etEditarNombre = dialogView.findViewById(R.id.etEditarNombre);
         etEditarDescripcion = dialogView.findViewById(R.id.etEditarDescripcion);
-        Button btnSeleccionarImagen = dialogView.findViewById(R.id.btnSeleccionarImagen);
-        Button btnGuardarCambios = dialogView.findViewById(R.id.btnGuardarCambios);
+        ImageButton btnSeleccionarImagen = dialogView.findViewById(R.id.btnSeleccionarImagen);
         Button btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        Button btnGuardarCambios = dialogView.findViewById(R.id.btnGuardarCambios);
 
         // Cargar datos actuales
         etEditarNombre.setText(empr.getNom_emprendimiento());
@@ -147,13 +151,24 @@ public class EmprendimientoLista extends Fragment {
             String nuevoNombre = etEditarNombre.getText().toString().trim();
             String nuevaDesc = etEditarDescripcion.getText().toString().trim();
 
+            // ANTES:
+            //if (nuevoNombre.isEmpty()) {
+            //  etEditarNombre.setError("El nombre es obligatorio");
+            //  return;
+            //}
+
+            //if nuevaDesc.isEmpty()) {
+            //    etEditarDescripcion.setError("La descripción es obligatoria");
+            //    return;
+            //}
+
             if (nuevoNombre.isEmpty()) {
-                etEditarNombre.setError("El nombre es obligatorio");
+                mostrarAlertaPersonalizada("Campo requerido", "El nombre del emprendimiento es obligatorio", false);
                 return;
             }
 
             if (nuevaDesc.isEmpty()) {
-                etEditarDescripcion.setError("La descripción es obligatoria");
+                mostrarAlertaPersonalizada("Campo requerido", "La descripción es obligatoria", false);
                 return;
             }
 
@@ -269,12 +284,35 @@ public class EmprendimientoLista extends Fragment {
     }
 
     private void confirmarEliminar(Emprendimiento empr) {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Eliminar Emprendimiento")
-                .setMessage("¿Estás seguro de eliminar '" + empr.getNom_emprendimiento() + "'?")
-                .setPositiveButton("Eliminar", (dialog, which) -> eliminarEmprendimiento(empr))
-                .setNegativeButton("Cancelar", null)
-                .show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.alert_dialog_opciones, null);
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        Button btnNo = dialogView.findViewById(R.id.btnNo);
+        Button btnSi = dialogView.findViewById(R.id.btnSi);
+
+        tvTitulo.setText("¿Eliminar '" + empr.getNom_emprendimiento() + "'?");
+
+        AlertDialog dialog = builder.setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        // Fondo transparente
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        // Botón No - Cancelar
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        // Botón Sí - Eliminar
+        btnSi.setOnClickListener(v -> {
+            dialog.dismiss();
+            eliminarEmprendimiento(empr);
+        });
+
+        dialog.show();
     }
 
     private void eliminarEmprendimiento(Emprendimiento empr) {
@@ -323,7 +361,43 @@ public class EmprendimientoLista extends Fragment {
             }
         });
     }
+    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView;
 
+        TextView tvTitulo;
+        TextView tvMensaje;
+        Button btnAceptar;
+
+        if (esPositivo) {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+        } else {
+            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+        }
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
     private void cargarEmprendimientos() {
         progressBar.setVisibility(View.VISIBLE);
 
@@ -397,5 +471,6 @@ public class EmprendimientoLista extends Fragment {
                 layoutEmpty.setVisibility(View.VISIBLE);
             }
         });
+
     }
 }

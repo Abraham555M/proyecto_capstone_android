@@ -31,7 +31,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     private OnSolicitudClickListener solicitudListener;
     private OnCommentClickListener commentListener;
     private OnFollowClickListener followListener;
-
+    private OnFavoriteClickListener favoriteListener;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
@@ -52,21 +52,42 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public interface OnFollowClickListener {
         void onFollowClicked(Publicacion publicacion, MaterialButton btnFollow);
     }
+
     public void setFollowListener(OnFollowClickListener followListener) {
         this.followListener = followListener;
+    }
+
+    public interface OnFavoriteClickListener {
+        void onFavoriteClicked(Publicacion publicacion, ImageView ivBookmark);
+    }
+
+    public void setFavoriteListener(OnFavoriteClickListener favoriteListener) {
+        this.favoriteListener = favoriteListener;
+    }
+
+    public interface OnEntrepreneurClickListener {
+        void onEntrepreneurClicked(Publicacion publicacion);
+    }
+
+    private OnEntrepreneurClickListener entrepreneurClickListener;
+
+    public void setEntrepreneurClickListener(OnEntrepreneurClickListener listener) {
+        this.entrepreneurClickListener = listener;
     }
 
     public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
                               OnLikeClickListener likeListener,
                               OnReportClickListener reportListener,
                               OnSolicitudClickListener solicitudListener,
-                              OnCommentClickListener commentListener) {
+                              OnCommentClickListener commentListener,
+                              OnFavoriteClickListener favoriteClickListener) {
         this.context = context;
         this.listaPublicaciones = listaPublicaciones;
         this.likeListener = likeListener;
         this.reportListener = reportListener;
         this.solicitudListener = solicitudListener;
         this.commentListener = commentListener;
+        this.favoriteListener = favoriteClickListener;
     }
 
     @NonNull
@@ -109,6 +130,13 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             holder.ivLike.setImageResource(R.drawable.ic_corazon);
         }
 
+        // 🚨 Usar favorito para pintar el ícono
+        if (publicacion.isFavorito()) {
+            holder.ivBookmark.setImageResource(R.drawable.ic_favoritos_lleno);
+        } else {
+            holder.ivBookmark.setImageResource(R.drawable.ic_favoritos);
+        }
+
         if (publicacion.getDioSeguimiento() != null && publicacion.getDioSeguimiento() == 1) {
             // Seguido
             holder.btnFollow.setText("Siguiendo");
@@ -131,7 +159,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             }
         });
 
-        // 🚨 AlertDialog al presionar comentar
+        // AlertDialog al presionar comentar
         holder.ivComment.setOnClickListener(v -> {
             if (commentListener != null) {
                 commentListener.onCommentClicked(publicacion);
@@ -158,8 +186,18 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         });
 
         holder.ivBookmark.setOnClickListener(v -> {
-            // Acción para guardar en favoritos
+            if (favoriteListener != null) {
+                favoriteListener.onFavoriteClicked(publicacion, holder.ivBookmark);
+            }
         });
+
+        // Redirigir al presionar el nombre del emprendmiento
+        holder.tvEntrepreneurName.setOnClickListener(v -> {
+            if (entrepreneurClickListener != null) {
+                entrepreneurClickListener.onEntrepreneurClicked(publicacion);
+            }
+        });
+
 
         // Listener del botón Más opciones
         holder.ivMoreOptions.setOnClickListener(v -> {

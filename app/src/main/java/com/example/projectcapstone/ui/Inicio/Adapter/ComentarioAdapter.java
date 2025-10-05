@@ -1,6 +1,7 @@
 package com.example.projectcapstone.ui.Inicio.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,12 +25,20 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
     private List<Comentario> listaComentarios;
     private Context context;
+    private OnCommentLikeClickListener likeClickListener;
+
+    public interface OnCommentLikeClickListener {
+        void onCommentLikeClicked(Comentario comentario, ImageView imgLike, TextView textLikeCount);
+    }
+
+    public void setOnCommentLikeClickListener(OnCommentLikeClickListener listener) {
+        this.likeClickListener = listener;
+    }
 
     public ComentarioAdapter(Context context, List<Comentario> listaComentarios) {
         this.context = context;
         this.listaComentarios = listaComentarios;
     }
-
 
     @NonNull
     @Override
@@ -44,10 +53,34 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
         holder.textUserName.setText(comentario.getNomEstudiante());
         holder.textComment.setText(comentario.getConComentario());
+        holder.textTime.setText(getTiempoRelativo(comentario.getFchComentario()));
 
-        // Convertir fecha a tiempo relativo
-        String fechaComentario = comentario.getFchComentario(); // Ej: "2025-09-28 16:20:00"
-        holder.textTime.setText(getTiempoRelativo(fechaComentario));    }
+        // Mostrar cantidad de likes si es mayor a 0
+        if (comentario.getTotalLikes() > 0) {
+            holder.textLikeCount.setVisibility(View.VISIBLE);
+            holder.textLikeCount.setText(String.valueOf(comentario.getTotalLikes()));
+        } else {
+            holder.textLikeCount.setVisibility(View.GONE);
+        }
+
+        // Pintar ícono de like según estado
+        if (comentario.isLiked()) {
+            holder.imgLike.setImageResource(R.drawable.ic_corazon_lleno);
+            holder.imgLike.setColorFilter(Color.parseColor("#FBAE3C")); // Color naranja
+
+        } else {
+            holder.imgLike.setImageResource(R.drawable.ic_corazon);
+            holder.imgLike.setColorFilter(Color.parseColor("#BDBDBD")); // Color gris
+        }
+
+        // Click en Like
+        holder.layoutLike.setOnClickListener(v -> {
+            if (likeClickListener != null) {
+                likeClickListener.onCommentLikeClicked(comentario, holder.imgLike, holder.textLikeCount);
+            }
+        });
+    }
+
 
     @Override
     public int getItemCount() {
@@ -92,8 +125,9 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     }
 
     public static class ComentarioViewHolder extends RecyclerView.ViewHolder {
-        TextView textUserName, textComment, textTime;
-        ImageView imgAvatar;
+        TextView textUserName, textComment, textTime, textLikeCount;
+        ImageView imgAvatar, imgLike;
+        View layoutLike;
 
         public ComentarioViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,6 +135,9 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             textComment = itemView.findViewById(R.id.text_comment_content);
             textTime = itemView.findViewById(R.id.text_comment_time);
             imgAvatar = itemView.findViewById(R.id.img_comment_avatar);
+            imgLike = itemView.findViewById(R.id.img_like);
+            textLikeCount = itemView.findViewById(R.id.text_like_count);
+            layoutLike = itemView.findViewById(R.id.layout_like);
         }
     }
 }

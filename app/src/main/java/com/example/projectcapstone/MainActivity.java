@@ -1,13 +1,18 @@
 package com.example.projectcapstone;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,6 +21,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.projectcapstone.databinding.ActivityMainBinding;
+
+import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
@@ -75,10 +82,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        try {
+            Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+            method.setAccessible(true);
+            method.invoke(menu, true);
+        } catch (Exception e) {
+            Log.w("MainActivity", "No se pudo mostrar íconos en menú: " + e.getMessage());
+        }
+
         return true;
     }
+
 
     @Override
     public boolean onSupportNavigateUp() {

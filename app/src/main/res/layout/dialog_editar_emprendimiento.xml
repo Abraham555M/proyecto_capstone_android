@@ -1,128 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp"
     android:background="@android:color/white">
 
-    <!-- Título -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Editar Emprendimiento"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="wrap_content">
 
-    <!-- Imagen de Portada -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp">
+        <!-- Área de imagen gris -->
+        <FrameLayout
+            android:id="@+id/containerImagen"
+            android:layout_width="0dp"
+            android:layout_height="220dp"
+            android:background="#F2F2F2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/imgEditarPortada"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_placeholder"
-            android:contentDescription="Foto de portada"/>
+            <!-- Imagen de preview o placeholder -->
+            <ImageView
+                android:id="@+id/imgEditarPortada"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_placeholder"
+                android:contentDescription="Foto de portada"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#40000000"/>
+            <!-- Overlay oscuro cuando no hay imagen -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#40000000"/>
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:src="@android:drawable/ic_menu_camera"
-            android:contentDescription="Cambiar foto"/>
-    </androidx.cardview.widget.CardView>
+            <!-- Texto "Subir foto" centrado -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:gravity="center">
 
-    <!-- Botón Seleccionar Imagen -->
-    <Button
-        android:id="@+id/btnSeleccionarImagen"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📷 Cambiar Imagen"
-        android:textColor="@android:color/white"
-        android:background="@drawable/button_rounded"
-        android:textSize="14sp"
-        android:layout_marginBottom="16dp"
-        android:padding="12dp"/>
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@android:drawable/ic_menu_upload"
+                    android:tint="@android:color/darker_gray"/>
 
-    <!-- Nombre del Emprendimiento -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:hint="Nombre del emprendimiento"
-        app:boxStrokeColor="@color/purple_500"
-        app:hintTextColor="@color/purple_700">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Subir foto"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </FrameLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
+        <!-- Botón circular de cámara (superpuesto) -->
+        <ImageButton
+            android:id="@+id/btnSeleccionarImagen"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="-50dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Cambiar foto"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_camara_emprendimiento"
+            android:tint="@color/orange_circle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/containerImagen"
+            android:layout_marginStart="0dp"/>
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Editar Emprendimiento"
+            android:textColor="@android:color/black"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSeleccionarImagen"/>
+
+        <!-- Label Nombre -->
+        <TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="24dp"
+            android:text="Nombre del emprendimiento"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitulo"/>
+
+        <!-- EditText Nombre -->
+        <EditText
             android:id="@+id/etEditarNombre"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:backgroundTint="@android:color/darker_gray"
+            android:hint="Nombre tienda"
             android:inputType="textCapWords"
-            android:maxLines="1"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvNombre"/>
 
-    <!-- Descripción -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:hint="Descripción"
-        app:boxStrokeColor="@color/purple_500"
-        app:hintTextColor="@color/purple_700">
+        <!-- Label Descripción -->
+        <TextView
+            android:id="@+id/tvDescripcion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:text="Descripción"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etEditarNombre"/>
 
-        <com.google.android.material.textfield.TextInputEditText
+        <!-- EditText Descripción -->
+        <EditText
             android:id="@+id/etEditarDescripcion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_marginHorizontal="24dp"
+            android:backgroundTint="@android:color/darker_gray"
+            android:gravity="top|start"
+            android:hint="Escribe la descripción aquí..."
             android:inputType="textMultiLine|textCapSentences"
-            android:minLines="3"
-            android:maxLines="5"
-            android:gravity="top"/>
-    </com.google.android.material.textfield.TextInputLayout>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvDescripcion"/>
 
-    <!-- Botones de Acción -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
-
-        <Button
-            android:id="@+id/btnCancelar"
+        <!-- Botones de acción -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Cancelar"
-            android:textColor="@color/purple_500"
-            android:background="@drawable/button_outline"
-            android:layout_marginEnd="8dp"
-            android:padding="12dp"/>
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etEditarDescripcion">
 
-        <Button
-            android:id="@+id/btnGuardarCambios"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Guardar"
-            android:textColor="@android:color/white"
-            android:background="@drawable/button_rounded"
-            android:layout_marginStart="8dp"
-            android:padding="12dp"/>
-    </LinearLayout>
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_outline"
+                android:text="Cancelar"
+                android:textColor="@color/orange_circle"/>
 
-</LinearLayout>
+            <Button
+                android:id="@+id/btnGuardarCambios"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="#F4A027"
+                android:text="Guardar"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
