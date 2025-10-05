@@ -27,13 +27,14 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/circle_gray_background" />
 
-            <!-- Ícono del emprendimiento -->
             <ImageView
                 android:id="@+id/ivEmprendimientoIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_centerInParent="true"
-                app:tint="@color/gray_dark" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/image_border"
+                android:contentDescription="Imagen del emprendimiento" />
 
         </RelativeLayout>
 
@@ -49,29 +50,33 @@
             android:layout_marginBottom="12dp"
             android:gravity="center" />
 
-        <!-- Botones Editar y Eliminar -->
+        <!-- Botones Editar y Eliminar con iconos -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnEditar"
-                android:layout_width="69dp"
-                android:layout_height="wrap_content"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/circle_green"
-                android:text="EDIT"
-                android:textColor="@android:color/white" />
+                android:background="@drawable/circle_green_button"
+                android:src="@drawable/ic_editar_perfil"
+                android:contentDescription="Editar emprendimiento"
+                android:padding="12dp"
+                android:scaleType="fitCenter" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnEliminar1"
-                android:layout_width="68dp"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/error_color"
-                android:text="ELIM"
-                android:textColor="@android:color/white" />
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_red_button"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="Eliminar emprendimiento"
+                android:padding="12dp"
+                android:scaleType="fitCenter" />
 
         </LinearLayout>
 
