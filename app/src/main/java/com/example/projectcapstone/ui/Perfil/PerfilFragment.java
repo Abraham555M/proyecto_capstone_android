@@ -6,13 +6,17 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +36,13 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
-public class PerfilFragment extends Fragment {
+public class PerfilFragment extends Fragment implements View.OnClickListener{
     private TextView tvCantidadPublicaciones, tvCantidadSeguidores, tvCantidadSeguidos;
     private RecyclerView rvEmprendimientosPerfil;
     private EmprendimientoPerfilAdapter emprendimientoAdapter;
     private List<EmprendimientoPerfil> listaEmprendimientos;
+    private LinearLayout layoutEmptyMessage;
+    private Button btnCrearEmprendimiento;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +54,10 @@ public class PerfilFragment extends Fragment {
         tvCantidadSeguidores = rootView.findViewById(R.id.tvCantidadSeguidores);
         tvCantidadSeguidos = rootView.findViewById(R.id.tvCantidadSeguidos);
         rvEmprendimientosPerfil = rootView.findViewById(R.id.rvEmprendimientosPerfil);
+        layoutEmptyMessage = rootView.findViewById(R.id.layoutEmptyMessage);
+        btnCrearEmprendimiento = rootView.findViewById(R.id.btnCrearEmprendimiento);
+
+        btnCrearEmprendimiento.setOnClickListener(this);
 
         return rootView;
     }
@@ -156,7 +166,11 @@ public class PerfilFragment extends Fragment {
 
                     // Mensaje si no hay emprendimientos
                     if (listaEmprendimientos.isEmpty()) {
-                        Toast.makeText(getContext(), "No tienes emprendimientos aún", Toast.LENGTH_SHORT).show();
+                        layoutEmptyMessage.setVisibility(View.VISIBLE);
+                        rvEmprendimientosPerfil.setVisibility(View.GONE);
+                    } else {
+                        layoutEmptyMessage.setVisibility(View.GONE);
+                        rvEmprendimientosPerfil.setVisibility(View.VISIBLE);
                     }
 
                 } catch (Exception e) {
@@ -170,5 +184,13 @@ public class PerfilFragment extends Fragment {
                 Toast.makeText(getContext(), "Error al cargar emprendimientos", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == btnCrearEmprendimiento){
+            NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.action_nav_perfil_to_nav_emprendimiento);
+        }
     }
 }

@@ -1,12 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:paddingBottom="16dp"
     android:paddingHorizontal="8dp">
 
-    <!-- Nombre de la categoría -->
+    <!-- Nombre del emprendimiento -->
     <TextView
         android:id="@+id/tvEmprendimientos"
         android:layout_width="wrap_content"
@@ -27,5 +27,40 @@
         android:overScrollMode="never"
         android:clipToPadding="false"
         tools:listitem="@layout/item_publicaciones_perfil" />
+
+    <!-- Mensaje cuando no hay publicaciones -->
+    <LinearLayout
+        android:id="@+id/layoutEmptyPosts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/ic_corazon"
+            android:layout_marginBottom="8dp"
+            android:alpha="0.6" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sin publicaciones"
+            android:textColor="@color/darker_gray"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aún no has publicado nada en este emprendimiento."
+            android:textColor="@color/darker_gray"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
 
 </LinearLayout>

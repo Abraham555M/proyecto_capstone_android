@@ -211,9 +211,9 @@
         <!-- Sección Emprendimientos -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@drawable/bottom_section_background"
+            android:background="@drawable/section_white_rounded_top"
             android:paddingTop="24dp"
             android:paddingBottom="32dp">
 
@@ -235,6 +235,57 @@
                 android:paddingHorizontal="16dp"
                 android:clipToPadding="false"
                 tools:listitem="@layout/item_emprendimiento_perfil" />
+
+            <!-- Mensaje cuando no hay emprendimientos -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_cerrar_sesion"
+                    app:tint="@color/darker_gray"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Aún no tienes emprendimientos registrados"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Empieza creando uno para compartir tus ideas con la comunidad."
+                    android:textColor="@color/darker_gray"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <Button
+                    android:id="@+id/btnCrearEmprendimiento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Crear Emprendimiento"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#FBAE3C"
+                    android:paddingHorizontal="32dp"
+                    android:paddingVertical="12dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

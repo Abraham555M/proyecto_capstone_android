@@ -4,16 +4,14 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.projectcapstone.R;
 import com.example.projectcapstone.databinding.ItemEmprendimientoPerfilBinding;
 import com.example.projectcapstone.ui.Clases.EmprendimientoPerfil;
+import com.example.projectcapstone.R;
 
 import java.util.List;
 
@@ -47,7 +45,7 @@ public class EmprendimientoPerfilAdapter extends RecyclerView.Adapter<Emprendimi
     }
 
     class EmprendimientoViewHolder extends RecyclerView.ViewHolder {
-        private ItemEmprendimientoPerfilBinding binding;
+        private final ItemEmprendimientoPerfilBinding binding;
 
         public EmprendimientoViewHolder(ItemEmprendimientoPerfilBinding binding) {
             super(binding.getRoot());
@@ -55,26 +53,36 @@ public class EmprendimientoPerfilAdapter extends RecyclerView.Adapter<Emprendimi
         }
 
         public void bind(EmprendimientoPerfil emprendimiento) {
-            // Título de la categoría
+            // Nombre del emprendimiento
             binding.tvEmprendimientos.setText(emprendimiento.getNombreCategoria());
 
-            // Configurar RecyclerView hijo (horizontal)
-            LinearLayoutManager layoutManager = new LinearLayoutManager(
-                    context,
-                    LinearLayoutManager.HORIZONTAL,
-                    false
-            );
+            // Publicaciones
+            if (emprendimiento.getPublicaciones() == null || emprendimiento.getPublicaciones().isEmpty()) {
+                // Si no hay publicaciones, mostramos el mensaje vacío
+                binding.recyclerPosts.setVisibility(View.GONE);
+                binding.layoutEmptyPosts.setVisibility(View.VISIBLE);
+            } else {
+                // Si hay publicaciones, mostramos el RecyclerView
+                binding.recyclerPosts.setVisibility(View.VISIBLE);
+                binding.layoutEmptyPosts.setVisibility(View.GONE);
 
-            binding.recyclerPosts.setLayoutManager(layoutManager);
+                // Configurar RecyclerView hijo
+                LinearLayoutManager layoutManager = new LinearLayoutManager(
+                        context,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                );
+                binding.recyclerPosts.setLayoutManager(layoutManager);
 
-            // Crear y asignar adapter hijo
-            PublicacionesPerfilAdapter publicacionesAdapter =
-                    new PublicacionesPerfilAdapter(emprendimiento.getPublicaciones());
-            binding.recyclerPosts.setAdapter(publicacionesAdapter);
+                // Crear y asignar adapter hijo
+                PublicacionesPerfilAdapter publicacionesAdapter =
+                        new PublicacionesPerfilAdapter(emprendimiento.getPublicaciones());
+                binding.recyclerPosts.setAdapter(publicacionesAdapter);
 
-            // Opcional: mejorar performance
-            binding.recyclerPosts.setHasFixedSize(true);
-            binding.recyclerPosts.setNestedScrollingEnabled(false);
+                // Mejoras de performance
+                binding.recyclerPosts.setHasFixedSize(true);
+                binding.recyclerPosts.setNestedScrollingEnabled(false);
+            }
         }
     }
 }

@@ -122,7 +122,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-
     private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments) {
         String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion + "&idEstudiante=1";
 
