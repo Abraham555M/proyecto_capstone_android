@@ -114,7 +114,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             bundle.putString("idEmprendimiento", publicacion.getImgEmprendimiento());
 
             NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_nav_inicio_to_nav_publicaciones_del_emprendimiento, bundle);
+            navController.navigate(R.id.action_nav_inicio_to_nav_perfil_emprendedor, bundle);
         });
 
         rvPublicaciones.setAdapter(publicacionAdapter);

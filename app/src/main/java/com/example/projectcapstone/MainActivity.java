@@ -15,6 +15,8 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
+import androidx.navigation.NavInflater;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -37,7 +39,20 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        session = new SessionManager(this);
 
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavInflater navInflater = navController.getNavInflater();
+        NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
+
+        if (session.isSesionActiva()) {
+            Log.d("SESSION_MANAGER", "✅ Sesión activa detectada: " + session.getNombre());
+            navGraph.setStartDestination(R.id.nav_inicio);
+        } else {
+            Log.d("SESSION_MANAGER", "⚠️ No hay sesión activa. Dirigiendo a StartUpn");
+            navGraph.setStartDestination(R.id.nav_start_upn);
+        }
+        navController.setGraph(navGraph);
         setSupportActionBar(binding.appBarMain.toolbar);
 
         DrawerLayout drawer = binding.drawerLayout;
@@ -50,22 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 .setOpenableLayout(drawer)
                 .build();
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-        session = new SessionManager(this);
-        if (!session.isSesionActiva()) {
-            // Si no hay sesión activa, ir directamente al fragmento de inicio de sesión
-            binding.getRoot().post(() -> {
-                NavController navControllerr = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-                NavOptions navOptions = new NavOptions.Builder()
-                        .setPopUpTo(navControllerr.getGraph().getStartDestinationId(), true)
-                        .setLaunchSingleTop(true)
-                        .build();
-                navControllerr.navigate(R.id.nav_start_upn, null, navOptions);
-            });
-        }
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta ||
@@ -122,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {

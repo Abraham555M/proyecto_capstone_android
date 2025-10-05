@@ -110,8 +110,8 @@
         android:label="Inicio"
         tools:layout="@layout/fragment_inicio" >
         <action
-            android:id="@+id/action_nav_inicio_to_nav_publicaciones_del_emprendimiento"
-            app:destination="@id/nav_publicaciones_del_emprendimiento" />
+            android:id="@+id/action_nav_inicio_to_nav_perfil_emprendedor"
+            app:destination="@id/nav_perfil_emprendedor" />
     </fragment>
 
     <fragment
@@ -178,7 +178,11 @@
         android:id="@+id/nav_perfil_emprendedor"
         android:name="com.example.projectcapstone.ui.Inicio.PerfilEmprendedorFragment"
         android:label="fragment_perfil_emprendedor"
-        tools:layout="@layout/fragment_perfil_emprendedor" />
+        tools:layout="@layout/fragment_perfil_emprendedor" >
+        <action
+            android:id="@+id/action_nav_perfil_emprendedor_to_nav_publicaciones_del_emprendimiento"
+            app:destination="@id/nav_publicaciones_del_emprendimiento" />
+    </fragment>
     <fragment
         android:id="@+id/nav_publicaciones_del_emprendimiento"
         android:name="com.example.projectcapstone.ui.Inicio.PublicacionesEmprendimientoFragment"
