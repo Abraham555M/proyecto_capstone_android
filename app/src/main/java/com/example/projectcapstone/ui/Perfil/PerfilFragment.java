@@ -38,7 +38,7 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 
 public class PerfilFragment extends Fragment implements View.OnClickListener{
-    private TextView tvCantidadPublicaciones, tvCantidadSeguidores, tvCantidadSeguidos;
+    private TextView tvCantidadPublicaciones, tvCantidadSeguidores, tvCantidadSeguidos, tvNombre, tvSede, tvTelefono;
     private RecyclerView rvEmprendimientosPerfil;
     private EmprendimientoPerfilAdapter emprendimientoAdapter;
     private List<EmprendimientoPerfil> listaEmprendimientos;
@@ -58,6 +58,9 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
         rvEmprendimientosPerfil = rootView.findViewById(R.id.rvEmprendimientosPerfil);
         layoutEmptyMessage = rootView.findViewById(R.id.layoutEmptyMessage);
         btnCrearEmprendimiento = rootView.findViewById(R.id.btnCrearEmprendimiento);
+        tvNombre = rootView.findViewById(R.id.tvNombre);
+        tvSede = rootView.findViewById(R.id.tvSede);
+        tvTelefono = rootView.findViewById(R.id.tvTelefono);
 
         session = new SessionManager(requireContext());
 
@@ -73,6 +76,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
         setupRecyclerView();
         cargarCantidadPublicaciones();
         cargarEmprendimientosConPublicaciones();
+        cargarInformacionPerfil();
     }
 
     private void setupRecyclerView() {
@@ -189,6 +193,43 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
+
+    private void cargarInformacionPerfil() {
+        int idEstudiante = session.getIdEstudiante();
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_informacion_perfil.php?idEstudiante=" + idEstudiante;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONObject jsonObject = new JSONObject(respuesta);
+
+                    if (jsonObject.has("error")) {
+                        Toast.makeText(getContext(), "No se encontró el estudiante", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String nombre = jsonObject.optString("nombre", "Sin nombre");
+                    String sede = jsonObject.optString("sede", "Sin sede");
+
+                    tvNombre.setText(nombre);
+                    tvSede.setText(sede);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar los datos del perfil", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al cargar información del perfil", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     @Override
     public void onClick(View v) {

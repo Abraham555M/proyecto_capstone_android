@@ -100,7 +100,7 @@
                         android:id="@+id/ivColaboraciones"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="15dp"
                         android:src="@drawable/ic_colaboraciones"
                         app:tint="@android:color/white" />
                 </LinearLayout>
