@@ -39,12 +39,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(view ->
-                Snackbar.make(view, "Acción rápida", Snackbar.LENGTH_LONG)
-                        .setAction("Ok", null)
-                        .setAnchorView(R.id.fab)
-                        .show()
-        );
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -62,13 +56,14 @@ public class MainActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         if (!session.isSesionActiva()) {
-            // Navegar al fragmento de inicio de sesión después de que el NavHost esté listo
+            // Si no hay sesión activa, ir directamente al fragmento de inicio de sesión
             binding.getRoot().post(() -> {
-                NavController navControllere = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+                NavController navControllerr = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
                 NavOptions navOptions = new NavOptions.Builder()
-                        .setPopUpTo(navControllere.getGraph().getStartDestinationId(), true)
+                        .setPopUpTo(navControllerr.getGraph().getStartDestinationId(), true)
+                        .setLaunchSingleTop(true)
                         .build();
-                navControllere.navigate(R.id.nav_inicio, null, navOptions);
+                navControllerr.navigate(R.id.nav_start_upn, null, navOptions);
             });
         }
 
@@ -83,11 +78,9 @@ public class MainActivity extends AppCompatActivity {
 
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // Desactiva swipe
-                binding.appBarMain.fab.setVisibility(View.GONE); //Quitar el flotante
             } else {
                 binding.appBarMain.toolbar.setVisibility(View.VISIBLE); // Reactivar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // Reactiva swipe
-                binding.appBarMain.fab.setVisibility(View.VISIBLE); // Reactivar el flotante
             }
         });
     }
@@ -105,6 +98,31 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // 🔒 Cerrar sesión
+            session.cerrarSesion();
+
+            // 🧭 Redirigir al fragmento de inicio de sesión o pantalla principal
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(navController.getGraph().getStartDestinationId(), true)
+                    .build();
+
+            navController.navigate(R.id.nav_start_upn, null, navOptions);
+
+            // 🗨️ Mensaje de confirmación
+            Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     public boolean onSupportNavigateUp() {
