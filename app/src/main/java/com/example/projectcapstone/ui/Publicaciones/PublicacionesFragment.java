@@ -74,7 +74,8 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
         int idEstudiante = prefs.getInt("id_estudiante", -1);
 
         RequestParams params = new RequestParams();
-            params.put("idEstudiante",idEstudiante);
+        params.put("idEstudiante", idEstudiante);
+        params.put("servidorConfig", ServidorConfig.URL_FOTOS_SERVIDOR);
 
         client.get(URL, params, new AsyncHttpResponseHandler() {
             @Override
@@ -86,16 +87,25 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     publicaciones.clear();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
+
+                        String imagen = obj.getString("imagen_url");
+
+                        // 👇 Si no es URL absoluta (http/https), concatenamos
+                        if (!imagen.startsWith("http")) {
+                            imagen = ServidorConfig.URL_FOTOS_SERVIDOR + imagen;
+                        }
+
                         publicaciones.add(new Publicacion(
                                 obj.getInt("id"),
                                 obj.getString("titulo"),
                                 obj.getString("descripcion"),
-                                obj.getString("imagen_url")
+                                imagen
                         ));
                     }
                     adapter.notifyDataSetChanged();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(getContext(), "Error procesando publicaciones", Toast.LENGTH_SHORT).show();
                 }
             }
 

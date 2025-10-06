@@ -39,6 +39,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.concurrent.TransferQueue;
 
 import cz.msebera.android.httpclient.Header;
@@ -96,8 +97,8 @@ public class NuevoEmprendimientoFragment extends Fragment {
                     idCategoria,
                     nombreTienda,
                     descripcion,
-                    imageUri.getPath(),
-                    imageUri.getPath()
+                    imageUri,
+                    imageUri
             );
         });
 
@@ -189,8 +190,8 @@ public class NuevoEmprendimientoFragment extends Fragment {
     }
     private void agregarEmprendimiento(int idEstudiante, int idCategoria,
                                        String nombre, String descripcion,
-                                       String imgPorEmprendimiento,
-                                       String imgPerEmprendimiento) {
+                                       Uri uriPor,
+                                       Uri uriPer) {
 
         String URL = ServidorConfig.URL_SERVIDOR + "emprendimiento/agregar_emprendimiento.php";
 
@@ -203,17 +204,13 @@ public class NuevoEmprendimientoFragment extends Fragment {
         params.put("des_emprendimiento", descripcion);
 
         try {
-            if (imgPorEmprendimiento != null) {
-                File file1 = getFileFromUri(Uri.parse(imgPorEmprendimiento));
-                if (file1 != null && file1.exists()) {
-                    params.put("img_por_emprendimiento", file1);
-                }
+            if (uriPor != null) {
+                InputStream isPor = requireContext().getContentResolver().openInputStream(uriPor);
+                params.put("img_por_emprendimiento", isPor, "imagen_por.jpg");
             }
-            if (imgPerEmprendimiento != null) {
-                File file2 = getFileFromUri(Uri.parse(imgPerEmprendimiento));
-                if (file2 != null && file2.exists()) {
-                    params.put("img_per_emprendimiento", file2);
-                }
+            if (uriPer != null) {
+                InputStream isPer = requireContext().getContentResolver().openInputStream(uriPer);
+                params.put("img_per_emprendimiento", isPer, "imagen_per.jpg");
             }
         } catch (Exception e) {
             e.printStackTrace();
