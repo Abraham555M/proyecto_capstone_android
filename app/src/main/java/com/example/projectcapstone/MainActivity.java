@@ -15,6 +15,8 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
+import androidx.navigation.NavInflater;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -37,14 +39,21 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        session = new SessionManager(this);
 
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavInflater navInflater = navController.getNavInflater();
+        NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
+
+        if (session.isSesionActiva()) {
+            Log.d("SESSION_MANAGER", "✅ Sesión activa detectada: " + session.getNombre());
+            navGraph.setStartDestination(R.id.nav_inicio);
+        } else {
+            Log.d("SESSION_MANAGER", "⚠️ No hay sesión activa. Dirigiendo a StartUpn");
+            navGraph.setStartDestination(R.id.nav_start_upn);
+        }
+        navController.setGraph(navGraph);
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(view ->
-                Snackbar.make(view, "Acción rápida", Snackbar.LENGTH_LONG)
-                        .setAction("Ok", null)
-                        .setAnchorView(R.id.fab)
-                        .show()
-        );
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -56,21 +65,8 @@ public class MainActivity extends AppCompatActivity {
                 .setOpenableLayout(drawer)
                 .build();
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-        session = new SessionManager(this);
-        if (!session.isSesionActiva()) {
-            // Navegar al fragmento de inicio de sesión después de que el NavHost esté listo
-            binding.getRoot().post(() -> {
-                NavController navControllere = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-                NavOptions navOptions = new NavOptions.Builder()
-                        .setPopUpTo(navControllere.getGraph().getStartDestinationId(), true)
-                        .build();
-                navControllere.navigate(R.id.nav_inicio, null, navOptions);
-            });
-        }
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta ||
@@ -83,11 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // Desactiva swipe
-                binding.appBarMain.fab.setVisibility(View.GONE); //Quitar el flotante
             } else {
                 binding.appBarMain.toolbar.setVisibility(View.VISIBLE); // Reactivar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // Reactiva swipe
-                binding.appBarMain.fab.setVisibility(View.VISIBLE); // Reactivar el flotante
             }
         });
     }
@@ -104,6 +98,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // 🔒 Cerrar sesión
+            session.cerrarSesion();
+
+            // 🧭 Redirigir al fragmento de inicio de sesión o pantalla principal
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(navController.getGraph().getStartDestinationId(), true)
+                    .build();
+
+            navController.navigate(R.id.nav_start_upn, null, navOptions);
+
+            // 🗨️ Mensaje de confirmación
+            Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

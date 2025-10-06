@@ -179,9 +179,21 @@
             android:textSize="13sp"
             android:textColor="@color/gray_medium"
             android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+
             android:maxLines="2"
             android:ellipsize="end"
             tools:text="Descripción breve del producto con un máximo de dos líneas..." />
 
+        <TextView
+            android:id="@+id/tvVerMas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver más"
+            android:textSize="13sp"
+            android:textColor="@color/teal_700"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

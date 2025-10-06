@@ -114,7 +114,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             bundle.putString("idEmprendimiento", publicacion.getImgEmprendimiento());
 
             NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_nav_inicio_to_nav_publicaciones_del_emprendimiento, bundle);
+            navController.navigate(R.id.action_nav_inicio_to_nav_perfil_emprendedor, bundle);
         });
 
         rvPublicaciones.setAdapter(publicacionAdapter);
@@ -551,15 +551,15 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void registrarSolicitud(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento, String mensaje, AlertDialog dialog) {
+    private void registrarColaboracion(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento, String mensaje, AlertDialog dialog) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
         params.put("idEstudiante", idEstudiante);
         params.put("idPublicacion", idPublicacion);
         params.put("idEmprendimiento", idEmprendimiento);
-        params.put("menSolicitud", mensaje);
+        params.put("menColaboracion", mensaje);
 
-        String url = ServidorConfig.URL_SERVIDOR + "solicitud/solicitud_registrar_colaboracion.php";
+        String url = ServidorConfig.URL_SERVIDOR + "colaboracion/colaboracion_registrar.php";
 
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
@@ -642,7 +642,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                 return;
             }
 
-            registrarSolicitud(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
+            registrarColaboracion(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
         });
     }
 
