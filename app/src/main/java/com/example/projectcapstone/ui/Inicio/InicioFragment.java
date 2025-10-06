@@ -13,6 +13,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -628,8 +630,38 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         // Referencias a las vistas
         TextInputEditText etMensaje = dialogView.findViewById(R.id.etMensajeSolicitud);
+        TextView tvWordCounter = dialogView.findViewById(R.id.tvWordCounter);
         MaterialButton btnEnviar = dialogView.findViewById(R.id.btnEnviar);
         ImageButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
+        // ✅ CONFIGURAR CONTADOR DE PALABRAS
+        etMensaje.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String texto = s.toString().trim();
+                int palabras = contarPalabras(texto);
+
+                // Actualizar el contador
+                tvWordCounter.setText(palabras + " / 100 palabras");
+
+                // Cambiar color y habilitar/deshabilitar botón según el límite
+                if (palabras > 10) {
+                    tvWordCounter.setTextColor(Color.RED);
+                    btnEnviar.setEnabled(false);
+                    btnEnviar.setAlpha(0.5f); // Efecto visual de deshabilitado
+                } else {
+                    tvWordCounter.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
+                    btnEnviar.setEnabled(palabras > 0);
+                    btnEnviar.setAlpha(palabras > 0 ? 1.0f : 0.5f);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         // Acción botón cerrar
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
@@ -637,13 +669,38 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         // Acción enviar
         btnEnviar.setOnClickListener(v -> {
             String mensaje = etMensaje.getText().toString().trim();
+            int palabras = contarPalabras(mensaje);
+
             if (mensaje.isEmpty()) {
                 Toast.makeText(context, "Por favor ingresa un mensaje", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            if (palabras > 10) {
+                Toast.makeText(context, "El mensaje no puede exceder 100 palabras", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             registrarColaboracion(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
         });
+    }
+
+    private int contarPalabras(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return 0;
+        }
+
+        // Dividir por espacios y contar solo palabras no vacías
+        String[] palabras = texto.split("\\s+");
+        int count = 0;
+
+        for (String palabra : palabras) {
+            if (!palabra.trim().isEmpty()) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private void mostrarDialogoComentarios(Context context, int idPublicacion) {
