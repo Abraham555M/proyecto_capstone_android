@@ -17,12 +17,13 @@ import com.example.projectcapstone.ui.Clases.Categoria;
 import java.util.List;
 
 public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.CategoriaViewHolder> {
-    private Context context;
-    private List<Categoria> listaCategorias;
+    private final Context context;
+    private final List<Categoria> listaCategorias;
     private OnItemClickListener listener;
-    private int selectedPosition = -1;
 
-    // Listener opcional para click en categoría
+    // Nueva variable: guarda el ID de la categoría seleccionada (más estable que position)
+    private Integer idCategoriaSeleccionada = null;
+
     public interface OnItemClickListener {
         void onItemClick(Categoria categoria);
     }
@@ -34,6 +35,12 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
+    }
+
+    // ✅ Nuevo método público para actualizar visualmente la selección desde el fragmento
+    public void setCategoriaSeleccionada(Integer idCategoria) {
+        this.idCategoriaSeleccionada = idCategoria;
+        notifyDataSetChanged(); // Refresca la vista completa
     }
 
     @NonNull
@@ -49,44 +56,53 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
 
         holder.tvNombre.setText(categoria.getNomCategoria());
 
-        // Cargar imagen desde URL con Glide
         Glide.with(context)
                 .load(categoria.getImgCategoria())
                 .placeholder(R.drawable.ic_error)
                 .error(R.drawable.ic_error)
                 .into(holder.imgCategoria);
 
-        // ← AGREGAR: Resaltar categoría seleccionada
-        if (selectedPosition == position) {
-            holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.purple_500));
-            holder.tvNombre.setTextColor(context.getResources().getColor(R.color.white));
+        // 💙 Cambiar solo color del texto (sin fondo)
+        boolean isSelected = idCategoriaSeleccionada != null &&
+                idCategoriaSeleccionada.equals(categoria.getIdCategoria());
+
+        if (isSelected) {
+            holder.itemView.setBackgroundResource(0);
+            holder.tvNombre.setTextColor(context.getResources().getColor(R.color.blue_primary));
         } else {
-            holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.white));
+            holder.itemView.setBackgroundResource(0);
             holder.tvNombre.setTextColor(context.getResources().getColor(R.color.gray_dark));
         }
 
-        // ← MODIFICAR: Evento click
+        // 🎬 Animación de clic (efecto de presión)
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition == RecyclerView.NO_POSITION) return;
+            v.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        v.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(100)
+                                .start();
 
-                int previousPosition = selectedPosition;
-
-                if (selectedPosition == adapterPosition) {
-                    selectedPosition = -1;
-                    listener.onItemClick(null);
-                } else {
-                    selectedPosition = adapterPosition;
-                    listener.onItemClick(categoria);
-                }
-
-                if (previousPosition != -1)
-                    notifyItemChanged(previousPosition);
-                notifyItemChanged(adapterPosition);
-            }
+                        // Tu lógica normal de selección
+                        if (listener != null) {
+                            if (isSelected) {
+                                idCategoriaSeleccionada = null; // deselecciona
+                                listener.onItemClick(null);
+                            } else {
+                                idCategoriaSeleccionada = categoria.getIdCategoria(); // selecciona
+                                listener.onItemClick(categoria);
+                            }
+                            notifyDataSetChanged();
+                        }
+                    })
+                    .start();
         });
     }
+
 
     @Override
     public int getItemCount() {
