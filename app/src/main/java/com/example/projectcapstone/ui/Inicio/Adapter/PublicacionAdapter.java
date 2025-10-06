@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -32,6 +34,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     private OnCommentClickListener commentListener;
     private OnFollowClickListener followListener;
     private OnFavoriteClickListener favoriteListener;
+    private OnEntrepreneurClickListener entrepreneurClickListener;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
@@ -53,26 +56,12 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         void onFollowClicked(Publicacion publicacion, MaterialButton btnFollow);
     }
 
-    public void setFollowListener(OnFollowClickListener followListener) {
-        this.followListener = followListener;
-    }
-
     public interface OnFavoriteClickListener {
         void onFavoriteClicked(Publicacion publicacion, ImageView ivBookmark);
     }
 
-    public void setFavoriteListener(OnFavoriteClickListener favoriteListener) {
-        this.favoriteListener = favoriteListener;
-    }
-
     public interface OnEntrepreneurClickListener {
         void onEntrepreneurClicked(Publicacion publicacion);
-    }
-
-    private OnEntrepreneurClickListener entrepreneurClickListener;
-
-    public void setEntrepreneurClickListener(OnEntrepreneurClickListener listener) {
-        this.entrepreneurClickListener = listener;
     }
 
     public PublicacionAdapter(Context context, List<Publicacion> listaPublicaciones,
@@ -88,6 +77,18 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         this.solicitudListener = solicitudListener;
         this.commentListener = commentListener;
         this.favoriteListener = favoriteClickListener;
+    }
+
+    public void setFollowListener(OnFollowClickListener followListener) {
+        this.followListener = followListener;
+    }
+
+    public void setFavoriteListener(OnFavoriteClickListener favoriteListener) {
+        this.favoriteListener = favoriteListener;
+    }
+
+    public void setEntrepreneurClickListener(OnEntrepreneurClickListener listener) {
+        this.entrepreneurClickListener = listener;
     }
 
     @NonNull
@@ -123,20 +124,21 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         holder.tvPrice.setText("S/ " + "20.00");
         holder.tvProductDescription.setText(publicacion.getConPublicacion());
 
-        // 🚨 Usar dioLike para pintar corazón
+        // Usar dioLike para pintar corazón
         if (publicacion.isLiked()) {
             holder.ivLike.setImageResource(R.drawable.ic_corazon_lleno);
         } else {
             holder.ivLike.setImageResource(R.drawable.ic_corazon);
         }
 
-        // 🚨 Usar favorito para pintar el ícono
+        // Usar favorito para pintar el ícono
         if (publicacion.isFavorito()) {
             holder.ivBookmark.setImageResource(R.drawable.ic_favoritos_lleno);
         } else {
             holder.ivBookmark.setImageResource(R.drawable.ic_favoritos);
         }
 
+        // Estado del botón seguir
         if (publicacion.getDioSeguimiento() != null && publicacion.getDioSeguimiento() == 1) {
             // Seguido
             holder.btnFollow.setText("Siguiendo");
@@ -159,13 +161,14 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             }
         });
 
-        // AlertDialog al presionar comentar
+        // Listener comentar
         holder.ivComment.setOnClickListener(v -> {
             if (commentListener != null) {
                 commentListener.onCommentClicked(publicacion);
             }
         });
 
+        // Listener seguir
         holder.btnFollow.setOnClickListener(v -> {
             if (followListener != null) {
                 followListener.onFollowClicked(publicacion, holder.btnFollow);
@@ -173,7 +176,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
                 // Nuevo estado (toggle)
                 int nuevoEstado = (publicacion.getDioSeguimiento() != null && publicacion.getDioSeguimiento() == 1) ? 0 : 1;
 
-                // 🔥 Recorremos TODAS las publicaciones del mismo emprendimiento
+                // Recorremos TODAS las publicaciones del mismo emprendimiento
                 for (Publicacion pub : listaPublicaciones) {
                     if (pub.getIdEmprendimiento().equals(publicacion.getIdEmprendimiento())) {
                         pub.setDioSeguimiento(nuevoEstado);
@@ -185,19 +188,63 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             }
         });
 
+        // Listener favoritos
         holder.ivBookmark.setOnClickListener(v -> {
             if (favoriteListener != null) {
                 favoriteListener.onFavoriteClicked(publicacion, holder.ivBookmark);
             }
         });
 
-        // Redirigir al presionar el nombre del emprendmiento
+        // Listener nombre emprendimiento
         holder.tvEntrepreneurName.setOnClickListener(v -> {
             if (entrepreneurClickListener != null) {
                 entrepreneurClickListener.onEntrepreneurClicked(publicacion);
             }
         });
 
+        // ===== FUNCIONALIDAD VER MÁS / VER MENOS =====
+        // Reiniciar estado
+        holder.tvProductDescription.setMaxLines(2);
+        holder.tvProductDescription.setEllipsize(TextUtils.TruncateAt.END);
+        holder.tvVerMas.setText("Ver más");
+        holder.tvVerMas.setVisibility(View.GONE);
+
+        // Verificar si el texto necesita "Ver más"
+        holder.tvProductDescription.post(() -> {
+            int lineCount = holder.tvProductDescription.getLineCount();
+
+            // También verificamos si el texto está truncado
+            if (lineCount >= 2) {
+                android.text.Layout layout = holder.tvProductDescription.getLayout();
+                if (layout != null) {
+                    int ellipsisCount = layout.getEllipsisCount(lineCount - 1);
+                    if (ellipsisCount > 0 || lineCount > 2) {
+                        holder.tvVerMas.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.tvVerMas.setVisibility(View.GONE);
+                    }
+                }
+            } else {
+                holder.tvVerMas.setVisibility(View.GONE);
+            }
+        });
+
+        // Listener del botón "Ver más / Ver menos"
+        holder.tvVerMas.setOnClickListener(v -> {
+            boolean expandido = holder.tvVerMas.getText().toString().equals("Ver menos");
+
+            if (expandido) {
+                // Contraer
+                holder.tvProductDescription.setMaxLines(2);
+                holder.tvProductDescription.setEllipsize(TextUtils.TruncateAt.END);
+                holder.tvVerMas.setText("Ver más");
+            } else {
+                // Expandir
+                holder.tvProductDescription.setMaxLines(Integer.MAX_VALUE);
+                holder.tvProductDescription.setEllipsize(null);
+                holder.tvVerMas.setText("Ver menos");
+            }
+        });
 
         // Listener del botón Más opciones
         holder.ivMoreOptions.setOnClickListener(v -> {
@@ -230,7 +277,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivEntrepreneurAvatar, ivProductImage, ivLike, ivComment, ivBookmark, ivMoreOptions;
-        TextView tvEntrepreneurName, tvLikes, tvProductTitle, tvPrice, tvProductDescription;
+        TextView tvEntrepreneurName, tvLikes, tvProductTitle, tvPrice, tvProductDescription, tvVerMas;
         MaterialButton btnFollow;
 
         public ViewHolder(@NonNull View itemView) {
@@ -248,6 +295,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             tvProductTitle = itemView.findViewById(R.id.tvProductTitle);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
+            tvVerMas = itemView.findViewById(R.id.tvVerMas);
 
             btnFollow = itemView.findViewById(R.id.btnFollow);
         }
