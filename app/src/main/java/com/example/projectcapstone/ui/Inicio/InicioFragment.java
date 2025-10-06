@@ -151,7 +151,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         // 🚨 Listener para cuando se presiona el nombre del emprendedor
         publicacionAdapter.setEntrepreneurClickListener(publicacion -> {
             Bundle bundle = new Bundle();
-            bundle.putString("idEmprendimiento", publicacion.getImgEmprendimiento());
+            bundle.putInt("idEmprendimiento", publicacion.getIdEmprendimiento());
 
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_nav_inicio_to_nav_perfil_emprendedor, bundle);
@@ -552,8 +552,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-
-
     private void registrarReporte(int idPublicacion, int idTipoReporte) {
         int idEstudiante = session.getIdEstudiante();
 
@@ -823,6 +821,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         etSearch.addTextChangedListener(searchTextWatcher);
     }
+
     private void buscarPublicaciones(int idEstudiante, String textoBusqueda) {
         try {
             String encoded = java.net.URLEncoder.encode(textoBusqueda, "UTF-8");
@@ -879,6 +878,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
     }
+
     // --- filtrarPorCategoria: cancelar búsqueda pendiente al empezar (opcional pero recomendable) ---
     private void filtrarPorCategoria(int idCategoria) {
         // cancelar cualquier búsqueda que pueda ejecutarse luego y sobreescribir este filtrado

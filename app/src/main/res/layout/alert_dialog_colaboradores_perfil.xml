@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    android:backgroundTint="#FFFFFF"
+    android:layout_margin="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF">
+
+        <!-- Header Moderno -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            android:background="#FFFFFF"
+            android:elevation="2dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_centerVertical="true">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="#FBAE3C"
+                    android:layout_marginEnd="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Colaboradores"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:id="@+id/tvTotalColaboradores"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(0)"
+                    android:textSize="16sp"
+                    android:textColor="#757575"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnCerrar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_close"
+                app:tint="#757575"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Cerrar"
+                android:padding="8dp" />
+        </RelativeLayout>
+
+        <!-- Divider sutil -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F5F5F5" />
+
+        <!-- RecyclerView de Colaboradores -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvColaboradores"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:maxHeight="450dp"
+            android:minHeight="200dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            tools:listitem="@layout/item_colaborador_perfil" />
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="40dp">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_user_avatar"
+                app:tint="#C7C7C7"
+                android:alpha="0.6" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Aún no hay colaboradores"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#424242"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sé el primero en colaborar con este emprendimiento"
+                android:textSize="14sp"
+                android:textColor="#9E9E9E"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- Progress Loading -->
+        <LinearLayout
+            android:id="@+id/layoutLoading"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:indeterminateTint="#FBAE3C" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Cargando colaboradores..."
+                android:textSize="14sp"
+                android:textColor="#9E9E9E" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
