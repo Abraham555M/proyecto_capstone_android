@@ -20,6 +20,7 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
     private Context context;
     private List<Categoria> listaCategorias;
     private OnItemClickListener listener;
+    private int selectedPosition = -1;
 
     // Listener opcional para click en categoría
     public interface OnItemClickListener {
@@ -50,15 +51,39 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
 
         // Cargar imagen desde URL con Glide
         Glide.with(context)
-                .load(categoria.getImgCategoria()) // URL
-                .placeholder(R.drawable.ic_error) // imagen mientras carga
-                .error(R.drawable.ic_error) // si falla
+                .load(categoria.getImgCategoria())
+                .placeholder(R.drawable.ic_error)
+                .error(R.drawable.ic_error)
                 .into(holder.imgCategoria);
 
-        // Evento click (si se configuró)
+        // ← AGREGAR: Resaltar categoría seleccionada
+        if (selectedPosition == position) {
+            holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.purple_500));
+            holder.tvNombre.setTextColor(context.getResources().getColor(R.color.white));
+        } else {
+            holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.white));
+            holder.tvNombre.setTextColor(context.getResources().getColor(R.color.gray_dark));
+        }
+
+        // ← MODIFICAR: Evento click
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onItemClick(categoria);
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition == RecyclerView.NO_POSITION) return;
+
+                int previousPosition = selectedPosition;
+
+                if (selectedPosition == adapterPosition) {
+                    selectedPosition = -1;
+                    listener.onItemClick(null);
+                } else {
+                    selectedPosition = adapterPosition;
+                    listener.onItemClick(categoria);
+                }
+
+                if (previousPosition != -1)
+                    notifyItemChanged(previousPosition);
+                notifyItemChanged(adapterPosition);
             }
         });
     }

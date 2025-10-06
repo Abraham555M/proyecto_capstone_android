@@ -15,12 +15,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,7 +64,11 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     private List<Comentario> listaComentarios = new ArrayList<>();
     private RecyclerView rvCategoria, rvPublicaciones;
     private SessionManager session;
-
+    private EditText etSearch;
+    private Handler searchHandler = new Handler();
+    private Runnable searchRunnable;
+    private TextWatcher searchTextWatcher;
+    private Integer categoriaSeleccionada = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,10 +77,40 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         session = new SessionManager(requireContext());
         rvCategoria = rootView.findViewById(R.id.rvCategoria);
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
-
+        etSearch = rootView.findViewById(R.id.etSearch);
         // Configuración horizontal
         rvCategoria.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
         categoriaAdapter = new CategoriaAdapter(getContext(), listaCategoria);
+        categoriaAdapter.setOnItemClickListener(categoria -> {
+            // Cancelar búsqueda pendiente
+            if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+
+            // Remover temporalmente el TextWatcher para no disparar onTextChanged con setText("")
+            if (searchTextWatcher != null) etSearch.removeTextChangedListener(searchTextWatcher);
+
+            if (categoria == null) {
+                // Caso especial: “Ver todo” (si lo manejas en tu adaptador)
+                cargarPublicaciones(session.getIdEstudiante());
+                categoriaSeleccionada = null;
+            } else {
+                // Si el usuario vuelve a tocar la misma categoría → deselecciona
+                if (categoriaSeleccionada != null && categoriaSeleccionada.equals(categoria.getIdCategoria())) {
+                    categoriaSeleccionada = null; // se deselecciona
+                    cargarPublicaciones(session.getIdEstudiante()); // volver a mostrar todo
+                } else {
+                    // Nueva categoría seleccionada
+                    categoriaSeleccionada = categoria.getIdCategoria();
+                    filtrarPorCategoria(categoriaSeleccionada);
+                }
+            }
+
+            // Limpiar campo de búsqueda
+            if (etSearch != null) etSearch.setText("");
+
+            // Volver a agregar el watcher
+            if (searchTextWatcher != null) etSearch.addTextChangedListener(searchTextWatcher);
+        });
         rvCategoria.setAdapter(categoriaAdapter);
 
         // Configuración vertical de publicaciones
@@ -120,7 +158,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         });
 
         rvPublicaciones.setAdapter(publicacionAdapter);
-
+        configurarBusqueda();
         cargarCategorias();
         cargarPublicaciones(session.getIdEstudiante());
 
@@ -234,6 +272,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         int esFavorito = obj.getInt("es_favorito");
 
                         listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo, esFavorito));
+                        Log.d("DEBUG", "Llamando a cargarPublicaciones()");
                     }
                     publicacionAdapter.notifyDataSetChanged();
 
@@ -630,38 +669,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         // Referencias a las vistas
         TextInputEditText etMensaje = dialogView.findViewById(R.id.etMensajeSolicitud);
-        TextView tvWordCounter = dialogView.findViewById(R.id.tvWordCounter);
         MaterialButton btnEnviar = dialogView.findViewById(R.id.btnEnviar);
         ImageButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
-
-        // ✅ CONFIGURAR CONTADOR DE PALABRAS
-        etMensaje.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String texto = s.toString().trim();
-                int palabras = contarPalabras(texto);
-
-                // Actualizar el contador
-                tvWordCounter.setText(palabras + " / 100 palabras");
-
-                // Cambiar color y habilitar/deshabilitar botón según el límite
-                if (palabras > 10) {
-                    tvWordCounter.setTextColor(Color.RED);
-                    btnEnviar.setEnabled(false);
-                    btnEnviar.setAlpha(0.5f); // Efecto visual de deshabilitado
-                } else {
-                    tvWordCounter.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
-                    btnEnviar.setEnabled(palabras > 0);
-                    btnEnviar.setAlpha(palabras > 0 ? 1.0f : 0.5f);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
 
         // Acción botón cerrar
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
@@ -669,38 +678,13 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         // Acción enviar
         btnEnviar.setOnClickListener(v -> {
             String mensaje = etMensaje.getText().toString().trim();
-            int palabras = contarPalabras(mensaje);
-
             if (mensaje.isEmpty()) {
                 Toast.makeText(context, "Por favor ingresa un mensaje", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (palabras > 10) {
-                Toast.makeText(context, "El mensaje no puede exceder 100 palabras", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             registrarColaboracion(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
         });
-    }
-
-    private int contarPalabras(String texto) {
-        if (texto == null || texto.isEmpty()) {
-            return 0;
-        }
-
-        // Dividir por espacios y contar solo palabras no vacías
-        String[] palabras = texto.split("\\s+");
-        int count = 0;
-
-        for (String palabra : palabras) {
-            if (!palabra.trim().isEmpty()) {
-                count++;
-            }
-        }
-
-        return count;
     }
 
     private void mostrarDialogoComentarios(Context context, int idPublicacion) {
@@ -812,6 +796,141 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         btnSi.setOnClickListener(v -> {
             registrarReporte(idPublicacion, idTipoReporte);
             dialog.dismiss();
+        });
+    }
+
+    private void configurarBusqueda() {
+        searchTextWatcher = new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Cancelar búsqueda anterior si existe
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+
+                // Crear nueva búsqueda con delay de 500ms (debounce)
+                final String texto = s.toString().trim();
+                searchRunnable = () -> buscarPublicaciones(session.getIdEstudiante(), texto);
+
+                // Ejecutar después de 500ms de que el usuario dejó de escribir
+                searchHandler.postDelayed(searchRunnable, 500);
+            }
+
+            @Override public void afterTextChanged(Editable s) {}
+        };
+
+        etSearch.addTextChangedListener(searchTextWatcher);
+    }
+    private void buscarPublicaciones(int idEstudiante, String textoBusqueda) {
+        try {
+            String encoded = java.net.URLEncoder.encode(textoBusqueda, "UTF-8");
+            String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_buscar.php?idEstudiante="
+                    + idEstudiante + "&textoBusqueda=" + encoded;
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(url, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                    try {
+                        String respuesta = new String(responseBody, "UTF-8");
+                        JSONArray jsonArray = new JSONArray(respuesta);
+
+                        listaPublicacion.clear();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.getJSONObject(i);
+                            // ... tu parsing normal ...
+                            int idPublicacion = obj.getInt("id_publicacion");
+                            int idEmprendimiento = obj.getInt("id_emprendimiento");
+                            String nomEmprendimiento = obj.getString("nom_emprendimiento");
+                            String imgEmprendimiento = obj.getString("img_per_emprendimiento");
+                            String titPublicacion = obj.getString("tit_publicacion");
+                            String conPublicacion = obj.getString("con_publicacion");
+                            String imgPublicacion = obj.getString("img_publicacion");
+                            Integer totalInteracciones = obj.getInt("total_me_gusta");
+                            int dioLike = obj.getInt("dio_like");
+                            int siguiendo = obj.getInt("siguiendo");
+                            int esFavorito = obj.getInt("es_favorito");
+
+                            listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento,
+                                    nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion,
+                                    imgPublicacion, totalInteracciones, dioLike, siguiendo, esFavorito));
+                        }
+
+                        publicacionAdapter.notifyDataSetChanged();
+
+                        if (listaPublicacion.isEmpty() && !textoBusqueda.isEmpty()) {
+                            Toast.makeText(getContext(), "No se encontraron publicaciones", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                    Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    // --- filtrarPorCategoria: cancelar búsqueda pendiente al empezar (opcional pero recomendable) ---
+    private void filtrarPorCategoria(int idCategoria) {
+        // cancelar cualquier búsqueda que pueda ejecutarse luego y sobreescribir este filtrado
+        if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_filtrar_categoria.php?idEstudiante="
+                + session.getIdEstudiante() + "&idCategoria=" + idCategoria;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaPublicacion.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        // ... tu parsing (igual que antes)
+                        int idPublicacion = obj.getInt("id_publicacion");
+                        int idEmprendimiento = obj.getInt("id_emprendimiento");
+                        String nomEmprendimiento = obj.getString("nom_emprendimiento");
+                        String imgEmprendimiento = obj.getString("img_per_emprendimiento");
+                        String titPublicacion = obj.getString("tit_publicacion");
+                        String conPublicacion = obj.getString("con_publicacion");
+                        String imgPublicacion = obj.getString("img_publicacion");
+                        Integer totalInteracciones = obj.getInt("total_me_gusta");
+                        int dioLike = obj.getInt("dio_like");
+                        int siguiendo = obj.getInt("siguiendo");
+                        int esFavorito = obj.getInt("es_favorito");
+
+                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento,
+                                nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion,
+                                imgPublicacion, totalInteracciones, dioLike, siguiendo, esFavorito));
+                    }
+
+                    publicacionAdapter.notifyDataSetChanged();
+
+                    if (listaPublicacion.isEmpty()) {
+                        Toast.makeText(getContext(), "No hay publicaciones en esta categoría", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
