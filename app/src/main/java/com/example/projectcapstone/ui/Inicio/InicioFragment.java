@@ -63,10 +63,11 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     private RecyclerView rvCategoria, rvPublicaciones;
     private SessionManager session;
     private EditText etSearch;
+    private Integer categoriaSeleccionada = null; // id de la categoría actualmente activa (null = ninguna)
+    private boolean manualTextChange = false;     // true cuando llamas etSearch.setText("") por código
+    private TextWatcher searchTextWatcher;        // lo guardamos para remover / agregar
     private Handler searchHandler = new Handler();
     private Runnable searchRunnable;
-    private TextWatcher searchTextWatcher;
-    private Integer categoriaSeleccionada = null;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,32 +82,37 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         categoriaAdapter = new CategoriaAdapter(getContext(), listaCategoria);
         categoriaAdapter.setOnItemClickListener(categoria -> {
-            // Cancelar búsqueda pendiente
+            // cancelar búsqueda pendiente
             if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
 
-            // Remover temporalmente el TextWatcher para no disparar onTextChanged con setText("")
+            // remover temporalmente el TextWatcher para que setText() no dispare onTextChanged
             if (searchTextWatcher != null) etSearch.removeTextChangedListener(searchTextWatcher);
 
             if (categoria == null) {
-                // Caso especial: “Ver todo” (si lo manejas en tu adaptador)
-                cargarPublicaciones(session.getIdEstudiante());
+                // si tu adaptador maneja "ver todo" con null
                 categoriaSeleccionada = null;
+                categoriaAdapter.setCategoriaSeleccionada(null);
+                cargarPublicaciones(session.getIdEstudiante());
             } else {
-                // Si el usuario vuelve a tocar la misma categoría → deselecciona
                 if (categoriaSeleccionada != null && categoriaSeleccionada.equals(categoria.getIdCategoria())) {
-                    categoriaSeleccionada = null; // se deselecciona
-                    cargarPublicaciones(session.getIdEstudiante()); // volver a mostrar todo
+                    // el usuario tocó la misma categoría → la deseleccionamos y mostramos todo
+                    categoriaSeleccionada = null;
+                    categoriaAdapter.setCategoriaSeleccionada(null);
+                    cargarPublicaciones(session.getIdEstudiante());
                 } else {
-                    // Nueva categoría seleccionada
+                    // nueva categoría seleccionada
                     categoriaSeleccionada = categoria.getIdCategoria();
+                    categoriaAdapter.setCategoriaSeleccionada(categoriaSeleccionada);
                     filtrarPorCategoria(categoriaSeleccionada);
                 }
             }
 
-            // Limpiar campo de búsqueda
+            // limpiar campo búsqueda SIN disparar TextWatcher
+            manualTextChange = true;
             if (etSearch != null) etSearch.setText("");
+            manualTextChange = false;
 
-            // Volver a agregar el watcher
+            // volver a agregar el watcher
             if (searchTextWatcher != null) etSearch.addTextChangedListener(searchTextWatcher);
         });
         rvCategoria.setAdapter(categoriaAdapter);
@@ -803,16 +809,28 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Cancelar búsqueda anterior si existe
-                if (searchRunnable != null) {
-                    searchHandler.removeCallbacks(searchRunnable);
-                }
+                // si el cambio fue por código (limpiado manualmente), ignorar
+                if (manualTextChange) return;
 
-                // Crear nueva búsqueda con delay de 500ms (debounce)
+                // cancelar búsqueda anterior si existe
+                if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+
                 final String texto = s.toString().trim();
-                searchRunnable = () -> buscarPublicaciones(session.getIdEstudiante(), texto);
 
-                // Ejecutar después de 500ms de que el usuario dejó de escribir
+                searchRunnable = () -> {
+                    // Si el texto está vacío → volver a la categoría seleccionada (si existe) o mostrar todo
+                    if (texto.isEmpty()) {
+                        if (categoriaSeleccionada != null) {
+                            filtrarPorCategoria(categoriaSeleccionada);
+                        } else {
+                            cargarPublicaciones(session.getIdEstudiante());
+                        }
+                    } else {
+                        // Texto no vacío → buscar, preferiblemente dentro de la categoría si hay una seleccionada
+                        buscarPublicaciones(session.getIdEstudiante(), texto, categoriaSeleccionada);
+                    }
+                };
+
                 searchHandler.postDelayed(searchRunnable, 500);
             }
 
@@ -821,11 +839,16 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         etSearch.addTextChangedListener(searchTextWatcher);
     }
-    private void buscarPublicaciones(int idEstudiante, String textoBusqueda) {
+    private void buscarPublicaciones(int idEstudiante, String textoBusqueda, Integer idCategoria) {
         try {
             String encoded = java.net.URLEncoder.encode(textoBusqueda, "UTF-8");
             String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_buscar.php?idEstudiante="
                     + idEstudiante + "&textoBusqueda=" + encoded;
+
+            // añadimos idCategoria si está seleccionada (backend debe soportarlo)
+            if (idCategoria != null) {
+                url += "&idCategoria=" + idCategoria;
+            }
 
             AsyncHttpClient client = new AsyncHttpClient();
             client.get(url, new AsyncHttpResponseHandler() {
@@ -836,9 +859,17 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         JSONArray jsonArray = new JSONArray(respuesta);
 
                         listaPublicacion.clear();
+
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject obj = jsonArray.getJSONObject(i);
-                            // ... tu parsing normal ...
+
+                            // Si el backend NO soporta idCategoria pero devuelve id_categoria en cada item,
+                            // filtramos aquí en cliente como fallback:
+                            if (idCategoria != null && obj.has("id_categoria")) {
+                                int itemCat = obj.getInt("id_categoria");
+                                if (itemCat != idCategoria) continue; // saltar si no coincide
+                            }
+
                             int idPublicacion = obj.getInt("id_publicacion");
                             int idEmprendimiento = obj.getInt("id_emprendimiento");
                             String nomEmprendimiento = obj.getString("nom_emprendimiento");
@@ -877,6 +908,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
     }
+
     // --- filtrarPorCategoria: cancelar búsqueda pendiente al empezar (opcional pero recomendable) ---
     private void filtrarPorCategoria(int idCategoria) {
         // cancelar cualquier búsqueda que pueda ejecutarse luego y sobreescribir este filtrado

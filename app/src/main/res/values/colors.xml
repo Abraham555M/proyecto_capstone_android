@@ -19,7 +19,7 @@
     <color name="yellow_circle">#FFE4B5</color>
     <color name="orange_circle">#FBAE3C</color>
     <color name="darker_gray">#757575</color>
-
+    <color name="blue_primary">#2196F3</color>
     <color name="button_orange">#FF9800</color>
     <color name="error_color">#F44336</color>
     <color name="primary_text_color">#212121</color>
