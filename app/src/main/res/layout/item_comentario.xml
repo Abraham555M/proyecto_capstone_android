@@ -7,7 +7,7 @@
     android:paddingVertical="12dp"
     android:paddingHorizontal="8dp">
 
-    <!-- Avatar del usuario con borde naranja -->
+    <!-- Avatar del usuario -->
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_comment_avatar"
         android:layout_width="42dp"
@@ -18,7 +18,7 @@
         android:layout_marginEnd="12dp"
         android:layout_gravity="top" />
 
-    <!-- Contenedor del comentario -->
+    <!-- Contenedor principal -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,22 +31,19 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp">
 
-            <!-- Nombre del estudiante -->
             <TextView
                 android:id="@+id/text_comment_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/img_options"
                 android:text="usuario_ejemplo"
                 android:textColor="#212121"
                 android:textStyle="bold"
                 android:textSize="15sp"
                 android:maxLines="1"
                 android:ellipsize="end"
+                android:layout_toStartOf="@+id/img_options"
                 android:layout_marginEnd="8dp" />
 
-            <!-- Botón de opciones (tres puntos) -->
             <ImageView
                 android:id="@+id/img_options"
                 android:layout_width="32dp"
@@ -59,7 +56,7 @@
                 android:padding="6dp" />
         </RelativeLayout>
 
-        <!-- Contenido del comentario -->
+        <!-- Contenido -->
         <TextView
             android:id="@+id/text_comment_content"
             android:layout_width="match_parent"
@@ -70,7 +67,7 @@
             android:textSize="14sp"
             android:lineSpacingMultiplier="1.3" />
 
-        <!-- Footer: Fecha y acciones -->
+        <!-- Footer: fecha, like y reporte -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,7 +84,7 @@
                 android:textColor="#9E9E9E"
                 android:layout_marginEnd="16dp" />
 
-            <!-- Like con fondo cuando se hace click -->
+            <!-- Like -->
             <LinearLayout
                 android:id="@+id/layout_like"
                 android:layout_width="wrap_content"
@@ -122,6 +119,41 @@
                     android:visibility="gone" />
             </LinearLayout>
 
+            <!-- Botón reportar comentario -->
+            <LinearLayout
+                android:id="@+id/layout_report"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:minWidth="48dp">
+
+                <ImageView
+                    android:id="@+id/img_report"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_reporte"
+                    app:tint="#F44336"
+                    android:contentDescription="Reportar comentario" />
+
+                <TextView
+                    android:id="@+id/text_report"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Reportar"
+                    android:textColor="#F44336"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
             <!-- Separador flexible -->
             <View
                 android:layout_width="0dp"
@@ -129,7 +161,7 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <!-- Divider sutil entre comentarios -->
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

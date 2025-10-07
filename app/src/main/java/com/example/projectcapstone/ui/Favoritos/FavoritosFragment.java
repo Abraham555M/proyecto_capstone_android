@@ -61,7 +61,6 @@ public class FavoritosFragment extends Fragment {
     private TipoReporteAdapter tipoReporteAdapter;
     private List<TipoReporte> listaTipoReporte = new ArrayList<>();
 
-
     private List<Comentario> listaComentarios = new ArrayList<>();
 
     @Nullable
@@ -497,7 +496,10 @@ public class FavoritosFragment extends Fragment {
         // Lista y adapter
         listaComentarios.clear();
         ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
-
+        recyclerComments.setAdapter(comentarioAdapter);
+        comentarioAdapter.setOnReportCommentListener(comentario -> {
+            mostrarDialogoReportarComentario(requireContext(), comentario.getIdComentario());
+        });
         // Asignar el listener al adapter
         comentarioAdapter.setOnCommentLikeClickListener((comentario, imgLike, textLikeCount) -> {
             registrarLikeComentario(
@@ -752,7 +754,7 @@ public class FavoritosFragment extends Fragment {
         });
     }
     private void cargarTiposReporte(Context context) {
-        String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_listar_tipo.php";
+        String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_listar_tipos.php";
         AsyncHttpClient client = new AsyncHttpClient();
 
         client.get(url, new AsyncHttpResponseHandler() {
@@ -831,4 +833,93 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
+    private void mostrarDialogoReportarComentario(Context context, int idComentario) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        ImageView ivClose = dialogView.findViewById(R.id.ivClose);
+        ivClose.setOnClickListener(v -> dialog.dismiss());
+
+        RecyclerView rvReportOptions = dialogView.findViewById(R.id.rvReportOptions);
+        rvReportOptions.setLayoutManager(new LinearLayoutManager(context));
+
+        tipoReporteAdapter = new TipoReporteAdapter(listaTipoReporte, tipo -> {
+            mostrarDialogoConfirmarReporteComentario(context, idComentario, tipo.getIdTipoReporte());
+            dialog.dismiss();
+        });
+        rvReportOptions.setAdapter(tipoReporteAdapter);
+
+        cargarTiposReporte(context);
+    }
+
+    private void mostrarDialogoConfirmarReporteComentario(Context context, int idComentario, int idTipoReporte) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_opciones, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btnNo);
+        MaterialButton btnSi = dialogView.findViewById(R.id.btnSi);
+
+        tvTitulo.setText("¿Deseas reportar este comentario?");
+
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+        btnSi.setOnClickListener(v -> {
+            registrarReporteComentario(idComentario, idTipoReporte);
+            dialog.dismiss();
+        });
+    }
+
+    private void registrarReporteComentario(int idComentario, int idTipoReporte) {
+        int idEstudiante = session.getIdEstudiante();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idComentario", idComentario);
+        params.put("idTipoReporte", idTipoReporte);
+
+        String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_registrar_comentario.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody, "UTF-8"));
+                    String status = json.getString("status");
+
+                    if ("reported".equals(status)) {
+                        mostrarDialogoExito(
+                                "Reporte enviado",
+                                "Gracias por ayudarnos a mantener la comunidad segura. Revisaremos este comentario."
+                        );
+                    } else {
+                        String msg = json.optString("message", "Error al registrar el reporte");
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

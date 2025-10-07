@@ -169,6 +169,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
+
     @Override
     public void onClick(View v) {
         if (v == btnCancelar) {
