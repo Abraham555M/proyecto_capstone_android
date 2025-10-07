@@ -142,6 +142,9 @@
         <action
             android:id="@+id/action_nav_perfil_to_nav_emprendimiento"
             app:destination="@id/nav_emprendimiento" />
+        <action
+            android:id="@+id/action_nav_perfil_to_nav_perfil_estudiante"
+            app:destination="@id/nav_perfil_estudiante" />
     </fragment>
     <fragment
         android:id="@+id/nav_colaboraciones"
@@ -186,11 +189,17 @@
     <fragment
         android:id="@+id/nav_publicaciones_del_emprendimiento"
         android:name="com.example.projectcapstone.ui.Inicio.PublicacionesEmprendimientoFragment"
-        android:label="fragment_publicaciones_emprendimiento"
+        android:label="Mis publicaciones"
         tools:layout="@layout/fragment_publicaciones_emprendimiento" />
     <fragment
         android:id="@+id/nuevaPublicacionFragment"
         android:name="com.example.projectcapstone.ui.Publicaciones.NuevaPublicacionFragment"
         android:label="fragment_nueva_publicacion"
         tools:layout="@layout/fragment_nueva_publicacion" />
+    <fragment
+        android:id="@+id/nav_perfil_estudiante"
+        android:name="com.example.projectcapstone.ui.Perfil.PerfilEstudianteFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_perfil_estudiante" />
+
 </navigation>

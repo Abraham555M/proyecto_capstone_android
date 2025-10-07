@@ -249,7 +249,8 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
         }
 
         if(v == ivEditar){
-
+            NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.action_nav_perfil_to_nav_perfil_estudiante);
         }
     }
 }
