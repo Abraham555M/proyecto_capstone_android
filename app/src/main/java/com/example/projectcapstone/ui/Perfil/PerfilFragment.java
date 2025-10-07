@@ -44,6 +44,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
     private List<EmprendimientoPerfil> listaEmprendimientos;
     private LinearLayout layoutEmptyMessage;
     private Button btnCrearEmprendimiento;
+    private ImageView ivColaboraciones, ivEditar;
     private SessionManager session;
 
     @Override
@@ -62,9 +63,14 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
         tvSede = rootView.findViewById(R.id.tvSede);
         tvTelefono = rootView.findViewById(R.id.tvTelefono);
 
+        ivColaboraciones = rootView.findViewById(R.id.ivColaboraciones);
+        ivEditar = rootView.findViewById(R.id.ivEditar);
+
         session = new SessionManager(requireContext());
 
         btnCrearEmprendimiento.setOnClickListener(this);
+        ivColaboraciones.setOnClickListener(this);
+        ivEditar.setOnClickListener(this);
 
         return rootView;
     }
@@ -236,6 +242,14 @@ public class PerfilFragment extends Fragment implements View.OnClickListener{
         if(v == btnCrearEmprendimiento){
             NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
             navController.navigate(R.id.action_nav_perfil_to_nav_emprendimiento);
+        }
+
+        if(v == ivColaboraciones){
+
+        }
+
+        if(v == ivEditar){
+
         }
     }
 }

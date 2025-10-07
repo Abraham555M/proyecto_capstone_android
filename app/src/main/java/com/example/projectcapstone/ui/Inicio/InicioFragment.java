@@ -13,6 +13,8 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +70,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     private TextWatcher searchTextWatcher;        // lo guardamos para remover / agregar
     private Handler searchHandler = new Handler();
     private Runnable searchRunnable;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,10 +85,10 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         categoriaAdapter = new CategoriaAdapter(getContext(), listaCategoria);
         categoriaAdapter.setOnItemClickListener(categoria -> {
-            // cancelar búsqueda pendiente
+            // Cancelar búsqueda pendiente
             if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
 
-            // remover temporalmente el TextWatcher para que setText() no dispare onTextChanged
+            // Remover temporalmente el TextWatcher para no disparar onTextChanged con setText("")
             if (searchTextWatcher != null) etSearch.removeTextChangedListener(searchTextWatcher);
 
             if (categoria == null) {
@@ -155,7 +158,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         // 🚨 Listener para cuando se presiona el nombre del emprendedor
         publicacionAdapter.setEntrepreneurClickListener(publicacion -> {
             Bundle bundle = new Bundle();
-            bundle.putString("idEmprendimiento", publicacion.getImgEmprendimiento());
+            bundle.putInt("idEmprendimiento", publicacion.getIdEmprendimiento());
 
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_nav_inicio_to_nav_perfil_emprendedor, bundle);
@@ -555,8 +558,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
-
-
 
     private void registrarReporte(int idPublicacion, int idTipoReporte) {
         int idEstudiante = session.getIdEstudiante();
