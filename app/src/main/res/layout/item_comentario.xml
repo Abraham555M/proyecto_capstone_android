@@ -35,14 +35,14 @@
                 android:id="@+id/text_comment_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="194dp"
+                android:layout_toStartOf="@+id/img_options"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="usuario_ejemplo"
                 android:textColor="#212121"
-                android:textStyle="bold"
                 android:textSize="15sp"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_toStartOf="@+id/img_options"
-                android:layout_marginEnd="8dp" />
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/img_options"
