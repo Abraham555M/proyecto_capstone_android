@@ -249,7 +249,7 @@
                 <ImageView
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/ic_cerrar_sesion"
+                    android:src="@drawable/ic_vacio_publicacion"
                     app:tint="@color/darker_gray"
                     android:layout_marginBottom="12dp" />
 
