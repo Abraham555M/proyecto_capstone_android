@@ -970,7 +970,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         });
     }
     private void mostrarDialogoReportarComentario(Context context, int idComentario) {
-        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte, null);
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte_comentario, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setView(dialogView);

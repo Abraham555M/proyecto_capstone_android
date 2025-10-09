@@ -133,26 +133,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:minWidth="48dp">
-
-                <ImageView
-                    android:id="@+id/img_report"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/ic_reporte"
-                    app:tint="#F44336"
-                    android:contentDescription="Reportar comentario" />
-
-                <TextView
-                    android:id="@+id/text_report"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="Reportar"
-                    android:textColor="#F44336"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:minWidth="48dp"/>
 
             <!-- Separador flexible -->
             <View
