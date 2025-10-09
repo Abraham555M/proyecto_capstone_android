@@ -16,6 +16,7 @@
 
         <!-- 🩷 Barra de búsqueda -->
         <LinearLayout
+            android:id="@+id/layoutSearchFavoritos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -54,6 +55,7 @@
                         android:textColorHint="@color/gray_medium"
                         android:background="@null"
                         android:maxLines="1" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

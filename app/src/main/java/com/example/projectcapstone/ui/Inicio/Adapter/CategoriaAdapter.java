@@ -32,7 +32,6 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
         this.context = context;
         this.listaCategorias = listaCategorias;
     }
-
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }

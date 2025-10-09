@@ -58,11 +58,14 @@ public class FavoritosFragment extends Fragment {
     private List<Categoria> listaCategorias = new ArrayList<>();
     private List<Publicacion> listaFavoritos = new ArrayList<>();
     private SessionManager session;
+    private boolean tieneFavoritosEnTotal = false;
     private TipoReporteAdapter tipoReporteAdapter;
     private List<TipoReporte> listaTipoReporte = new ArrayList<>();
 
     private List<Comentario> listaComentarios = new ArrayList<>();
     private boolean isFiltering = false;
+    private LinearLayout layoutSearchFavoritos;
+    private int categoriaSeleccionada = -1;
 
     @Nullable
     @Override
@@ -78,6 +81,7 @@ public class FavoritosFragment extends Fragment {
         tvEmptyFavoritos = view.findViewById(R.id.tvEmptyFavoritos);
         //rvPublicaciones = view.findViewById(R.id.rvPublicaciones);
         session = new SessionManager(requireContext());
+        layoutSearchFavoritos = view.findViewById(R.id.layoutSearchFavoritos);
         int idEstudiante = session.getIdEstudiante();
 
         // Configurar categorías (horizontal)
@@ -89,11 +93,17 @@ public class FavoritosFragment extends Fragment {
         // Asignar el listener correctamente
         categoriaAdapter.setOnItemClickListener(categoria -> {
             if (categoria == null) {
-                // Si se deselecciona, mostrar todos los favoritos
+                // Deseleccionar: mostrar todos los favoritos
+                categoriaSeleccionada = -1;
+                isFiltering = false;
                 cargarFavoritos(idEstudiante);
+                etSearchFavoritos.setText(""); // Limpiar búsqueda
             } else {
-                // Si se selecciona, filtrar por esa categoría
+                // Seleccionar: filtrar por categoría
+                categoriaSeleccionada = categoria.getIdCategoria();
+                isFiltering = true;
                 filtrarFavoritosPorCategoria(idEstudiante, categoria.getIdCategoria());
+                etSearchFavoritos.setText(""); // Limpiar búsqueda
             }
         });
         rvCategoriaFavoritos.setAdapter(categoriaAdapter);
@@ -134,16 +144,7 @@ public class FavoritosFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                String texto = s.toString().trim();
-
-                if (texto.isEmpty()) {
-                    // vuelve al modo "sin filtro" sin ocultar filtros
-                    isFiltering = false;
-                    cargarFavoritos(idEstudiante);
-                } else {
-                    isFiltering = true;
-                    buscarFavoritos(idEstudiante, texto);
-                }
+                buscarFavoritos(idEstudiante, s.toString().trim());
             }
         });
 
@@ -184,6 +185,7 @@ public class FavoritosFragment extends Fragment {
 
     private void cargarFavoritos(int idEstudiante) {
         isFiltering = false;
+        categoriaSeleccionada = -1;
         String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_listar_publicacion.php?idEstudiante=" + idEstudiante;
         AsyncHttpClient client = new AsyncHttpClient();
 
@@ -214,6 +216,12 @@ public class FavoritosFragment extends Fragment {
                     // Actualiza la vista (el adapter ya fue creado en onCreateView y tiene callbacks)
                     if (publicacionAdapter != null) {
                         publicacionAdapter.notifyDataSetChanged();
+                        tieneFavoritosEnTotal = !listaFavoritos.isEmpty();
+
+                        if (publicacionAdapter != null) {
+                            publicacionAdapter.notifyDataSetChanged();
+                            actualizarEstadoFavoritos();
+                        }
                         actualizarEstadoFavoritos();
                     }
 
@@ -235,7 +243,27 @@ public class FavoritosFragment extends Fragment {
 
 
     private void buscarFavoritos(int idEstudiante, String texto) {
+        if (texto.isEmpty()) {
+            // Si no hay texto, volver al estado anterior
+            if (categoriaSeleccionada != -1) {
+                // Si hay categoría seleccionada, filtrar por ella
+                filtrarFavoritosPorCategoria(idEstudiante, categoriaSeleccionada);
+            } else {
+                // Si no hay categoría, cargar todos
+                isFiltering = false;
+                cargarFavoritos(idEstudiante);
+            }
+            return;
+        }
+
+        // Construir URL con texto de búsqueda Y categoría (si existe)
         String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_buscar_publicacion.php?texto=" + texto + "&idEstudiante=" + idEstudiante;
+
+        // Si hay categoría seleccionada, agregarla a la búsqueda
+        if (categoriaSeleccionada != -1) {
+            url += "&idCategoria=" + categoriaSeleccionada;
+        }
+
         AsyncHttpClient client = new AsyncHttpClient();
 
         client.get(url, new AsyncHttpResponseHandler() {
@@ -262,10 +290,7 @@ public class FavoritosFragment extends Fragment {
                         ));
                     }
 
-                    if (publicacionAdapter != null)
-                        publicacionAdapter.notifyDataSetChanged();
-
-                    // 🔹 esto mantiene los filtros visibles incluso si no hay resultados
+                    publicacionAdapter.notifyDataSetChanged();
                     actualizarEstadoFavoritos();
 
                 } catch (Exception e) {
@@ -279,10 +304,9 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
-
-
     private void filtrarFavoritosPorCategoria(int idEstudiante, int idCategoria) {
         isFiltering = true;
+        categoriaSeleccionada = idCategoria;
         String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_filtrar_categoria.php?idEstudiante=" + idEstudiante + "&idCategoria=" + idCategoria;
         AsyncHttpClient client = new AsyncHttpClient();
 
@@ -312,7 +336,6 @@ public class FavoritosFragment extends Fragment {
                     publicacionAdapter.notifyDataSetChanged();
                     actualizarEstadoFavoritos();
                     tvEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
-
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al filtrar favoritos", Toast.LENGTH_SHORT).show();
@@ -360,13 +383,12 @@ public class FavoritosFragment extends Fragment {
                                 break;
                             }
                         }
-
                         if (idx != -1) {
                             listaFavoritos.remove(idx);
                             publicacionAdapter.notifyItemRemoved(idx);
                             publicacionAdapter.notifyItemRangeChanged(idx, listaFavoritos.size() - idx);
                         } else {
-                            // fallback seguro
+                            // fallback seguro: buscar y eliminar por id con iterator
                             for (int i = 0; i < listaFavoritos.size(); i++) {
                                 if (listaFavoritos.get(i).getIdPublicacion() == publicacion.getIdPublicacion()) {
                                     listaFavoritos.remove(i);
@@ -376,17 +398,13 @@ public class FavoritosFragment extends Fragment {
                             }
                         }
 
-                        // 🔹 Actualizamos la interfaz después de eliminar
-                        actualizarEstadoFavoritos();
-
+                        if (listaFavoritos.isEmpty()) tvEmptyFavoritos.setVisibility(View.VISIBLE);
+                        cargarFavoritos(session.getIdEstudiante());
                         Toast.makeText(getContext(), "Eliminado de favoritos", Toast.LENGTH_SHORT).show();
 
                     } else if ("favorited".equals(status)) {
                         ivFavorito.setImageResource(R.drawable.ic_favoritos_lleno);
                         Toast.makeText(getContext(), "Agregado a favoritos", Toast.LENGTH_SHORT).show();
-
-                        // 🔹 Por si se agrega desde otra pantalla o estaba vacío
-                        actualizarEstadoFavoritos();
                     } else {
                         String msg = json.optString("message", "Respuesta inesperada");
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
@@ -939,13 +957,23 @@ public class FavoritosFragment extends Fragment {
         });
     }
     private void actualizarEstadoFavoritos() {
-        if (isFiltering) {
-            // Cuando estamos filtrando: siempre mostrar filtros para que el usuario pueda cambiar la búsqueda
+        // Usar la variable que indica si HAY favoritos en total (sin filtros)
+        if (tieneFavoritosEnTotal) {
+            // SIEMPRE mostrar controles de búsqueda si el usuario tiene favoritos
             rvCategoriaFavoritos.setVisibility(View.VISIBLE);
-            etSearchFavoritos.setVisibility(View.VISIBLE);
+            layoutSearchFavoritos.setVisibility(View.VISIBLE);
 
-            // Mostrar mensaje vacío sólo si la búsqueda no devolvió elementos
+            // Solo cambiar el estado de la lista y mensaje vacío
             if (listaFavoritos.isEmpty()) {
+                // Mensaje según el contexto
+                String textoBusqueda = etSearchFavoritos.getText().toString().trim();
+                if (!textoBusqueda.isEmpty()) {
+                    tvEmptyFavoritos.setText("No se encontraron favoritos con '" + textoBusqueda + "'");
+                } else if (isFiltering) {
+                    tvEmptyFavoritos.setText("No hay favoritos en esta categoría");
+                } else {
+                    tvEmptyFavoritos.setText("No se encontraron resultados");
+                }
                 tvEmptyFavoritos.setVisibility(View.VISIBLE);
                 rvPublicacionesFavoritos.setVisibility(View.GONE);
             } else {
@@ -953,18 +981,12 @@ public class FavoritosFragment extends Fragment {
                 rvPublicacionesFavoritos.setVisibility(View.VISIBLE);
             }
         } else {
-            // No estamos filtrando: mostrar filtros sólo si hay favoritos en general
-            if (listaFavoritos.isEmpty()) {
-                tvEmptyFavoritos.setVisibility(View.VISIBLE);
-                rvPublicacionesFavoritos.setVisibility(View.GONE);
-                rvCategoriaFavoritos.setVisibility(View.GONE);
-                etSearchFavoritos.setVisibility(View.GONE);
-            } else {
-                tvEmptyFavoritos.setVisibility(View.GONE);
-                rvPublicacionesFavoritos.setVisibility(View.VISIBLE);
-                rvCategoriaFavoritos.setVisibility(View.VISIBLE);
-                etSearchFavoritos.setVisibility(View.VISIBLE);
-            }
+            // NO tiene favoritos en absoluto: ocultar TODO
+            tvEmptyFavoritos.setText("Aún no tienes publicaciones favoritas.\nEmpieza a guardar las que más te gusten.");
+            tvEmptyFavoritos.setVisibility(View.VISIBLE);
+            rvPublicacionesFavoritos.setVisibility(View.GONE);
+            rvCategoriaFavoritos.setVisibility(View.GONE);
+            layoutSearchFavoritos.setVisibility(View.GONE);
         }
     }
 }
