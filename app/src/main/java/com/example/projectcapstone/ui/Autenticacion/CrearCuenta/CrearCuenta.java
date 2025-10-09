@@ -1,12 +1,12 @@
 package com.example.projectcapstone.ui.Autenticacion.CrearCuenta;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,40 +18,41 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.projectcapstone.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-
 import cz.msebera.android.httpclient.Header;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CrearCuenta extends Fragment {
-
+public class CrearCuenta extends Fragment implements View.OnClickListener {
     private TextInputEditText edtNombres, edtApellidoPaterno, edtApellidoMaterno, edtCorreo, edtContra;
     private EditText etNumeroCelular;
     private AutoCompleteTextView actvSexo, actvSede;
     private Button btnListo, btnCancelar;
+    private FrameLayout loaderContainer;
+
     private Map<String, Integer> sexoMap = new HashMap<>();
     private Map<String, Integer> sedeMap = new HashMap<>();
-    private FrameLayout loaderContainer; // 👈 Agregar esta variable
+
+    // Variables temporales para enviar al siguiente fragmento
+    private String nombres, apePat, apeMat, correo, contrasena, celular, sexo, sede;
+    private int idSexo, idSede;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView =  inflater.inflate(R.layout.fragment_crear_cuenta, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_crear_cuenta, container, false);
 
         edtNombres = rootView.findViewById(R.id.edtNombres);
         edtApellidoPaterno = rootView.findViewById(R.id.edtApellidoPaterno);
@@ -66,75 +67,254 @@ public class CrearCuenta extends Fragment {
         loaderContainer = rootView.findViewById(R.id.loaderContainer);
 
         cargarSexo();
-        // Configurar opciones para Sexo
-        /*String[] opcionesSexo = {"Masculino", "Femenino", "Otro"};
-        ArrayAdapter<String> adapterSexo = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                opcionesSexo
-        );
-        actvSexo.setAdapter(adapterSexo);*/
-
         cargarSedes();
 
-        // Acción botón "Listo"
-        /*btnListo.setOnClickListener(v -> {
-            if (validarCampos()) {
-                crearCuenta();
-            }
-        });*/
-
-        btnListo.setOnClickListener(v -> {
-            if (validarCampos()) {
-                String correo = edtCorreo.getText().toString().trim();
-                verificarCorreo(correo);
-            }
-        });
-
-        // Acción botón "Cancelar"
-        btnCancelar.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_nav_crear_cuenta_to_nav_start_upn);
-        });
+        btnListo.setOnClickListener(this);
+        btnCancelar.setOnClickListener(this);
 
         return rootView;
     }
 
+    private boolean validarCampos() {
+        nombres = edtNombres.getText().toString().trim();
+        apePat = edtApellidoPaterno.getText().toString().trim();
+        apeMat = edtApellidoMaterno.getText().toString().trim();
+        correo = edtCorreo.getText().toString().trim();
+        contrasena = edtContra.getText().toString().trim();
+        celular = etNumeroCelular.getText().toString().trim();
+        sexo = actvSexo.getText().toString().trim();
+        sede = actvSede.getText().toString().trim();
+
+        // Validaciones básicas
+        if (nombres.isEmpty()) {
+            edtNombres.setError("Ingrese sus nombres");
+            return false;
+        }
+        if (apePat.isEmpty()) {
+            edtApellidoPaterno.setError("Ingrese su apellido paterno");
+            return false;
+        }
+        if (apeMat.isEmpty()) {
+            edtApellidoMaterno.setError("Ingrese su apellido materno");
+            return false;
+        }
+
+        // Validación de correo institucional
+        if (correo.isEmpty()) {
+            edtCorreo.setError("Ingrese su correo");
+            return false;
+        }
+        if (!correo.endsWith("@upn.pe")) {
+            edtCorreo.setError("Debe usar el correo institucional (@upn.pe)");
+            return false;
+        }
+
+        // Validación de celular
+        if (celular.isEmpty()) {
+            etNumeroCelular.setError("Ingrese su número de celular");
+            return false;
+        }
+        if (!celular.matches("^9\\d{8}$")) {
+            etNumeroCelular.setError("Número de celular inválido (debe tener 9 dígitos y empezar con 9)");
+            return false;
+        }
+
+        // Validación de contraseña
+        if (contrasena.isEmpty()) {
+            Toast.makeText(requireContext(), "Ingrese su contraseña", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (contrasena.length() < 6) {
+            Toast.makeText(requireContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        String passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).+$";
+        if (!contrasena.matches(passwordPattern)) {
+            Toast.makeText(requireContext(), "La contraseña debe tener 1 mayúscula, 1 número y 1 carácter especial", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Validar sexo
+        if (sexo.isEmpty()) {
+            Toast.makeText(requireContext(), "Seleccione su sexo", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Validar sede
+        if (sede.isEmpty()) {
+            Toast.makeText(requireContext(), "Seleccione su sede", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Validar existencia de IDs en los mapas
+        if (!sexoMap.containsKey(sexo) || !sedeMap.containsKey(sede)) {
+            Toast.makeText(requireContext(), "Selecciona valores válidos", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        idSexo = sexoMap.get(sexo);
+        idSede = sedeMap.get(sede);
+
+        return true;
+    }
+
+    private void procesarRegistro() {
+        if (!validarCampos()) {
+            return;
+        }
+        verificarCorreoAntesDeEnviarCodigo();
+    }
+
+    private void verificarCorreoAntesDeEnviarCodigo() {
+        mostrarLoader();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("correo", correo);
+
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/verificar_correo.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                ocultarLoader();
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    boolean success = json.getBoolean("success");
+                    String mensaje = json.getString("mensaje");
+
+                    if (success) {
+                        // Correo disponible → Enviar código
+                        enviarCodigoVerificacion();
+                    } else {
+                        // Correo ya existe → Mostrar alerta
+                        mostrarAlertaCorreoExistente(mensaje);
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                    Log.e("CREAR_CUENTA", "Error parseando JSON: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                ocultarLoader();
+                Toast.makeText(requireContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                Log.e("CREAR_CUENTA", "Fallo conexión: " + error.getMessage());
+            }
+        });
+    }
+
+    private void mostrarAlertaCorreoExistente(String mensaje) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View vistaDialogo = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+
+        // Referencias a los elementos de la vista
+        TextView tvTitulo = vistaDialogo.findViewById(R.id.tvTituloError);
+        TextView tvMensaje = vistaDialogo.findViewById(R.id.tvMensajeError);
+        MaterialButton btnOk = vistaDialogo.findViewById(R.id.btnFuncionalidadError);
+
+        // Personalizar contenido dinámico
+        tvTitulo.setText("Correo ya registrado");
+        tvMensaje.setText("\nSi olvidaste tu contraseña, puedes recuperarla.");
+
+        // Crear el AlertDialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(vistaDialogo)
+                .setCancelable(false)
+                .create();
+
+        // Botón de acción
+        btnOk.setOnClickListener(v -> dialog.dismiss());
+
+        // Mostrar con fondo transparente para respetar bordes redondeados
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
+    }
+
+    private void enviarCodigoVerificacion() {
+        mostrarLoader();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("correo", correo);
+        params.put("nombres", nombres + " " + apePat + " " + apeMat);
+
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/enviar_codigo.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                ocultarLoader();
+                String respuesta = new String(responseBody);
+
+                try {
+                    JSONObject json = new JSONObject(respuesta);
+                    String status = json.getString("status");
+
+                    if (status.equals("ok")) {
+                        Toast.makeText(requireContext(), "Código enviado a tu correo", Toast.LENGTH_SHORT).show();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("nombres", nombres);
+                        bundle.putString("apePat", apePat);
+                        bundle.putString("apeMat", apeMat);
+                        bundle.putString("correo", correo);
+                        bundle.putString("contrasena", contrasena);
+                        bundle.putString("celular", celular);
+                        bundle.putInt("id_sexo", idSexo);
+                        bundle.putInt("id_sede", idSede);
+
+                        NavController navController = Navigation.findNavController(requireView());
+                        navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear, bundle);
+
+                    } else {
+                        String msg = json.optString("msg", "Error al enviar el código");
+                        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error inesperado en la respuesta", Toast.LENGTH_SHORT).show();
+                    Log.e("CREAR_CUENTA", "Error parseando respuesta: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                ocultarLoader();
+                Toast.makeText(requireContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                Log.e("CREAR_CUENTA", "Fallo conexión: " + error.getMessage());
+            }
+        });
+    }
+
     private void cargarSexo() {
         AsyncHttpClient client = new AsyncHttpClient();
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sexo.php"; // cambia por tu URL
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sexo.php";
 
         client.get(url, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 List<String> nombresSexo = new ArrayList<>();
-
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject sexo = response.getJSONObject(i);
                         int id = sexo.getInt("id_sexo");
                         String nombre = sexo.getString("nom_sexo");
-
                         nombresSexo.add(nombre);
                         sexoMap.put(nombre, id);
                     }
-
-                    ArrayAdapter<String> adapterSexo = new ArrayAdapter<>(
-                            requireContext(),
-                            android.R.layout.simple_dropdown_item_1line,
-                            nombresSexo
-                    );
+                    ArrayAdapter<String> adapterSexo = new ArrayAdapter<>(requireContext(),
+                            android.R.layout.simple_dropdown_item_1line, nombresSexo);
                     actvSexo.setAdapter(adapterSexo);
 
-                    actvSexo.setOnItemClickListener((parent, view, position, id) -> {
-                        String seleccionado = parent.getItemAtPosition(position).toString();
-                        int idSexo = sexoMap.get(seleccionado);
-                        // Aquí puedes guardar idSede en una variable o enviarlo a tu formulario
-                        Log.d("SEXO", "Seleccionaste: " + seleccionado + " con id: " + idSexo);
-                    });
-
                 } catch (JSONException e) {
-                    e.printStackTrace();
                     Toast.makeText(requireContext(), "Error al procesar datos", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -146,154 +326,27 @@ public class CrearCuenta extends Fragment {
         });
     }
 
-    // Método para validar campos
-    private boolean validarCampos() {
-        if (edtNombres.getText().toString().trim().isEmpty()) {
-            edtNombres.setError("Ingrese su nombre");
-            return false;
-        }
-
-        if (edtApellidoPaterno.getText().toString().trim().isEmpty()) {
-            edtApellidoPaterno.setError("Ingrese su apellido paterno");
-            return false;
-        }
-
-        String correo = edtCorreo.getText().toString().trim();
-        String regex = "^[A-Za-z0-9._%+-]+@upn\\.pe$";
-
-        if (correo.isEmpty()) {
-            edtCorreo.setError("Ingrese su correo");
-            return false;
-        } else if (!correo.matches(regex)) {
-            edtCorreo.setError("Ingrese un correo válido con dominio @upn.pe");
-            return false;
-        }
-        if (edtContra.getText().toString().trim().isEmpty()) {
-            edtContra.setError("Ingrese su contraseña");
-            return false;
-        }
-        String pass1 = edtContra.getText().toString().trim();
-        String passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).+$";
-        if (!pass1.matches(passwordPattern)) {
-            mostrarAlertaPersonalizada(
-                    "Error",
-                    "La contraseña debe contener al menos una letra mayúscula, un número y un carácter especial (@#$%^&+=!)",
-                    false
-            );
-            return false;
-        }
-
-        String celular = etNumeroCelular.getText().toString().trim();
-        if (celular.isEmpty()) {
-            etNumeroCelular.setError("Ingrese su número de celular");
-            return false;
-        } else if (!celular.matches("^9\\d{8}$")) {
-            etNumeroCelular.setError("El número debe iniciar con 9 y tener 9 dígitos");
-            return false;
-        }
-        if (actvSexo.getText().toString().trim().isEmpty()) {
-            actvSexo.setError("Seleccione su sexo");
-            return false;
-        }
-        if (actvSede.getText().toString().trim().isEmpty()) {
-            actvSede.setError("Seleccione su sede");
-            return false;
-        }
-        return true;
-    }
-
-
-
-    private void crearCuenta() {
-        String nombres = edtNombres.getText().toString().trim();
-        String apePat = edtApellidoPaterno.getText().toString().trim();
-        String apeMat = edtApellidoMaterno.getText().toString().trim();
-        String correo = edtCorreo.getText().toString().trim();
-        String contraseña = edtContra.getText().toString().trim();
-        String celular = etNumeroCelular.getText().toString().trim();
-        String sexoTexto = actvSexo.getText().toString().trim();
-        String sedeTexto = actvSede.getText().toString().trim();
-
-        int sexo = sexoMap.getOrDefault(sexoTexto, -1);
-        int sede = sedeMap.getOrDefault(sedeTexto, -1);
-
-        if (!validarCampos()) {
-            return;
-        }
-
-        // URL de tu backend (PHP o API)
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/crear_cuenta.php";
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        RequestParams params = new RequestParams();
-        params.put("nombres", nombres);
-        params.put("apePat", apePat);
-        params.put("apeMat", apeMat);
-        params.put("correo", correo);
-        params.put("contrasena", contraseña);
-        params.put("celular", celular);
-        params.put("sexo", sexo);
-        params.put("sede", sede);
-
-        client.post(url, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String respuesta = new String(responseBody);
-                Toast.makeText(requireContext(), "Respuesta: " + respuesta, Toast.LENGTH_LONG).show();
-
-                // 👉 Si el backend responde con "ok", navega al validar correo
-                if (respuesta.contains("ok")) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("correo", correo);
-                    NavController navController = Navigation.findNavController(requireView());
-                    navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear, bundle);
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(requireContext(), "No se pudo CrearCuenta", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-
     private void cargarSedes() {
         AsyncHttpClient client = new AsyncHttpClient();
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sedes.php"; // cambia por tu URL
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sedes.php";
 
         client.get(url, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 List<String> nombresSede = new ArrayList<>();
-
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject sede = response.getJSONObject(i);
                         int id = sede.getInt("id_sede");
                         String nombre = sede.getString("nom_sede");
-
                         nombresSede.add(nombre);
                         sedeMap.put(nombre, id);
                     }
-
-                    ArrayAdapter<String> adapterSede = new ArrayAdapter<>(
-                            requireContext(),
-                            android.R.layout.simple_dropdown_item_1line,
-                            nombresSede
-                    );
+                    ArrayAdapter<String> adapterSede = new ArrayAdapter<>(requireContext(),
+                            android.R.layout.simple_dropdown_item_1line, nombresSede);
                     actvSede.setAdapter(adapterSede);
 
-                    // Guardar id_sede al seleccionar
-                    actvSede.setOnItemClickListener((parent, view, position, id) -> {
-                        String seleccionado = parent.getItemAtPosition(position).toString();
-                        int idSede = sedeMap.get(seleccionado);
-                        // Aquí puedes guardar idSede en una variable o enviarlo a tu formulario
-                        Log.d("SEDE", "Seleccionaste: " + seleccionado + " con id: " + idSede);
-                    });
-
                 } catch (JSONException e) {
-                    e.printStackTrace();
                     Toast.makeText(requireContext(), "Error al procesar datos", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -306,152 +359,22 @@ public class CrearCuenta extends Fragment {
     }
 
     private void mostrarLoader() {
-        if (loaderContainer != null) {
-            loaderContainer.setVisibility(View.VISIBLE);
-        }
+        if (loaderContainer != null) loaderContainer.setVisibility(View.VISIBLE);
     }
 
     private void ocultarLoader() {
-        if (loaderContainer != null) {
-            loaderContainer.setVisibility(View.GONE);
-        }
+        if (loaderContainer != null) loaderContainer.setVisibility(View.GONE);
     }
 
-    private void enviarCodigoVerificacion() {
-        mostrarLoader();
-        String correo = edtCorreo.getText().toString().trim();
-        String nombres = edtNombres.getText().toString().trim();
 
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/enviar_codigo.php";
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        RequestParams params = new RequestParams();
-        params.put("correo", correo);
-        params.put("nombres", nombres);
-
-        client.post(url, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                ocultarLoader();
-                try {
-                    String respuestaStr = new String(responseBody);
-
-                    // Parsear JSON
-                    JSONObject respuestaJson = new JSONObject(respuestaStr);
-
-                    if (respuestaJson.getString("status").equalsIgnoreCase("ok")) {
-                        String codigo = respuestaJson.getString("codigo"); // <-- Guardamos el código
-                        String expira = respuestaJson.getString("expira");
-
-                        // Enviar TODOS los datos en el bundle para luego crear la cuenta
-                        Bundle bundle = new Bundle();
-                        bundle.putString("nombres", edtNombres.getText().toString().trim());
-                        bundle.putString("apePat", edtApellidoPaterno.getText().toString().trim());
-                        bundle.putString("apeMat", edtApellidoMaterno.getText().toString().trim());
-                        bundle.putString("correo", edtCorreo.getText().toString().trim());
-                        bundle.putString("contrasena", edtContra.getText().toString().trim());
-                        bundle.putString("celular", etNumeroCelular.getText().toString().trim());
-                        bundle.putInt("sexo", sexoMap.get(actvSexo.getText().toString().trim()));
-                        bundle.putInt("sede", sedeMap.get(actvSede.getText().toString().trim()));
-                        bundle.putString("codigo", codigo);
-                        bundle.putString("expira", expira);
-
-                        NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_nav_crear_cuenta_to_nav_validar_correo_crear, bundle);
-                    } else {
-                        Toast.makeText(requireContext(), "Error al enviar código", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(requireContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                ocultarLoader();
-                Toast.makeText(requireContext(), "Fallo en el envío del código", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void verificarCorreo(String correo){
-        mostrarLoader();
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/verificar_correo.php";
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        RequestParams params = new RequestParams();
-        params.put("correo", correo);
-
-        client.post(url, params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                ocultarLoader();
-                try {
-                    boolean success = response.getBoolean("success");
-                    String mensaje = response.getString("mensaje");
-
-                    if (success) {
-                        enviarCodigoVerificacion();
-                    } else {
-                        // Ya existe, mostramos error
-                        mostrarAlertaPersonalizada(
-                                "Error",
-                                "Este correo ya esta registrado",
-                                false
-                        );
-                        //Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                ocultarLoader();
-                Toast.makeText(getContext(), "Error en el servidor", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-        View dialogView;
-
-        if (esPositivo) {
-            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
-        } else {
-            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
+    @Override
+    public void onClick(View v) {
+        if (v == btnListo) {
+            procesarRegistro();
         }
-
-        TextView tvTitulo, tvMensaje;
-        Button btnAceptar;
-
-        if (esPositivo) {
-            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
-            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
-            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
-        } else {
-            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
-            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
-            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
+        if(v == btnCancelar){
+            NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.action_nav_crear_cuenta_to_nav_start_upn);
         }
-
-        tvTitulo.setText(titulo);
-        tvMensaje.setText(mensaje);
-
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setView(dialogView)
-                .setCancelable(false)
-                .create();
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(
-                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-        }
-
-        btnAceptar.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
     }
 }

@@ -2,27 +2,28 @@ package com.example.projectcapstone.ui.Autenticacion.CrearCuenta;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,284 +31,192 @@ import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 
-public class ValidarCorreoCrear extends Fragment {
-
-    private EditText etDigit1, etDigit2, etDigit3, etDigit4;
+public class ValidarCorreoCrear extends Fragment implements View.OnClickListener {
+    private TextView tvDigit1, tvDigit2, tvDigit3, tvDigit4, tvCancelar, tvEmail;
+    private EditText etCodigo;
     private MaterialButton btnValidar;
-    private TextView tvCancelar;
 
-   @Override
+    // Variables que vienen del fragment anterior
+    private String nombres, apePat, apeMat, correo, contrasena, celular;
+    private int idSexo, idSede;
+    private SessionManager sessionManager;
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-       View rootView = inflater.inflate(R.layout.fragment_validar_correo_crear, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_validar_correo_crear, container, false);
 
-       // Referencias
-       etDigit1 = rootView.findViewById(R.id.etDigit1);
-       etDigit2 = rootView.findViewById(R.id.etDigit2);
-       etDigit3 = rootView.findViewById(R.id.etDigit3);
-       etDigit4 = rootView.findViewById(R.id.etDigit4);
-       btnValidar = rootView.findViewById(R.id.btnValidar);
-       tvCancelar = rootView.findViewById(R.id.tvCancelar);
+        // Referencias UI
+        tvDigit1 = rootView.findViewById(R.id.tvDigito1);
+        tvDigit2 = rootView.findViewById(R.id.tvDigito2);
+        tvDigit3 = rootView.findViewById(R.id.tvDigito3);
+        tvDigit4 = rootView.findViewById(R.id.tvDigito4);
+        etCodigo = rootView.findViewById(R.id.etCodigo);
+        btnValidar = rootView.findViewById(R.id.btnValidarCodigo);
+        tvCancelar = rootView.findViewById(R.id.btnCancelarCodigo);
+        tvEmail = rootView.findViewById(R.id.tvEmail);
 
-       String correo = getArguments().getString("correo");
-       String codigoEnviado = getArguments().getString("codigo");
-       String nombres = getArguments().getString("nombres");
-       String apePat = getArguments().getString("apePat");
-       String apeMat = getArguments().getString("apeMat");
-       String celular = getArguments().getString("celular");
-       int sexo = getArguments().getInt("sexo");         // <- usar getInt()
-       int sede = getArguments().getInt("sede");         // <- usar getInt()
-       String contraseña = getArguments().getString("contraseña");
-       String expirationDate = getArguments().getString("expira");
+        btnValidar.setOnClickListener(this);
+        tvCancelar.setOnClickListener(this);
 
-       Toast.makeText(getContext(), "Código enviado:", Toast.LENGTH_SHORT).show();
+        // Recuperar datos del Bundle
+        if (getArguments() != null) {
+            nombres = getArguments().getString("nombres");
+            apePat = getArguments().getString("apePat");
+            apeMat = getArguments().getString("apeMat");
+            correo = getArguments().getString("correo");
+            contrasena = getArguments().getString("contrasena");
+            celular = getArguments().getString("celular");
+            idSexo = getArguments().getInt("id_sexo");
+            idSede = getArguments().getInt("id_sede");
+            tvEmail.setText(correo);
+        }
 
-       // Mover cursor automáticamente al siguiente campo
-       setupOtpInputs();
+        sessionManager = new SessionManager(requireContext());
 
-       // Acción del botón validar
-       btnValidar.setOnClickListener(v -> {
-           String codigo = etDigit1.getText().toString() +
-                   etDigit2.getText().toString() +
-                   etDigit3.getText().toString() +
-                   etDigit4.getText().toString();
+        // AutoFocus al EditText oculto
+        etCodigo.requestFocus();
 
-           if (codigo.length() == 4) {
-               verificarCodigo(codigo, codigoEnviado, nombres, apePat, apeMat, celular, sexo, sede, contraseña, correo, expirationDate);
-           } else {
-               Toast.makeText(getContext(), "Debes ingresar los 4 dígitos", Toast.LENGTH_SHORT).show();
-           }
-       });
+        // Listener para mostrar los dígitos ingresados
+        etCodigo.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-       // Acción de cancelar
-       tvCancelar.setOnClickListener(v -> {
-           requireActivity().onBackPressed(); // Regresa al fragmento anterior
-       });
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                actualizarDigitos(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         return rootView;
-   }
+    }
 
-    private void validarCodigoEnServidor(String mail, String codigo) {
+    private void actualizarDigitos(String codigo) {
+        // Reiniciar texto
+        tvDigit1.setText("");
+        tvDigit2.setText("");
+        tvDigit3.setText("");
+        tvDigit4.setText("");
+
+        // Reflejar caracteres digitados
+        if (codigo.length() > 0) tvDigit1.setText(String.valueOf(codigo.charAt(0)));
+        if (codigo.length() > 1) tvDigit2.setText(String.valueOf(codigo.charAt(1)));
+        if (codigo.length() > 2) tvDigit3.setText(String.valueOf(codigo.charAt(2)));
+        if (codigo.length() > 3) tvDigit4.setText(String.valueOf(codigo.charAt(3)));
+    }
+
+    private void validarCodigoYRegistrar(String codigo) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
-        params.put("email", mail);
+
         params.put("codigo", codigo);
-
-        // URL de tu endpoint en el backend que valida el código
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/verificar_codigo.php";
-
-        client.post(url, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String response = new String(responseBody);
-
-                if (response.equalsIgnoreCase("OK")) {
-                    // Inflar tu layout personalizado
-                    LayoutInflater inflater = LayoutInflater.from(requireContext());
-                    View dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
-
-                    // Referencias a los elementos del layout
-                    TextView tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
-                    TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
-                    MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
-
-                    // Cambiar dinámicamente título y mensaje
-                    tvTitulo.setText("Validación Exitosa");
-                    tvMensaje.setText("Tu cuenta fue activada correctamente 🎉");
-
-                    // Crear el diálogo
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setView(dialogView);
-
-                    // Evitar que se cierre tocando afuera
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.setCancelable(false);
-
-                    // Acción del botón
-                    btnAceptar.setOnClickListener(v -> {
-                        alertDialog.dismiss();
-                        // Navegar al inicio
-                        NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_nav_validar_correo_crear_to_nav_inicio);
-                    });
-
-                    // Mostrar el diálogo
-                    alertDialog.show();;
-                } else {
-                    Toast.makeText(getContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error de la verificacion de correo" + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void setupOtpInputs() {
-        // Cuando se llena un dígito pasa al siguiente
-        etDigit1.addTextChangedListener(new GenericTextWatcher(etDigit1, etDigit2));
-        etDigit2.addTextChangedListener(new GenericTextWatcher(etDigit2, etDigit3));
-        etDigit3.addTextChangedListener(new GenericTextWatcher(etDigit3, etDigit4));
-        // Si llegas al 4to, no salta más
-    }
-
-    private class GenericTextWatcher implements TextWatcher {
-
-        private View currentView;
-        private View nextView;
-
-        public GenericTextWatcher(View currentView, View nextView) {
-            this.currentView = currentView;
-            this.nextView = nextView;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            String text = s.toString();
-            if (text.length() == 1 && nextView != null) {
-                nextView.requestFocus();
-            }
-        }
-    }
-
-    private void verificarCodigo(String codigo, String codigoEnviado, String nombres, String apePat, String apeMat, String celular, int sexo, int sede, String contraseña, String correo, String expirationDate) {
-
-        try {
-            // Formato de fecha que devuelve tu backend (ej: 2025-09-24 16:45:00)
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            Date expira = sdf.parse(expirationDate);
-            Date ahora = new Date();
-
-            /*if (ahora.after(expira)) {
-                // Código caducado
-                mostrarAlertaPersonalizada(
-                        "Error",
-                        "Este codigo ya esta expirado, vuelve al crear cuenta",
-                        false
-                );
-                return;
-            }*/
-
-            if (codigo.equals(codigoEnviado)) {
-                // Código correcto, crear cuenta
-                LayoutInflater inflater = LayoutInflater.from(requireContext());
-                View dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
-
-                // Referencias a los elementos del layout
-                TextView tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
-                TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
-                MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
-
-                // Cambiar dinámicamente título y mensaje
-                tvTitulo.setText("Validación Exitosa");
-                tvMensaje.setText("Tu cuenta fue activada correctamente 🎉");
-
-                // Crear el diálogo
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setView(dialogView);
-
-                // Evitar que se cierre tocando afuera
-                AlertDialog alertDialog = builder.create();
-                alertDialog.setCancelable(false);
-
-                // Acción del botón
-                btnAceptar.setOnClickListener(v -> {
-                    alertDialog.dismiss();
-                    crearCuenta(nombres, apePat, apeMat, celular, sexo, sede, contraseña, correo, codigo);
-                });
-
-                // Mostrar el diálogo
-                alertDialog.show();
-            } else {
-                Toast.makeText(requireContext(), "Código incorrecto ❌", Toast.LENGTH_SHORT).show();
-            }
-
-        } catch (Exception e) {
-            Toast.makeText(requireContext(), "Error al verificar el código: " + e.getMessage(),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void crearCuenta(String nombres, String apePat, String apeMat, String celular, int sexo, int sede, String contraseña, String correo, String codigo) {
-        // URL de tu backend (PHP o API)
-        String url = ServidorConfig.URL_SERVIDOR + "estudiante/crear_cuenta.php";
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        RequestParams params = new RequestParams();
+        params.put("correo", correo);
         params.put("nombres", nombres);
         params.put("apePat", apePat);
         params.put("apeMat", apeMat);
-        params.put("correo", correo);
-        params.put("contrasena", contraseña);
+        params.put("contrasena", contrasena);
         params.put("celular", celular);
-        params.put("sexo", sexo);
-        params.put("sede", sede);
-        params.put("codigo", codigo);
+        params.put("id_sexo", idSexo);
+        params.put("id_sede", idSede);
+        params.put("fecha_registro", getFechaActual());
+
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/validar_codigo_registrar.php";
 
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String respuesta = new String(responseBody);
+                try {
+                    JSONObject json = new JSONObject(respuesta);
+                    String status = json.getString("status");
 
-                // 👉 Si el backend responde con "ok", navega al validar correo
-                if (respuesta.contains("ok")) {
-                    NavController navController = Navigation.findNavController(requireView());
-                    navController.navigate(R.id.action_nav_validar_correo_crear_to_nav_inicio);
+                    switch (status) {
+                        case "ok":
+                            // Guardar sesión con los datos devueltos
+                            if (json.has("user")) {
+                                JSONObject user = json.getJSONObject("user");
+                                sessionManager.guardarSesion(user);
+                            }
+
+                            Toast.makeText(requireContext(), "Cuenta creada correctamente ✅", Toast.LENGTH_SHORT).show();
+
+                            // Redirigir al fragmento de inicio
+                            Navigation.findNavController(requireView())
+                                    .navigate(R.id.action_nav_validar_correo_crear_to_nav_inicio);
+                            break;
+
+                        case "codigo_invalido":
+                            mostrarAlertaError("Código inválido", "El código que ingresaste es incorrecto.");
+                            break;
+
+                        case "codigo_expirado":
+                            mostrarAlertaError("Código expirado", "El código ha caducado. Solicita uno nuevo.");
+                            break;
+
+                        default:
+                            String msg = json.optString("msg", "Error al registrar. Inténtalo de nuevo.");
+                            mostrarAlertaError("Error", msg);
+                            break;
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error inesperado en la respuesta", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(requireContext(), "No se pudo CrearCuenta", Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
+    private void mostrarAlertaError(String titulo, String mensaje) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
-        View dialogView;
+        View dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
 
-        if (esPositivo) {
-            dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
-        } else {
-            dialogView = inflater.inflate(R.layout.alert_dialog_res_negativa, null);
-        }
-
-        TextView tvTitulo, tvMensaje;
-        Button btnAceptar;
-
-        if (esPositivo) {
-            tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
-            tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
-            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
-        } else {
-            tvTitulo = dialogView.findViewById(R.id.tvTituloError);
-            tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
-            btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadError);
-        }
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeError);
+        MaterialButton btnOk = dialogView.findViewById(R.id.btnFuncionalidadError);
 
         tvTitulo.setText(titulo);
         tvMensaje.setText(mensaje);
 
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
                 .setCancelable(false)
                 .create();
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(
-                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-        }
+        alertDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        btnAceptar.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
+        btnOk.setOnClickListener(v -> alertDialog.dismiss());
+
+        alertDialog.show();
+    }
+
+    private String getFechaActual() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btnValidar) {
+            String codigo = etCodigo.getText().toString().trim();
+
+            if (codigo.length() != 4) {
+                Toast.makeText(requireContext(), "Ingresa el código de 4 dígitos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            validarCodigoYRegistrar(codigo);
+        } else if (v == tvCancelar) {
+            // Navegar atrás al fragmento anterior
+            NavController navController = Navigation.findNavController(requireView());
+            navController.popBackStack();
+        }
     }
 }
