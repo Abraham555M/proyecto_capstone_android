@@ -284,6 +284,7 @@
                         android:background="@android:color/transparent"
                         android:hint="Número Celular"
                         android:inputType="phone"
+                        android:maxLength="9"
                         android:padding="16dp"
                         android:textColorHint="@color/hint_color"
                         android:textSize="16sp" />
