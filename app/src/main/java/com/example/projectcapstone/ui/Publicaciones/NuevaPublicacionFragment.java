@@ -1,6 +1,7 @@
 package com.example.projectcapstone.ui.Publicaciones;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +37,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
@@ -50,6 +54,7 @@ public class NuevaPublicacionFragment extends Fragment {
     private ImageView imgUpload;
     private Uri imageUri; // para guardar la URI de la foto seleccionada
     private ActivityResultLauncher<String> galleryLauncher; // Lanzador para galería
+    private int idEmprendimientoSeleccionado = -1;
 
     @Nullable
     @Override
@@ -74,6 +79,11 @@ public class NuevaPublicacionFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spTipoPublicacion.setAdapter(adapter);
 
+        Bundle args = getArguments();
+        if (args != null) {
+            idEmprendimientoSeleccionado = args.getInt("id_emprendimiento", -1);
+        }
+
         // Llamada a la API con AsyncHttpClient
         cargarTiposPublicacion();
 
@@ -95,9 +105,11 @@ public class NuevaPublicacionFragment extends Fragment {
                         break;
                     case "Evento":
                         layoutEvento.setVisibility(View.VISIBLE);
+                        configurarCalendarioEvento();
                         break;
                     case "Promoción":
                         layoutPromocion.setVisibility(View.VISIBLE);
+                        configurarCalendarioPromocion();
                         break;
                 }
             }
@@ -174,7 +186,7 @@ public class NuevaPublicacionFragment extends Fragment {
             }
         });
     }
-    private void agregarPublicacion(){
+    private void agregarPublicacion() {
         String url = ServidorConfig.URL_SERVIDOR + "publicacion/agregar_publicacion.php";
 
         // Validación básica
@@ -189,11 +201,13 @@ public class NuevaPublicacionFragment extends Fragment {
         // Obtener tipo seleccionado
         TipoPublicacion tipoSeleccionado = (TipoPublicacion) spTipoPublicacion.getSelectedItem();
         String idTipo = tipoSeleccionado.getId_tipo_publicacion();
+        String nombreTipo = tipoSeleccionado.getNom_tipo_publicacion();
 
-        String idEmprendimiento = "4"; // Como lo haria esto de aqui ?? - dudoso
+        String idEmprendimiento = String.valueOf(idEmprendimientoSeleccionado);
 
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
+
         params.put("id_emprendimiento", idEmprendimiento);
         params.put("id_tipo_publicacion", idTipo);
         params.put("tit_publicacion", titulo);
@@ -204,11 +218,64 @@ public class NuevaPublicacionFragment extends Fragment {
         if (imageUri != null) {
             try {
                 InputStream inputStream = requireActivity().getContentResolver().openInputStream(imageUri);
-                params.put("img_publicacion", inputStream, "imagen.jpg");  // clave "img_publicacion"
+                params.put("img_publicacion", inputStream, "imagen.jpg");
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(requireContext(), "Error al preparar imagen", Toast.LENGTH_SHORT).show();
             }
+        }
+
+        switch (nombreTipo) {
+            case "Producto":
+                EditText etPrecio = layoutProducto.findViewById(R.id.etPrecioPublicacion);
+                EditText etStock = layoutProducto.findViewById(R.id.etStockPublicacion);
+
+                String precio = etPrecio.getText().toString().trim();
+                String stock = etStock.getText().toString().trim();
+
+                if (precio.isEmpty() || stock.isEmpty()) {
+                    Toast.makeText(requireContext(), "Complete precio y stock", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                params.put("prc_producto", precio);
+                params.put("stk_producto", stock);
+                break;
+
+            case "Promoción":
+                EditText etDescuento = layoutPromocion.findViewById(R.id.etDescuento);
+                EditText etFechaIni = layoutPromocion.findViewById(R.id.etFechaInicio);
+                EditText etFechaFin = layoutPromocion.findViewById(R.id.etFechaFin);
+
+                String descuento = etDescuento.getText().toString().trim();
+                String fechaIni = etFechaIni.getText().toString().trim();
+                String fechaFin = etFechaFin.getText().toString().trim();
+
+                if (descuento.isEmpty() || fechaIni.isEmpty() || fechaFin.isEmpty()) {
+                    Toast.makeText(requireContext(), "Complete todos los datos de la promoción", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                params.put("dsc_promocion", descuento);
+                params.put("fch_ini_promocion", fechaIni);
+                params.put("fch_fin_promocion", fechaFin);
+                break;
+
+            case "Evento":
+                EditText etFechaEvento = layoutEvento.findViewById(R.id.etFechaEvento);
+                EditText etLugar = layoutEvento.findViewById(R.id.etLugarEvento);
+
+                String fechaEvento = etFechaEvento.getText().toString().trim();
+                String lugarEvento = etLugar.getText().toString().trim();
+
+                if (fechaEvento.isEmpty() || lugarEvento.isEmpty()) {
+                    Toast.makeText(requireContext(), "Complete fecha y lugar del evento", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                params.put("fch_evento", fechaEvento);
+                params.put("lgr_evento", lugarEvento);
+                break;
         }
 
         client.post(url, params, new AsyncHttpResponseHandler() {
@@ -219,10 +286,15 @@ public class NuevaPublicacionFragment extends Fragment {
                     JSONObject obj = new JSONObject(response);
 
                     if (obj.getBoolean("success")) {
-                        Toast.makeText(requireContext(), "Publicación agregada", Toast.LENGTH_SHORT).show();
-                        // opcional: limpiar campos
+                        Toast.makeText(requireContext(), "Publicación agregada correctamente", Toast.LENGTH_SHORT).show();
+
                         etNombrePublicacion.setText("");
                         etDescripcion.setText("");
+                        imgUpload.setImageResource(R.drawable.ic_buscar);
+                        imageUri = null;
+
+                        NavController navController = Navigation.findNavController(requireView());
+                        navController.popBackStack();
                     } else {
                         Toast.makeText(requireContext(), "Error: " + obj.getString("message"), Toast.LENGTH_SHORT).show();
                     }
@@ -245,16 +317,59 @@ public class NuevaPublicacionFragment extends Fragment {
         galleryLauncher.launch("image/*");
     }
 
-    private String getRealPathFromURI(Uri uri) {
-        String[] projection = { android.provider.MediaStore.Images.Media.DATA };
-        android.database.Cursor cursor = requireActivity().getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int column_index = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String path = cursor.getString(column_index);
-            cursor.close();
-            return path;
-        }
-        return null;
+    private void configurarCalendarioPromocion(){
+        EditText etFechaInicio = layoutPromocion.findViewById(R.id.etFechaInicio);
+        EditText etFechaFin = layoutPromocion.findViewById(R.id.etFechaFin);
+
+        prepararCampoFecha(etFechaInicio);
+        prepararCampoFecha(etFechaFin);
+
+        etFechaInicio.setOnClickListener(v -> mostrarCalendario(etFechaInicio));
+        etFechaFin.setOnClickListener(v -> mostrarCalendario(etFechaFin));
+    }
+
+    private void configurarCalendarioEvento() {
+        EditText etFechaEvento = layoutEvento.findViewById(R.id.etFechaEvento);
+
+        prepararCampoFecha(etFechaEvento);
+
+        etFechaEvento.setOnClickListener(v -> mostrarCalendario(etFechaEvento));
+    }
+
+    private void prepararCampoFecha(EditText editText) {
+        // Evita que aparezca el teclado
+        editText.setInputType(0);
+        editText.setFocusable(false);
+        editText.setClickable(true);
+
+        // Abre el calendario al primer toque
+        editText.setOnClickListener(v -> mostrarCalendario(editText));
+    }
+
+    private void mostrarCalendario(EditText editText) {
+
+        final Calendar calendar = Calendar.getInstance();
+        int año = calendar.get(Calendar.YEAR);
+        int mes = calendar.get(Calendar.MONTH);
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                requireContext(),
+                (view, year, month, dayOfMonth) -> {
+                    String fecha = year + "-" + String.format("%02d", (month + 1)) + "-" + String.format("%02d", dayOfMonth);
+                    editText.setText(fecha);
+                },
+                año, mes, dia
+        );
+
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.show();
+    }
+
+    private void limpiarCampos() {
+        etNombrePublicacion.setText("");
+        etDescripcion.setText("");
+        imgUpload.setImageResource(R.drawable.ic_buscar);
+        imageUri = null;
     }
 }

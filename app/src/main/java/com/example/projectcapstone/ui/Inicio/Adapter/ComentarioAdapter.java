@@ -1,5 +1,6 @@
 package com.example.projectcapstone.ui.Inicio.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.format.DateUtils;
@@ -81,9 +82,10 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             holder.imgLike.setColorFilter(Color.parseColor("#BDBDBD")); // gris
         }
 
-        // -------------------------------
+        // ================================
         // EVENTOS
-        // -------------------------------
+        // ================================
+
         // Click en Like
         holder.layoutLike.setOnClickListener(v -> {
             if (likeClickListener != null) {
@@ -91,11 +93,22 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             }
         });
 
-        // Click en Reportar comentario
-        holder.layoutReport.setOnClickListener(v -> {
-            if (reportListener != null) {
-                reportListener.onReportCommentClick(comentario);
-            }
+        // 🔥 NUEVO: Click en todo el comentario para mostrar opciones
+        holder.itemView.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Acciones del comentario");
+            String[] opciones = {"Reportar comentario", "Cancelar"};
+
+            builder.setItems(opciones, (dialog, which) -> {
+                if (which == 0) {
+                    if (reportListener != null) {
+                        reportListener.onReportCommentClick(comentario);
+                    }
+                }
+                dialog.dismiss();
+            });
+
+            builder.show();
         });
     }
 
@@ -134,8 +147,8 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     // ============================
     public static class ComentarioViewHolder extends RecyclerView.ViewHolder {
         TextView textUserName, textComment, textTime, textLikeCount;
-        ImageView imgAvatar, imgLike, imgReport;
-        View layoutLike, layoutReport;
+        ImageView imgAvatar, imgLike;
+        View layoutLike;
 
         public ComentarioViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -146,10 +159,6 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             imgLike = itemView.findViewById(R.id.img_like);
             textLikeCount = itemView.findViewById(R.id.text_like_count);
             layoutLike = itemView.findViewById(R.id.layout_like);
-
-            // NUEVOS elementos de reporte
-            layoutReport = itemView.findViewById(R.id.layout_report);
-            imgReport = itemView.findViewById(R.id.img_report);
         }
     }
 }
