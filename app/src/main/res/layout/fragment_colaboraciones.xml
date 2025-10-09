@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F9F9F9"
     tools:context=".ui.Colaboraciones.ColaboracionesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Título -->
     <TextView
+        android:id="@+id/tvTituloColaboraciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Colaboraciones"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:textColor="#000" />
+
+    <!-- RecyclerView para mostrar las colaboraciones -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerColaboraciones"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:paddingHorizontal="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
-</FrameLayout>
+</LinearLayout>
