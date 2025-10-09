@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- Color de fondo del círculo -->
+    <solid android:color="#FFFFFF" />
+
+    <!-- Borde alrededor del círculo -->
+    <stroke
+        android:width="2dp"
+        android:color="#FF9800" />
+
+    <!-- Tamaño mínimo (opcional, puede ajustarse) -->
+    <size
+        android:width="60dp"
+        android:height="60dp" />
+
+</shape>
