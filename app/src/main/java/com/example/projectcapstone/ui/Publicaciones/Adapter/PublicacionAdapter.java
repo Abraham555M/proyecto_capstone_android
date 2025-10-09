@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.Publicaciones;
+package com.example.projectcapstone.ui.Publicaciones.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

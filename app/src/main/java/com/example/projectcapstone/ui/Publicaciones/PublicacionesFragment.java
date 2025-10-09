@@ -21,6 +21,8 @@ import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Publicaciones.Adapter.CategoriaPublicacion;
 import com.example.projectcapstone.ui.Publicaciones.Adapter.CategoriaPublicacionAdapter;
+import com.example.projectcapstone.ui.Publicaciones.Adapter.Publicacion;
+import com.example.projectcapstone.ui.Publicaciones.Adapter.PublicacionAdapter;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -108,7 +110,6 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
         RequestParams params = new RequestParams();
         params.put("idEstudiante", idEstudiante);
-        params.put("servidorConfig", ServidorConfig.URL_FOTOS_SERVIDOR);
 
         client.get(URL, params, new AsyncHttpResponseHandler() {
             @Override
@@ -121,18 +122,11 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
 
-                        String imagen = obj.getString("imagen_url");
-
-                        // 👇 Si no es URL absoluta (http/https), concatenamos
-                        if (!imagen.startsWith("http")) {
-                            imagen = ServidorConfig.URL_FOTOS_SERVIDOR + imagen;
-                        }
-
                         publicaciones.add(new Publicacion(
                                 obj.getInt("id"),
                                 obj.getString("titulo"),
                                 obj.getString("descripcion"),
-                                imagen
+                                obj.getString("imagen_url")
                         ));
                     }
                     adapter.notifyDataSetChanged();

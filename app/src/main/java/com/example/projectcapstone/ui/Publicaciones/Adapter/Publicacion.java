@@ -1,4 +1,4 @@
-package com.example.projectcapstone.ui.Publicaciones;
+package com.example.projectcapstone.ui.Publicaciones.Adapter;
 
 public class Publicacion {
     private int id;

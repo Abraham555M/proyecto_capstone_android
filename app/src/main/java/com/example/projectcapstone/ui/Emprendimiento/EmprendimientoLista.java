@@ -472,6 +472,5 @@ public class EmprendimientoLista extends Fragment {
                 layoutEmpty.setVisibility(View.VISIBLE);
             }
         });
-
     }
 }
