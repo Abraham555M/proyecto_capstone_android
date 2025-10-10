@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -39,18 +41,21 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
     private RecyclerView recyclerView;
     private RecyclerView recyclerEmprendimientos;
-    private PublicacionAdapter adapter;
+    public PublicacionAdapter adapter;
     private CategoriaPublicacionAdapter emprendimientoAdapter;
     private List<Publicacion> publicaciones;
     private List<CategoriaPublicacion> categorias;
     private Button btnAgregarPublicacion;
     private SessionManager session;
+    private TextView tvSinPublicaciones, tvSinEmprendimientos;
     private int idEmprendimientoSeleccionado = -1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_publicaciones, container, false);
 
+        tvSinPublicaciones = rootView.findViewById(R.id.txtSinPublicaciones);
+        tvSinEmprendimientos = rootView.findViewById(R.id.txtSinEmprendimientos);
         idEmprendimientoSeleccionado = -1;
         recyclerEmprendimientos = rootView.findViewById(R.id.recyclerEmprendimientos);
         recyclerView = rootView.findViewById(R.id.recyclerPublicaciones);
@@ -74,7 +79,12 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
         session = new SessionManager(requireContext());
 
         publicaciones = new ArrayList<>();
-        adapter = new PublicacionAdapter(publicaciones, getContext());
+        adapter = new PublicacionAdapter(publicaciones, getContext(), new PublicacionAdapter.OnPublicacionActualizadaListener() {
+            @Override
+            public void onPublicacionesActualizadas() {
+                cargarPublicaciones();
+            }
+        });
         recyclerView.setAdapter(adapter);
         btnAgregarPublicacion.setOnClickListener(this);
 
@@ -102,7 +112,6 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
     private void cargarPublicaciones() {
         String URL = ServidorConfig.URL_SERVIDOR + "publicacion/listar_publicaciones.php";
-
         AsyncHttpClient client = new AsyncHttpClient();
 
         SharedPreferences prefs = requireActivity().getSharedPreferences("usuario", Context.MODE_PRIVATE);
@@ -121,7 +130,6 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     publicaciones.clear();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
-
                         publicaciones.add(new Publicacion(
                                 obj.getInt("id"),
                                 obj.getString("titulo"),
@@ -129,16 +137,27 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                                 obj.getString("imagen_url")
                         ));
                     }
+
                     adapter.notifyDataSetChanged();
+
+                    // Mostrar u ocultar mensaje
+                    if (publicaciones.isEmpty()) {
+                        tvSinPublicaciones.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        tvSinPublicaciones.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Error procesando publicaciones", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error cargando publicaciones", Toast.LENGTH_SHORT).show();
+                tvSinPublicaciones.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             }
         });
     }
@@ -157,7 +176,6 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     categorias.clear();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject obj = array.getJSONObject(i);
-
                         String imagen = obj.getString("img_categoria");
                         if (!imagen.startsWith("http")) {
                             imagen = ServidorConfig.URL_FOTOS_SERVIDOR + imagen;
@@ -171,6 +189,30 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                         ));
                     }
                     emprendimientoAdapter.notifyDataSetChanged();
+
+                    // ✅ Controlar visibilidad y posición
+                    TextView txtSinEmprendimientos = getView().findViewById(R.id.txtSinEmprendimientos);
+                    RecyclerView recyclerEmprendimientos = getView().findViewById(R.id.recyclerEmprendimientos);
+                    TextView tvMisPublicaciones = getView().findViewById(R.id.tvMisPublicaciones);
+
+                    if (categorias.isEmpty()) {
+                        recyclerEmprendimientos.setVisibility(View.GONE);
+                        txtSinEmprendimientos.setVisibility(View.VISIBLE);
+
+                        // mover "Mis Publicaciones" debajo del mensaje
+                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) tvMisPublicaciones.getLayoutParams();
+                        params.topToBottom = R.id.txtSinEmprendimientos;
+                        tvMisPublicaciones.setLayoutParams(params);
+                    } else {
+                        recyclerEmprendimientos.setVisibility(View.VISIBLE);
+                        txtSinEmprendimientos.setVisibility(View.GONE);
+
+                        // volver a colocar "Mis Publicaciones" debajo del RecyclerView
+                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) tvMisPublicaciones.getLayoutParams();
+                        params.topToBottom = R.id.recyclerEmprendimientos;
+                        tvMisPublicaciones.setLayoutParams(params);
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error procesando categorías", Toast.LENGTH_SHORT).show();
@@ -179,14 +221,15 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error cargando categorías", Toast.LENGTH_SHORT).show();
+                tvSinEmprendimientos.setVisibility(View.VISIBLE);
+                recyclerEmprendimientos.setVisibility(View.GONE);
             }
         });
     }
     private void cargarPublicacionesPorCategoria(int idCategoria, int idEmprendimiento) {
         String URL = ServidorConfig.URL_SERVIDOR + "publicacion/listar_publicaciones_categoria.php";
-
         AsyncHttpClient client = new AsyncHttpClient();
+
         SharedPreferences prefs = requireActivity().getSharedPreferences("usuario", Context.MODE_PRIVATE);
         int idEstudiante = prefs.getInt("id_estudiante", -1);
 
@@ -203,37 +246,43 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     JSONArray array = new JSONArray(response);
 
                     publicaciones.clear();
-
-                    if (array.length() == 0) {
-                        Toast.makeText(getContext(), "No tienes publicaciones en esta categoría.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        for (int i = 0; i < array.length(); i++) {
-                            JSONObject obj = array.getJSONObject(i);
-                            String imagen = obj.getString("imagen_url");
-
-                            if (!imagen.startsWith("http")) {
-                                imagen = ServidorConfig.URL_FOTOS_SERVIDOR + imagen;
-                            }
-
-                            publicaciones.add(new Publicacion(
-                                    obj.getInt("id"),
-                                    obj.getString("titulo"),
-                                    obj.getString("descripcion"),
-                                    imagen
-                            ));
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+                        String imagen = obj.getString("imagen_url");
+                        if (!imagen.startsWith("http")) {
+                            imagen = ServidorConfig.URL_FOTOS_SERVIDOR + imagen;
                         }
+
+                        publicaciones.add(new Publicacion(
+                                obj.getInt("id"),
+                                obj.getString("titulo"),
+                                obj.getString("descripcion"),
+                                imagen
+                        ));
                     }
 
                     adapter.notifyDataSetChanged();
+
+                    // Mostrar u ocultar mensaje
+                    if (publicaciones.isEmpty()) {
+                        tvSinPublicaciones.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        tvSinPublicaciones.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Error procesando publicaciones", Toast.LENGTH_SHORT).show();
+                    tvSinPublicaciones.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error cargando publicaciones", Toast.LENGTH_SHORT).show();
+                tvSinPublicaciones.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             }
         });
     }

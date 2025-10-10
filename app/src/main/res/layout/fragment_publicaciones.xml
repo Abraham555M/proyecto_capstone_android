@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.Publicaciones.PublicacionesFragment">
 
-    <!-- Título Mis Emprendimientos -->
+    <!-- 🟠 Título Mis Emprendimientos -->
     <TextView
         android:id="@+id/tvMisEmprendimientos"
         android:layout_width="wrap_content"
@@ -20,7 +20,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp" />
 
-    <!-- RecyclerView horizontal de Emprendimientos -->
+    <!-- 🟢 RecyclerView horizontal de Emprendimientos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerEmprendimientos"
         android:layout_width="match_parent"
@@ -28,14 +28,30 @@
         android:layout_marginTop="8dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/tvMisEmprendimientos"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:orientation="horizontal"
         tools:listitem="@layout/item_categoria_publicacion" />
 
-    <!-- Título Mis Publicaciones -->
+    <!-- 🟡 Mensaje cuando no hay emprendimientos -->
+    <TextView
+        android:id="@+id/txtSinEmprendimientos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Aún no tienes emprendimientos registrados."
+        android:textSize="14sp"
+        android:textColor="#777777"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="8dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="80dp"
+        app:layout_constraintTop_toBottomOf="@id/tvMisEmprendimientos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 🔵 Título Mis Publicaciones -->
     <TextView
         android:id="@+id/tvMisPublicaciones"
         android:layout_width="wrap_content"
@@ -49,7 +65,7 @@
         app:layout_constraintTop_toBottomOf="@id/recyclerEmprendimientos"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- RecyclerView para listar publicaciones -->
+    <!-- 🔴 RecyclerView para listar publicaciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerPublicaciones"
         android:layout_width="0dp"
@@ -61,7 +77,25 @@
         app:layout_constraintBottom_toTopOf="@+id/btnAgregarPublicacion"
         tools:listitem="@layout/item_publicacion" />
 
-    <!-- Botón para agregar publicación -->
+    <!-- 🟣 Mensaje cuando no hay publicaciones -->
+    <TextView
+        android:id="@+id/txtSinPublicaciones"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Aún no has realizado publicaciones."
+        android:textSize="14sp"
+        android:textColor="#777777"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toBottomOf="@id/tvMisPublicaciones"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnAgregarPublicacion" />
+
+    <!-- 🟤 Botón para agregar publicación -->
     <Button
         android:id="@+id/btnAgregarPublicacion"
         android:layout_width="wrap_content"
@@ -73,6 +107,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
