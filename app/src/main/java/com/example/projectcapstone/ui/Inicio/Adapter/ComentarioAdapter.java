@@ -28,6 +28,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     private Context context;
     private OnCommentLikeClickListener likeClickListener;
     private OnReportCommentListener reportListener;
+    private int idEstudianteActual;
 
     public interface OnCommentLikeClickListener {
         void onCommentLikeClicked(Comentario comentario, ImageView imgLike, TextView textLikeCount);
@@ -44,10 +45,20 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     public void setOnReportCommentListener(OnReportCommentListener listener) {
         this.reportListener = listener;
     }
+    public interface OnDeleteCommentListener {
+        void onDeleteCommentClick(Comentario comentario);
+    }
 
-    public ComentarioAdapter(Context context, List<Comentario> listaComentarios) {
+    private OnDeleteCommentListener deleteListener;
+
+    public void setOnDeleteCommentListener(OnDeleteCommentListener listener) {
+        this.deleteListener = listener;
+    }
+
+    public ComentarioAdapter(Context context, List<Comentario> listaComentarios,int idEstudianteActual) {
         this.context = context;
         this.listaComentarios = listaComentarios;
+        this.idEstudianteActual = idEstudianteActual;
     }
 
     @NonNull
@@ -82,11 +93,6 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             holder.imgLike.setColorFilter(Color.parseColor("#BDBDBD")); // gris
         }
 
-        // ================================
-        // EVENTOS
-        // ================================
-
-        // Click en Like
         holder.layoutLike.setOnClickListener(v -> {
             if (likeClickListener != null) {
                 likeClickListener.onCommentLikeClicked(comentario, holder.imgLike, holder.textLikeCount);
@@ -97,11 +103,24 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         holder.itemView.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Acciones del comentario");
-            String[] opciones = {"Reportar comentario", "Cancelar"};
+
+            // Si el comentario pertenece al usuario actual, mostrar Eliminar
+            String[] opciones;
+            if (comentario.getIdEstudiante() == idEstudianteActual) {
+                opciones = new String[]{"Eliminar comentario", "Cancelar"};
+            } else {
+                opciones = new String[]{"Reportar comentario", "Cancelar"};
+            }
 
             builder.setItems(opciones, (dialog, which) -> {
-                if (which == 0) {
-                    if (reportListener != null) {
+                if (comentario.getIdEstudiante() == idEstudianteActual) {
+                    // Es mi comentario
+                    if (which == 0) {
+                        mostrarDialogoConfirmarEliminar(comentario);
+                    }
+                } else {
+                    // Es de otro usuario
+                    if (which == 0 && reportListener != null) {
                         reportListener.onReportCommentClick(comentario);
                     }
                 }
@@ -110,8 +129,46 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
             builder.show();
         });
+
     }
 
+    private void mostrarDialogoConfirmarEliminar(Comentario comentario) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.alert_dialog_opciones, null);
+
+        // Referencias según tu XML
+        TextView tvTitulo = view.findViewById(R.id.tvTituloError);
+        com.google.android.material.button.MaterialButton btnNo = view.findViewById(R.id.btnNo);
+        com.google.android.material.button.MaterialButton btnSi = view.findViewById(R.id.btnSi);
+
+        // Personalizar texto del diálogo
+        tvTitulo.setText("¿Estás seguro de eliminar este comentario?");
+        btnNo.setText("No");
+        btnSi.setText("Sí");
+
+        // Crear el diálogo
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setView(view)
+                .create();
+
+        // Fondo transparente (opcional, si usas bordes redondeados en el CardView)
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Acción botón "No"
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        // Acción botón "Sí"
+        btnSi.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onDeleteCommentClick(comentario);
+            }
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
     @Override
     public int getItemCount() {
         return listaComentarios.size();
@@ -142,9 +199,6 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         return "";
     }
 
-    // ============================
-    // VIEW HOLDER
-    // ============================
     public static class ComentarioViewHolder extends RecyclerView.ViewHolder {
         TextView textUserName, textComment, textTime, textLikeCount;
         ImageView imgAvatar, imgLike;
