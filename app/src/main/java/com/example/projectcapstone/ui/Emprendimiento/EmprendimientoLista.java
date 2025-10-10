@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -124,9 +125,15 @@ public class EmprendimientoLista extends Fragment {
         imgEditarPortada = dialogView.findViewById(R.id.imgEditarPortada);
         etEditarNombre = dialogView.findViewById(R.id.etEditarNombre);
         etEditarDescripcion = dialogView.findViewById(R.id.etEditarDescripcion);
-        ImageButton btnSeleccionarImagen = dialogView.findViewById(R.id.btnSeleccionarImagen);
-        Button btnCancelar = dialogView.findViewById(R.id.btnCancelar);
-        Button btnGuardarCambios = dialogView.findViewById(R.id.btnGuardarCambios);
+
+        // ✅ CAMBIO: Ahora es CardView en lugar de ImageButton
+        CardView containerImagen = dialogView.findViewById(R.id.containerImagen);
+        CardView btnSeleccionarImagen = dialogView.findViewById(R.id.btnSeleccionarImagen);
+
+        // ✅ CAMBIO: Ahora buscamos el botón de cerrar y los botones como TextView
+        ImageView btnCerrar = dialogView.findViewById(R.id.btn_close);
+        TextView btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        TextView btnGuardarCambios = dialogView.findViewById(R.id.btnGuardarCambios);
 
         // Cargar datos actuales
         etEditarNombre.setText(empr.getNom_emprendimiento());
@@ -140,30 +147,32 @@ public class EmprendimientoLista extends Fragment {
                     .into(imgEditarPortada);
         }
 
-        // Seleccionar nueva imagen
-        btnSeleccionarImagen.setOnClickListener(v -> {
+        // ✅ CAMBIO: Listener para abrir galería (ahora con CardView)
+        View.OnClickListener abrirGaleria = v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             imagePickerLauncher.launch(intent);
-        });
+        };
+
+        // Ambos elementos pueden abrir la galería
+        containerImagen.setOnClickListener(abrirGaleria);
+        btnSeleccionarImagen.setOnClickListener(abrirGaleria);
 
         builder.setView(dialogView);
         dialogEditar = builder.create();
+
+        // ✅ CAMBIO: Fondo transparente para el dialog
+        if (dialogEditar.getWindow() != null) {
+            dialogEditar.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        // ✅ CAMBIO: Botón cerrar (X)
+        btnCerrar.setOnClickListener(v -> dialogEditar.dismiss());
 
         // Guardar cambios
         btnGuardarCambios.setOnClickListener(v -> {
             String nuevoNombre = etEditarNombre.getText().toString().trim();
             String nuevaDesc = etEditarDescripcion.getText().toString().trim();
-
-            // ANTES:
-            //if (nuevoNombre.isEmpty()) {
-            //  etEditarNombre.setError("El nombre es obligatorio");
-            //  return;
-            //}
-
-            //if nuevaDesc.isEmpty()) {
-            //    etEditarDescripcion.setError("La descripción es obligatoria");
-            //    return;
-            //}
 
             if (nuevoNombre.isEmpty()) {
                 mostrarAlertaPersonalizada("Campo requerido", "El nombre del emprendimiento es obligatorio", false);
@@ -364,6 +373,7 @@ public class EmprendimientoLista extends Fragment {
             }
         });
     }
+
     private void mostrarAlertaPersonalizada(String titulo, String mensaje, boolean esPositivo) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View dialogView;
@@ -401,6 +411,7 @@ public class EmprendimientoLista extends Fragment {
 
         dialog.show();
     }
+
     private void cargarEmprendimientos() {
         progressBar.setVisibility(View.VISIBLE);
         int idEstudiante = session.getIdEstudiante();

@@ -159,7 +159,7 @@
     <fragment
         android:id="@+id/nuevoEmprendimientoFragment"
         android:name="com.example.projectcapstone.ui.Emprendimiento.NuevoEmprendimientoFragment"
-        android:label="fragment_nuevo_emprendimiento"
+        android:label="Crear emprendimiento"
         tools:layout="@layout/fragment_nuevo_emprendimiento" />
 
     <fragment
