@@ -200,6 +200,10 @@
         android:id="@+id/nav_perfil_estudiante"
         android:name="com.example.projectcapstone.ui.Perfil.PerfilEstudianteFragment"
         android:label="Perfil"
-        tools:layout="@layout/fragment_perfil_estudiante" />
+        tools:layout="@layout/fragment_perfil_estudiante" >
+        <action
+            android:id="@+id/action_nav_perfil_estudiante_to_nav_perfil"
+            app:destination="@id/nav_perfil" />
+    </fragment>
 
 </navigation>
