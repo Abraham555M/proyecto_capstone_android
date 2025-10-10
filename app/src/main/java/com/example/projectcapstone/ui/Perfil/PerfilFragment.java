@@ -341,9 +341,11 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
 
                     String nombre = jsonObject.optString("nombre", "Sin nombre");
                     String sede = jsonObject.optString("sede", "Sin sede");
+                    String telefono = jsonObject.optString("telefono", "000000000");
 
                     tvNombre.setText(nombre);
                     tvSede.setText(sede);
+                    tvTelefono.setText(telefono);
 
                 } catch (Exception e) {
                     e.printStackTrace();
