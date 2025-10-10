@@ -193,8 +193,9 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         String nomEstudiante = obj.getString("estudiante");
                         int totalLikes = obj.getInt("total_likes");
                         boolean dioLike = obj.getInt("dio_like") == 1;
+                        int idEstudianteComentario = obj.getInt("id_estudiante");
 
-                        listaComentarios.add(new Comentario(idComentario, conComentario, fchComentario, nomEstudiante, dioLike, totalLikes));
+                        listaComentarios.add(new Comentario(idComentario, conComentario, fchComentario, nomEstudiante,dioLike, totalLikes, idEstudianteComentario));
                     }
 
                     if (listaComentarios.isEmpty()) {
@@ -710,7 +711,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         // Lista y adapter
         listaComentarios.clear();
-        ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios);
+        ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios, session.getIdEstudiante());
         recyclerComments.setAdapter(comentarioAdapter);
         comentarioAdapter.setOnReportCommentListener(comentario -> {
             mostrarDialogoReportarComentario(requireContext(), comentario.getIdComentario());
@@ -725,6 +726,11 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     imgLike,
                     textLikeCount
             );
+        });
+
+        comentarioAdapter.setOnDeleteCommentListener(comentario -> {
+            eliminarComentario(comentario.getIdComentario(), idPublicacion,
+                    comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
         });
 
         // Layout manager y adapter
@@ -1046,6 +1052,42 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void eliminarComentario(int idComentario, int idPublicacion, ComentarioAdapter adapter,
+                                    List<Comentario> lista, LinearLayout layoutEmpty, RecyclerView recycler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idComentario", idComentario);
+        params.put("idEstudiante", session.getIdEstudiante()); // ← Enviar ID del usuario actual
+
+        String url = ServidorConfig.URL_SERVIDOR + "comentario/comentario_eliminar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody, "UTF-8"));
+                    String status = json.getString("status");
+
+                    if ("success".equals(status)) {
+                        Toast.makeText(getContext(), "Comentario eliminado", Toast.LENGTH_SHORT).show();
+                        // Recargar comentarios
+                        cargarComentariosPublicacion(idPublicacion, adapter, lista, layoutEmpty, recycler, session.getIdEstudiante());
+                    } else {
+                        String msg = json.optString("message", "Error al eliminar");
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
                 }
             }

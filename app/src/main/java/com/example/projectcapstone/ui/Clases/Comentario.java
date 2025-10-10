@@ -7,16 +7,25 @@ public class Comentario {
     private String nomEstudiante;
     private boolean liked;
     private int totalLikes;
+    private int idEstudiante;
 
-    public Comentario(int idComentario, String conComentario, String fchComentario, String nomEstudiante, boolean liked, int totalLikes) {
+    public Comentario(int idComentario, String conComentario, String fchComentario, String nomEstudiante, boolean liked, int totalLikes , int idEstudiante) {
         this.idComentario = idComentario;
         this.conComentario = conComentario;
         this.fchComentario = fchComentario;
         this.nomEstudiante = nomEstudiante;
         this.liked = liked;
         this.totalLikes = totalLikes;
+        this.idEstudiante = idEstudiante;
     }
 
+    public int getIdEstudiante() {
+        return idEstudiante;
+    }
+
+    public void setIdEstudiante(int idEstudiante) {
+        this.idEstudiante = idEstudiante;
+    }
     public boolean isLiked() {
         return liked;
     }
