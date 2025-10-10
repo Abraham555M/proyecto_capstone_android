@@ -89,18 +89,48 @@
             android:nestedScrollingEnabled="false"
             tools:listitem="@layout/item_publicacion_favorito" />
 
-        <!-- 💬 Estado vacío -->
-        <TextView
-            android:id="@+id/tvEmptyFavoritos"
+        <!-- 💬 Estado vacío mejorado -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyFavoritos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="No tienes publicaciones en favoritos 💔"
-            android:textSize="16sp"
-            android:textColor="@color/gray_medium"
+            android:orientation="vertical"
             android:gravity="center"
-            android:visibility="gone"
-            android:textStyle="italic"
-            android:padding="16dp" />
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imgEmptyFavoritos"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_vacio_publicacion"
+                android:contentDescription="Sin favoritos"
+                android:alpha="0.7"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tvEmptyFavoritosTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aún no tienes favoritos"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray_dark"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvEmptyFavoritosSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guarda tus publicaciones favoritas para verlas más tarde 💕"
+                android:textSize="15sp"
+                android:textColor="@color/gray_medium"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

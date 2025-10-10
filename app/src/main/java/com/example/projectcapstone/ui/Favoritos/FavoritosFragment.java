@@ -52,8 +52,9 @@ public class FavoritosFragment extends Fragment {
 
     private RecyclerView rvCategoriaFavoritos, rvPublicacionesFavoritos;
     private EditText etSearchFavoritos;
-    private TextView tvEmptyFavoritos;
-    private CategoriaAdapter categoriaAdapter;
+    private LinearLayout layoutEmptyFavoritos;
+    private TextView tvEmptyFavoritosTitle;
+    private TextView tvEmptyFavoritosSubtitle;    private CategoriaAdapter categoriaAdapter;
     private PublicacionAdapter publicacionAdapter;
     private List<Categoria> listaCategorias = new ArrayList<>();
     private List<Publicacion> listaFavoritos = new ArrayList<>();
@@ -78,7 +79,9 @@ public class FavoritosFragment extends Fragment {
         rvCategoriaFavoritos = view.findViewById(R.id.rvCategoriaFavoritos);
         rvPublicacionesFavoritos = view.findViewById(R.id.rvPublicacionesFavoritos);
         etSearchFavoritos = view.findViewById(R.id.etSearchFavoritos);
-        tvEmptyFavoritos = view.findViewById(R.id.tvEmptyFavoritos);
+        layoutEmptyFavoritos = view.findViewById(R.id.layoutEmptyFavoritos);
+        tvEmptyFavoritosTitle = view.findViewById(R.id.tvEmptyFavoritosTitle);
+        tvEmptyFavoritosSubtitle = view.findViewById(R.id.tvEmptyFavoritosSubtitle);
         //rvPublicaciones = view.findViewById(R.id.rvPublicaciones);
         session = new SessionManager(requireContext());
         layoutSearchFavoritos = view.findViewById(R.id.layoutSearchFavoritos);
@@ -226,7 +229,7 @@ public class FavoritosFragment extends Fragment {
                     }
 
                     // Mostrar/ocultar estado vacío
-                    tvEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
+                    layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -335,7 +338,7 @@ public class FavoritosFragment extends Fragment {
 
                     publicacionAdapter.notifyDataSetChanged();
                     actualizarEstadoFavoritos();
-                    tvEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
+                    layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al filtrar favoritos", Toast.LENGTH_SHORT).show();
@@ -398,7 +401,7 @@ public class FavoritosFragment extends Fragment {
                             }
                         }
 
-                        if (listaFavoritos.isEmpty()) tvEmptyFavoritos.setVisibility(View.VISIBLE);
+                        if (listaFavoritos.isEmpty()) layoutEmptyFavoritos.setVisibility(View.VISIBLE);
                         cargarFavoritos(session.getIdEstudiante());
                         Toast.makeText(getContext(), "Eliminado de favoritos", Toast.LENGTH_SHORT).show();
 
@@ -1006,25 +1009,29 @@ public class FavoritosFragment extends Fragment {
 
             // Solo cambiar el estado de la lista y mensaje vacío
             if (listaFavoritos.isEmpty()) {
-                // Mensaje según el contexto
+                // Cambiar texto según el contexto
                 String textoBusqueda = etSearchFavoritos.getText().toString().trim();
                 if (!textoBusqueda.isEmpty()) {
-                    tvEmptyFavoritos.setText("No se encontraron favoritos con '" + textoBusqueda + "'");
+                    tvEmptyFavoritosTitle.setText("Sin resultados");
+                    tvEmptyFavoritosSubtitle.setText("No se encontraron favoritos con '" + textoBusqueda + "'");
                 } else if (isFiltering) {
-                    tvEmptyFavoritos.setText("No hay favoritos en esta categoría");
+                    tvEmptyFavoritosTitle.setText("Sin favoritos aquí");
+                    tvEmptyFavoritosSubtitle.setText("No hay favoritos en esta categoría");
                 } else {
-                    tvEmptyFavoritos.setText("No se encontraron resultados");
+                    tvEmptyFavoritosTitle.setText("No se encontraron resultados");
+                    tvEmptyFavoritosSubtitle.setText("Intenta con otra búsqueda o categoría");
                 }
-                tvEmptyFavoritos.setVisibility(View.VISIBLE);
+                layoutEmptyFavoritos.setVisibility(View.VISIBLE);
                 rvPublicacionesFavoritos.setVisibility(View.GONE);
             } else {
-                tvEmptyFavoritos.setVisibility(View.GONE);
+                layoutEmptyFavoritos.setVisibility(View.GONE);
                 rvPublicacionesFavoritos.setVisibility(View.VISIBLE);
             }
         } else {
-            // NO tiene favoritos en absoluto: ocultar TODO
-            tvEmptyFavoritos.setText("Aún no tienes publicaciones favoritas.\nEmpieza a guardar las que más te gusten.");
-            tvEmptyFavoritos.setVisibility(View.VISIBLE);
+            // NO tiene favoritos en absoluto: ocultar TODO y mostrar mensaje inicial
+            tvEmptyFavoritosTitle.setText("Aún no tienes favoritos");
+            tvEmptyFavoritosSubtitle.setText("Guarda tus publicaciones favoritas para verlas más tarde 💕");
+            layoutEmptyFavoritos.setVisibility(View.VISIBLE);
             rvPublicacionesFavoritos.setVisibility(View.GONE);
             rvCategoriaFavoritos.setVisibility(View.GONE);
             layoutSearchFavoritos.setVisibility(View.GONE);
