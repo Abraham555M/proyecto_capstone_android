@@ -1,19 +1,16 @@
 package com.example.projectcapstone;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Menu;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.projectcapstone.ui.Configuracion.SessionManager;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.NavGraph;
 import androidx.navigation.NavInflater;
@@ -21,17 +18,30 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.projectcapstone.databinding.ActivityMainBinding;
+import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
+import com.google.android.material.navigation.NavigationView;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
+
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private SessionManager session;
+
+    // Referencias del header
+    private TextView tvNombreEstudiante;
+    private ImageView imageViewProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         session = new SessionManager(this);
 
+        // Configuración de navegación
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavInflater navInflater = navController.getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
@@ -52,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("SESSION_MANAGER", "⚠️ No hay sesión activa. Dirigiendo a StartUpn");
             navGraph.setStartDestination(R.id.nav_start_upn);
         }
+
         navController.setGraph(navGraph);
         setSupportActionBar(binding.appBarMain.toolbar);
 
@@ -68,6 +80,19 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        // -------------------------
+        // 🔹 Obtener referencias del header del Navigation Drawer
+        // -------------------------
+        View headerView = navigationView.getHeaderView(0);
+        tvNombreEstudiante = headerView.findViewById(R.id.tvNombreEstudiante);
+        imageViewProfile = headerView.findViewById(R.id.imageViewProfile);
+
+        // 🔹 Cargar datos reales del estudiante logueado
+        cargarInformacionPerfil();
+
+        // -------------------------
+        // 🔹 Ocultar Toolbar y Drawer en fragmentos específicos
+        // -------------------------
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta ||
                     destination.getId() == R.id.nav_inicio_sesion ||
@@ -77,11 +102,11 @@ public class MainActivity extends AppCompatActivity {
                     destination.getId() == R.id.nav_validar_correo_recuperar ||
                     destination.getId() == R.id.nav_cambiar_password) {
 
-                binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
-                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // Desactiva swipe
+                binding.appBarMain.toolbar.setVisibility(View.GONE);
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             } else {
-                binding.appBarMain.toolbar.setVisibility(View.VISIBLE); // Reactivar el encabezado
-                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // Reactiva swipe
+                binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             }
         });
     }
@@ -96,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.w("MainActivity", "No se pudo mostrar íconos en menú: " + e.getMessage());
         }
-
         return true;
     }
 
@@ -115,13 +139,46 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             navController.navigate(R.id.nav_start_upn, null, navOptions);
-
-            // 🗨️ Mensaje de confirmación
             Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cargarInformacionPerfil() {
+        int idEstudiante = session.getIdEstudiante();
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/estudiante_informacion_perfil.php?idEstudiante=" + idEstudiante;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, StandardCharsets.UTF_8);
+                    JSONObject jsonObject = new JSONObject(respuesta);
+
+                    if (jsonObject.has("error")) {
+                        Toast.makeText(MainActivity.this, "No se encontró el estudiante", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    String nombre = jsonObject.optString("nombre", "Sin nombre");
+
+                    // Mostrar nombre en el header
+                    tvNombreEstudiante.setText(nombre);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Error al procesar los datos del perfil", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(MainActivity.this, "Error al cargar información del perfil", Toast.LENGTH_SHORT).show();
+                Log.e("PERFIL", "Error HTTP: " + error.getMessage());
+            }
+        });
     }
 
     @Override

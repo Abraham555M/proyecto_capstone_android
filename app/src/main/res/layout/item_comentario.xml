@@ -61,11 +61,25 @@
             android:id="@+id/text_comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:text="Este es un comentario de ejemplo para tu diseño."
             android:textColor="#424242"
             android:textSize="14sp"
-            android:lineSpacingMultiplier="1.3" />
+            android:lineSpacingMultiplier="1.3"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <!-- Ver más -->
+        <TextView
+            android:id="@+id/text_ver_mas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver más"
+            android:textColor="#FBAE3C"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp" />
 
         <!-- Footer: fecha, like y reporte -->
         <LinearLayout

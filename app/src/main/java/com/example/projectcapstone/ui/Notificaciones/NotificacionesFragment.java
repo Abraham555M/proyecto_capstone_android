@@ -60,11 +60,6 @@ public class NotificacionesFragment extends Fragment {
         client.get(url, new AsyncHttpResponseHandler() {
 
             @Override
-            public void onStart() {
-                Toast.makeText(getContext(), "Cargando notificaciones...", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
                     String response = new String(responseBody);

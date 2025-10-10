@@ -3,6 +3,7 @@ package com.example.projectcapstone.ui.Inicio.Adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Layout;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +46,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     public void setOnReportCommentListener(OnReportCommentListener listener) {
         this.reportListener = listener;
     }
+
     public interface OnDeleteCommentListener {
         void onDeleteCommentClick(Comentario comentario);
     }
@@ -55,7 +57,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         this.deleteListener = listener;
     }
 
-    public ComentarioAdapter(Context context, List<Comentario> listaComentarios,int idEstudianteActual) {
+    public ComentarioAdapter(Context context, List<Comentario> listaComentarios, int idEstudianteActual) {
         this.context = context;
         this.listaComentarios = listaComentarios;
         this.idEstudianteActual = idEstudianteActual;
@@ -73,7 +75,6 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         Comentario comentario = listaComentarios.get(position);
 
         holder.textUserName.setText(comentario.getNomEstudiante());
-        holder.textComment.setText(comentario.getConComentario());
         holder.textTime.setText(getTiempoRelativo(comentario.getFchComentario()));
 
         // Mostrar cantidad de likes si es mayor a 0
@@ -87,11 +88,61 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         // Estado del like
         if (comentario.isLiked()) {
             holder.imgLike.setImageResource(R.drawable.ic_corazon_lleno);
-            holder.imgLike.setColorFilter(Color.parseColor("#FBAE3C")); // naranja
+            holder.imgLike.setColorFilter(Color.parseColor("#FBAE3C"));
         } else {
             holder.imgLike.setImageResource(R.drawable.ic_corazon);
-            holder.imgLike.setColorFilter(Color.parseColor("#BDBDBD")); // gris
+            holder.imgLike.setColorFilter(Color.parseColor("#BDBDBD"));
         }
+
+        // 🔹 Resetear estado inicial
+        holder.isExpanded = false;
+        holder.textVerMas.setText("Ver más");
+        holder.textVerMas.setVisibility(View.GONE);
+
+        // Configurar el TextView
+        holder.textComment.setMaxLines(3);
+        holder.textComment.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        holder.textComment.setText(comentario.getConComentario());
+
+        // 🔹 Verificar si necesita "Ver más" después del layout
+        holder.textComment.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                Layout layout = holder.textComment.getLayout();
+                if (layout != null) {
+                    int lines = layout.getLineCount();
+                    if (lines > 0) {
+                        // Verificar si el texto está truncado (tiene más contenido que lo visible)
+                        int ellipsisCount = layout.getEllipsisCount(lines - 1);
+                        if (ellipsisCount > 0 || lines > 3) {
+                            holder.textVerMas.setVisibility(View.VISIBLE);
+                        } else {
+                            holder.textVerMas.setVisibility(View.GONE);
+                        }
+                        // Remover el listener para no ejecutarlo múltiples veces
+                        holder.textComment.removeOnLayoutChangeListener(this);
+                    }
+                }
+            }
+        });
+
+        // 🔹 Click en "Ver más / Ver menos"
+        holder.textVerMas.setOnClickListener(v -> {
+            if (holder.isExpanded) {
+                // Colapsar
+                holder.textComment.setMaxLines(3);
+                holder.textComment.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                holder.textVerMas.setText("Ver más");
+                holder.isExpanded = false;
+            } else {
+                // Expandir
+                holder.textComment.setMaxLines(Integer.MAX_VALUE);
+                holder.textComment.setEllipsize(null);
+                holder.textVerMas.setText("Ver menos");
+                holder.isExpanded = true;
+            }
+        });
 
         holder.layoutLike.setOnClickListener(v -> {
             if (likeClickListener != null) {
@@ -99,12 +150,11 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             }
         });
 
-        // 🔥 NUEVO: Click en todo el comentario para mostrar opciones
+        // Click en todo el comentario para mostrar opciones
         holder.itemView.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Acciones del comentario");
 
-            // Si el comentario pertenece al usuario actual, mostrar Eliminar
             String[] opciones;
             if (comentario.getIdEstudiante() == idEstudianteActual) {
                 opciones = new String[]{"Eliminar comentario", "Cancelar"};
@@ -114,12 +164,10 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
             builder.setItems(opciones, (dialog, which) -> {
                 if (comentario.getIdEstudiante() == idEstudianteActual) {
-                    // Es mi comentario
                     if (which == 0) {
                         mostrarDialogoConfirmarEliminar(comentario);
                     }
                 } else {
-                    // Es de otro usuario
                     if (which == 0 && reportListener != null) {
                         reportListener.onReportCommentClick(comentario);
                     }
@@ -129,37 +177,30 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
             builder.show();
         });
-
     }
 
     private void mostrarDialogoConfirmarEliminar(Comentario comentario) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.alert_dialog_opciones, null);
 
-        // Referencias según tu XML
         TextView tvTitulo = view.findViewById(R.id.tvTituloError);
         com.google.android.material.button.MaterialButton btnNo = view.findViewById(R.id.btnNo);
         com.google.android.material.button.MaterialButton btnSi = view.findViewById(R.id.btnSi);
 
-        // Personalizar texto del diálogo
         tvTitulo.setText("¿Estás seguro de eliminar este comentario?");
         btnNo.setText("No");
         btnSi.setText("Sí");
 
-        // Crear el diálogo
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setView(view)
                 .create();
 
-        // Fondo transparente (opcional, si usas bordes redondeados en el CardView)
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // Acción botón "No"
         btnNo.setOnClickListener(v -> dialog.dismiss());
 
-        // Acción botón "Sí"
         btnSi.setOnClickListener(v -> {
             if (deleteListener != null) {
                 deleteListener.onDeleteCommentClick(comentario);
@@ -169,6 +210,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
 
         dialog.show();
     }
+
     @Override
     public int getItemCount() {
         return listaComentarios.size();
@@ -200,9 +242,10 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     }
 
     public static class ComentarioViewHolder extends RecyclerView.ViewHolder {
-        TextView textUserName, textComment, textTime, textLikeCount;
+        TextView textUserName, textComment, textTime, textLikeCount, textVerMas;
         ImageView imgAvatar, imgLike;
         View layoutLike;
+        boolean isExpanded = false;
 
         public ComentarioViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -213,6 +256,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             imgLike = itemView.findViewById(R.id.img_like);
             textLikeCount = itemView.findViewById(R.id.text_like_count);
             layoutLike = itemView.findViewById(R.id.layout_like);
+            textVerMas = itemView.findViewById(R.id.text_ver_mas);
         }
     }
 }

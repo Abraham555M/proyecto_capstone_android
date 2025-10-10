@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Estado: Ítem seleccionado (marcado) -->
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <!-- Color de fondo para el ítem seleccionado -->
+            <!-- Puedes usar un color muy claro o con transparencia -->
+            <solid android:color="#1AEC9A2E" /> <!-- Ejemplo: Naranja con ~10% de opacidad -->
+
+            <!-- Bordes redondeados -->
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <!-- Estado: Ítem por defecto (no seleccionado) -->
+    <item android:drawable="@android:color/transparent" />
+
+</selector>
