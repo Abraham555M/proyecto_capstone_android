@@ -60,7 +60,6 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         // Inicializar vistas
         tvCantidadPublicaciones = rootView.findViewById(R.id.tvCantidadPublicaciones);
         tvCantidadSeguidores = rootView.findViewById(R.id.tvCantidadSeguidores);
-        tvCantidadSeguidos = rootView.findViewById(R.id.tvCantidadSeguidos);
         rvEmprendimientosPerfil = rootView.findViewById(R.id.rvEmprendimientosPerfil);
         layoutEmptyMessage = rootView.findViewById(R.id.layoutEmptyMessage);
         btnCrearEmprendimiento = rootView.findViewById(R.id.btnCrearEmprendimiento);
@@ -86,6 +85,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
 
         setupRecyclerView();
         cargarCantidadPublicaciones();
+        cargarCantidadSeguidores();
         cargarEmprendimientosConPublicaciones();
         cargarInformacionPerfil();
     }
@@ -113,6 +113,34 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
 
                     int total = jsonObject.getInt("total_publicaciones");
                     tvCantidadPublicaciones.setText(String.valueOf(total));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cargarCantidadSeguidores() {
+        int idEstudiante = session.getIdEstudiante();
+        String url = ServidorConfig.URL_SERVIDOR + "seguimiento/seguimiento_listar_perfil.php?idEmprendedor=" + idEstudiante;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONObject jsonObject = new JSONObject(respuesta);
+
+                    int total = jsonObject.getInt("total_seguidores");
+                    tvCantidadSeguidores.setText(String.valueOf(total));
 
                 } catch (Exception e) {
                     e.printStackTrace();
