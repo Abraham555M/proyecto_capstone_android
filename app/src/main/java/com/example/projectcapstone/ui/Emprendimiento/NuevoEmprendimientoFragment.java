@@ -41,6 +41,9 @@ import com.loopj.android.http.RequestParams;
 import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.TransferQueue;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import java.util.UUID;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -80,6 +83,7 @@ public class NuevoEmprendimientoFragment extends Fragment {
         etDescripcion = root.findViewById(R.id.etDescripcion);
 
         btnCrear = root.findViewById(R.id.btnCrear);
+
         btnCrear.setOnClickListener(v -> {
             String nombreTienda = etNombreTienda.getText().toString().trim();
             String descripcion = etDescripcion.getText().toString().trim();
@@ -92,14 +96,7 @@ public class NuevoEmprendimientoFragment extends Fragment {
                 return;
             }
 
-            agregarEmprendimiento(
-                    idEstudiante,
-                    idCategoria,
-                    nombreTienda,
-                    descripcion,
-                    imageUri,
-                    imageUri
-            );
+            subirImagenFirebaseYCrearEmprendimiento(idEstudiante, idCategoria, nombreTienda, descripcion, imageUri);
         });
 
         // Evento de cámara (foto nueva)
@@ -255,5 +252,79 @@ public class NuevoEmprendimientoFragment extends Fragment {
             e.printStackTrace();
         }
         return file;
+    }
+
+    private void subirImagenFirebaseYCrearEmprendimiento(int idEstudiante, int idCategoria,
+                                                         String nombre, String descripcion, Uri uri) {
+        // Mostrar un ProgressDialog
+        android.app.ProgressDialog pd = new android.app.ProgressDialog(getContext());
+        pd.setMessage("Subiendo imagen...");
+        pd.setCancelable(false);
+        pd.show();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        // Nombre único para la imagen
+        String nombreArchivo = "emprendimientos/" + UUID.randomUUID().toString() + ".jpg";
+        StorageReference imageRef = storageRef.child(nombreArchivo);
+
+        imageRef.putFile(uri)
+                .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                    pd.setMessage("Guardando emprendimiento...");
+
+                    // URL de la imagen en Firebase
+                    String urlImagen = downloadUri.toString();
+
+                    // Llamar a tu método de agregar, ahora enviando URL en lugar de InputStream
+                    agregarEmprendimientoFirebase(idEstudiante, idCategoria, nombre, descripcion, urlImagen);
+
+                    pd.dismiss();
+                }).addOnFailureListener(e -> {
+                    pd.dismiss();
+                    Toast.makeText(getContext(), "Error al obtener URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }))
+                .addOnFailureListener(e -> {
+                    pd.dismiss();
+                    Toast.makeText(getContext(), "Error al subir imagen: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                })
+                .addOnProgressListener(snapshot -> {
+                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                    pd.setMessage("Subiendo: " + (int) progress + "%");
+                });
+    }
+
+    private void agregarEmprendimientoFirebase(int idEstudiante, int idCategoria,
+                                               String nombre, String descripcion,
+                                               String urlImagen) {
+
+        String URL = ServidorConfig.URL_SERVIDOR + "emprendimiento/agregar_emprendimiento.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+
+        params.put("id_estudiante", idEstudiante);
+        params.put("id_categoria", idCategoria);
+        params.put("nom_emprendimiento", nombre);
+        params.put("des_emprendimiento", descripcion);
+        params.put("img_per_emprendimiento", urlImagen); // enviar URL de Firebase
+        params.put("img_por_emprendimiento", urlImagen); // enviar URL de Firebase
+
+        client.post(URL, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                Toast.makeText(getContext(), "Éxito: " + response, Toast.LENGTH_LONG).show();
+
+                NavController navController = Navigation.findNavController(requireView());
+                navController.popBackStack();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                String errorMsg = (responseBody != null) ? new String(responseBody) : error.getMessage();
+                Toast.makeText(getContext(), "Error: " + errorMsg, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

@@ -1,8 +1,6 @@
 package com.example.projectcapstone.ui.Publicaciones;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -27,6 +25,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Publicaciones.Adapter.TipoPublicacion;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -34,7 +33,6 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -124,7 +122,7 @@ public class NuevaPublicacionFragment extends Fragment {
         imgUpload.setOnClickListener(v -> openGallery());
 
         btnCrear.setOnClickListener(v -> {
-            agregarPublicacion();
+            agregarPublicacionFirebase();
         });
 
         return view;
@@ -371,5 +369,118 @@ public class NuevaPublicacionFragment extends Fragment {
         etDescripcion.setText("");
         imgUpload.setImageResource(R.drawable.ic_buscar);
         imageUri = null;
+    }
+
+    private void agregarPublicacionFirebase() {
+        String urlPHP = ServidorConfig.URL_SERVIDOR + "publicacion/agregar_publicacion.php";
+
+        // Validación básica
+        String titulo = etNombrePublicacion.getText().toString().trim();
+        String descripcion = etDescripcion.getText().toString().trim();
+
+        if (titulo.isEmpty()) {
+            Toast.makeText(requireContext(), "Ingrese un título", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        TipoPublicacion tipoSeleccionado = (TipoPublicacion) spTipoPublicacion.getSelectedItem();
+        String idTipo = tipoSeleccionado.getId_tipo_publicacion();
+        String nombreTipo = tipoSeleccionado.getNom_tipo_publicacion();
+
+        String idEmprendimiento = String.valueOf(idEmprendimientoSeleccionado);
+
+        if (imageUri != null) {
+            // 1️⃣ Subir a Firebase Storage
+            String nombreImagen = "publicaciones/" + System.currentTimeMillis() + ".jpg";
+            com.google.firebase.storage.StorageReference storageRef =
+                    com.google.firebase.storage.FirebaseStorage.getInstance().getReference().child(nombreImagen);
+
+            storageRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot ->
+                            storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                String urlImagenFirebase = uri.toString();
+                                enviarPublicacionPHP(urlPHP, idEmprendimiento, idTipo, titulo, descripcion,
+                                        nombreTipo, urlImagenFirebase);
+                            })
+                    )
+                    .addOnFailureListener(e ->
+                            Toast.makeText(requireContext(), "Error subiendo imagen: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                    );
+        } else {
+            // Sin imagen
+            enviarPublicacionPHP(urlPHP, idEmprendimiento, idTipo, titulo, descripcion, nombreTipo, null);
+        }
+    }
+
+    private void enviarPublicacionPHP(String urlPHP, String idEmprendimiento, String idTipo,
+                                      String titulo, String descripcion, String nombreTipo,
+                                      @Nullable String urlImagen) {
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+
+        params.put("id_emprendimiento", idEmprendimiento);
+        params.put("id_tipo_publicacion", idTipo);
+        params.put("tit_publicacion", titulo);
+        params.put("con_publicacion", descripcion);
+        params.put("est_publicacion", "1");
+
+        if (urlImagen != null) {
+            params.put("img_publicacion", urlImagen); // enviar URL de Firebase
+        }
+
+        switch (nombreTipo) {
+            case "Producto":
+                EditText etPrecio = layoutProducto.findViewById(R.id.etPrecioPublicacion);
+                EditText etStock = layoutProducto.findViewById(R.id.etStockPublicacion);
+                params.put("prc_producto", etPrecio.getText().toString().trim());
+                params.put("stk_producto", etStock.getText().toString().trim());
+                break;
+
+            case "Promoción":
+                EditText etDescuento = layoutPromocion.findViewById(R.id.etDescuento);
+                EditText etFechaIni = layoutPromocion.findViewById(R.id.etFechaInicio);
+                EditText etFechaFin = layoutPromocion.findViewById(R.id.etFechaFin);
+                params.put("dsc_promocion", etDescuento.getText().toString().trim());
+                params.put("fch_ini_promocion", etFechaIni.getText().toString().trim());
+                params.put("fch_fin_promocion", etFechaFin.getText().toString().trim());
+                break;
+
+            case "Evento":
+                EditText etFechaEvento = layoutEvento.findViewById(R.id.etFechaEvento);
+                EditText etLugar = layoutEvento.findViewById(R.id.etLugarEvento);
+                params.put("fch_evento", etFechaEvento.getText().toString().trim());
+                params.put("lgr_evento", etLugar.getText().toString().trim());
+                break;
+        }
+
+        client.post(urlPHP, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody);
+                    JSONObject obj = new JSONObject(response);
+
+                    if (obj.optBoolean("success", false)) {
+                        Toast.makeText(requireContext(), "Publicación agregada correctamente", Toast.LENGTH_SHORT).show();
+                        limpiarCampos();
+                        NavController navController = Navigation.findNavController(requireView());
+                        navController.popBackStack();
+                    } else {
+                        Toast.makeText(requireContext(), "Error: " + obj.optString("message"), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(),
+                        "Error de conexión: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

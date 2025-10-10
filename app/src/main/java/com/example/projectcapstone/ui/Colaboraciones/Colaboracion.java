@@ -1,6 +1,6 @@
 package com.example.projectcapstone.ui.Colaboraciones;
 
-import com.example.projectcapstone.ui.Publicaciones.Publicacion;
+import com.example.projectcapstone.ui.Publicaciones.Adapter.Publicacion;
 
 public class Colaboracion {
     private int id_colaboracion;

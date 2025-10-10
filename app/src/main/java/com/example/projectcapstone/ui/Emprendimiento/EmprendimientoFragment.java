@@ -1,5 +1,7 @@
 package com.example.projectcapstone.ui.Emprendimiento;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 //import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Emprendimiento.Adapter.CategoriaAdapter;
 import com.example.projectcapstone.ui.Clases.Categoria;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,11 +40,13 @@ public class EmprendimientoFragment extends Fragment implements View.OnClickList
     RecyclerView recyclerCategorias;
     CategoriaAdapter adapter;
     List<Categoria> listaCategorias = new ArrayList<>();
+    private SessionManager session;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_emprendimiento, container, false);
 
+        session = new SessionManager(requireContext());
         recyclerCategorias = rootView.findViewById(R.id.recyclerCategorias);
         recyclerCategorias.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
@@ -79,17 +85,20 @@ public class EmprendimientoFragment extends Fragment implements View.OnClickList
     }
 
     private void cargarCategoriasDesdeBD() {
-        String url = ServidorConfig.URL_SERVIDOR + "categoria/obtener_categorias.php"; // Ajusta tu endpoint
+        String url = ServidorConfig.URL_SERVIDOR + "categoria/obtener_categorias.php";
+
+        // Obtener el ID del estudiante con la funciona seesionManager
+        int idEstudiante = session.getIdEstudiante();
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler(){
+        RequestParams params = new RequestParams();
+        params.put("id_estudiante", idEstudiante);
+
+        client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONArray response) {
                 try {
-
-                    Toast.makeText(getContext(), "Cargando categorías", Toast.LENGTH_SHORT).show();
-
-                    listaCategorias.clear(); // limpiar para evitar duplicados
+                    listaCategorias.clear();
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
 
@@ -100,10 +109,7 @@ public class EmprendimientoFragment extends Fragment implements View.OnClickList
                         Categoria categoria = new Categoria(id, nombre, imagen);
                         listaCategorias.add(categoria);
                     }
-
-                    // Notificar al adapter que hay datos nuevos
                     adapter.notifyDataSetChanged();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -111,7 +117,6 @@ public class EmprendimientoFragment extends Fragment implements View.OnClickList
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
                 Toast.makeText(getContext(), "Error al cargar categorías", Toast.LENGTH_SHORT).show();
             }
         });

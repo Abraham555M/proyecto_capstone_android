@@ -1,14 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.Soporte.SoporteFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Título superior -->
+    <TextView
+        android:id="@+id/tvTituloSoporte"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Soporte"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:paddingBottom="8dp" />
+
+    <!-- Campo de búsqueda -->
+    <EditText
+        android:id="@+id/etBuscar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Buscar"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp"
+        android:background="@drawable/bg_search_bar"
+        android:paddingHorizontal="16dp"
+        android:textColorHint="#999"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Lista de Preguntas Frecuentes (acordeón) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/layoutPreguntas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Ejemplo de una pregunta expandible -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_faq_item"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutPregunta1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="¿Cómo vender?"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/iconExpand1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_down"
+                        android:tint="@color/black" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRespuesta1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mattis id volutpat placerat."
+                    android:textSize="14sp"
+                    android:paddingHorizontal="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Puedes duplicar el bloque anterior para más preguntas -->
+            <!-- Ejemplo de una pregunta expandible -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_faq_item"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutPregunta2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="¿Cómo Comprar?"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/iconExpand2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_down"
+                        android:tint="@color/black" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRespuesta2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mattis id volutpat placerat."
+                    android:textSize="14sp"
+                    android:paddingHorizontal="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_faq_item"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutPregunta3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="¿Cómo Crear una publicacion?"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/iconExpand3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_down"
+                        android:tint="@color/black" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRespuesta3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mattis id volutpat placerat."
+                    android:textSize="14sp"
+                    android:paddingHorizontal="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Solicitud de nueva categoría -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:text="Solicitar Categoria nueva"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp" />
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/etSolicitud"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:hint="Escribe tu solicitud..."
+        android:gravity="top"
+        android:background="@drawable/bg_edittext_box"
+        android:padding="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/btnEnviar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar"
+        android:textColor="@color/white"
+        android:backgroundTint="#F7A81B"
+        android:paddingVertical="10dp" />
+
+</LinearLayout>

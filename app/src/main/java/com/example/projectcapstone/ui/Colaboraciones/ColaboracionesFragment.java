@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
-import com.example.projectcapstone.ui.Publicaciones.Publicacion;
+import com.example.projectcapstone.ui.Publicaciones.Adapter.Publicacion;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
