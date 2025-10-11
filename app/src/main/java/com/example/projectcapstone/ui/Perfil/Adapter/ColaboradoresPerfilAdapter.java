@@ -63,29 +63,6 @@ public class ColaboradoresPerfilAdapter extends RecyclerView.Adapter<Colaborador
             holder.tvFechaColaboracion.setText("Desde: -");
         }
 
-        // Estado de colaboración
-        int estado = col.getEstColaboracion();
-        String estadoTexto = col.getEstadoTexto();
-
-        if (estado == 1) { // Aceptado
-            holder.ivEstadoColaboracion.setImageResource(R.drawable.ic_check);
-            holder.ivEstadoColaboracion.setColorFilter(context.getColor(R.color.mint_green));
-            holder.tvEstadoColaboracion.setText(estadoTexto);
-            holder.tvEstadoColaboracion.setTextColor(context.getColor(R.color.mint_green));
-            holder.cardEstado.setCardBackgroundColor(context.getColor(R.color.white));
-        } else if (estado == 0) { // Pendiente
-            holder.ivEstadoColaboracion.setColorFilter(context.getColor(R.color.orange_circle));
-            holder.tvEstadoColaboracion.setText(estadoTexto);
-            holder.tvEstadoColaboracion.setTextColor(context.getColor(R.color.orange_circle));
-            holder.cardEstado.setCardBackgroundColor(context.getColor(R.color.orange_light));
-        } else { // Rechazado
-            holder.ivEstadoColaboracion.setImageResource(R.drawable.ic_close);
-            holder.ivEstadoColaboracion.setColorFilter(context.getColor(R.color.orange_red));
-            holder.tvEstadoColaboracion.setText(estadoTexto);
-            holder.tvEstadoColaboracion.setTextColor(context.getColor(R.color.orange_red));
-            holder.cardEstado.setCardBackgroundColor(context.getColor(R.color.white));
-        }
-
         // Imagen del colaborador (usa Glide)
         Glide.with(context)
                 .load("https://ui-avatars.com/api/?name=" + nombreCompleto.replace(" ", "+"))

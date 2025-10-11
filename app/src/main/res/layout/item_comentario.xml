@@ -33,16 +33,16 @@
 
             <TextView
                 android:id="@+id/text_comment_username"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="194dp"
                 android:layout_toStartOf="@+id/img_options"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="usuario_ejemplo"
                 android:textColor="#212121"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp" />
 
             <ImageView
                 android:id="@+id/img_options"
