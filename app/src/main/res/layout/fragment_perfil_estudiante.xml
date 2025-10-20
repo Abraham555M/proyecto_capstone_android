@@ -124,13 +124,14 @@
                     app:boxStrokeWidth="0dp"
                     app:endIconMode="dropdown_menu">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/spSexoEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
                         android:textColor="#1F2937"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Spinner Sede -->
@@ -150,13 +151,14 @@
                     app:boxStrokeWidth="0dp"
                     app:endIconMode="dropdown_menu">
 
-                    <AutoCompleteTextView
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/spSedeEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
                         android:textColor="#1F2937"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Campo Correo -->

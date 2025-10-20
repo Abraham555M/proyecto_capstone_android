@@ -93,6 +93,9 @@ public class PerfilEstudianteFragment extends Fragment {
                     etTelefonoEd.setText(json.optString("tel_estudiante", ""));
                     spSexoEd.setText(json.optString("sexo", ""), false);
                     spSedeEd.setText(json.optString("sede", ""), false);
+                    etCorreoEd.setEnabled(false);
+                    etCorreoEd.setFocusable(false);
+                    etCorreoEd.setClickable(false);
 
                 } catch (Exception e) {
                     e.printStackTrace();
