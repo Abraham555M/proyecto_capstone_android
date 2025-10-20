@@ -18,7 +18,7 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <!-- Header del emprendimiento -->
+        <!-- 🔸 Header del emprendimiento -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                 android:textColor="@color/gray_dark" />
         </LinearLayout>
 
-        <!-- Imagen del producto principal -->
+        <!-- 🔸 Imagen principal -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="280dp"
@@ -86,7 +86,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Acciones del producto -->
+        <!-- 🔸 Acciones -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,7 +112,6 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp" />
 
-            <!-- More Options movido aquí -->
             <ImageView
                 android:id="@+id/ivMoreOptions"
                 android:layout_width="30dp"
@@ -136,7 +135,7 @@
                 android:padding="4dp" />
         </LinearLayout>
 
-        <!-- Información del producto -->
+        <!-- 🔸 Likes -->
         <TextView
             android:id="@+id/tvLikes"
             android:layout_width="wrap_content"
@@ -147,6 +146,7 @@
             android:layout_marginBottom="4dp"
             tools:text="11,683 Me gusta" />
 
+        <!-- 🔸 Título y precio -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -172,6 +172,7 @@
                 tools:text="S/ 20.00" />
         </LinearLayout>
 
+        <!-- 🔸 Descripción -->
         <TextView
             android:id="@+id/tvProductDescription"
             android:layout_width="match_parent"
@@ -180,7 +181,6 @@
             android:textColor="@color/gray_medium"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
-
             android:maxLines="2"
             android:ellipsize="end"
             tools:text="Descripción breve del producto con un máximo de dos líneas..." />
@@ -195,5 +195,125 @@
             android:textStyle="bold"
             android:visibility="gone"
             android:layout_marginTop="2dp" />
+
+        <!-- ⚡ Sección PRODUCTO -->
+        <LinearLayout
+            android:id="@+id/sectionProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:background="@drawable/bg_section_card"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvPrecioProducto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Precio: S/ 0.00"
+                android:textColor="@color/gray_dark"
+                android:textStyle="bold"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvStockProducto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stock: 0"
+                android:textColor="@color/gray_dark"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- ⚡ Sección EVENTO -->
+        <LinearLayout
+            android:id="@+id/sectionEvento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:background="@drawable/bg_section_card"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_calendario"
+                    app:tint="@color/teal_700"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tvFechaEvento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha: 00/00/0000"
+                    android:textColor="@color/gray_dark"
+                    android:textStyle="bold"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvLugarEvento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lugar: ..."
+                android:textColor="@color/gray_medium"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- ⚡ Sección PROMOCIÓN -->
+        <LinearLayout
+            android:id="@+id/sectionPromocion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:background="@drawable/bg_section_card"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_regalo"
+                    app:tint="@color/brown_light"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tvDescripcionPromocion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Promoción especial"
+                    android:textColor="@color/brown_light"
+                    android:textStyle="bold"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvFechasPromocion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Válido del ... al ..."
+                android:textColor="@color/gray_medium"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,51 +103,35 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Publicacion publicacion = listaPublicaciones.get(position);
 
+        // 🔹 Datos generales
         holder.tvEntrepreneurName.setText(publicacion.getNomEmprendimiento());
-
-        // Imagen perfil emprendimiento
         Glide.with(context)
                 .load(publicacion.getImgEmprendimiento())
                 .placeholder(R.color.gray_light)
                 .circleCrop()
                 .into(holder.ivEntrepreneurAvatar);
 
-        // Imagen principal producto
         Glide.with(context)
                 .load(publicacion.getImgPublicacion())
                 .placeholder(R.color.gray_light)
                 .centerCrop()
                 .into(holder.ivProductImage);
 
-        // Total de likes
         holder.tvLikes.setText(publicacion.getTotalInteracciones() + " Me gusta");
         holder.tvProductTitle.setText(publicacion.getTitPublicacion());
-        holder.tvPrice.setText("S/ " + "20.00");
         holder.tvProductDescription.setText(publicacion.getConPublicacion());
 
-        // Usar dioLike para pintar corazón
-        if (publicacion.isLiked()) {
-            holder.ivLike.setImageResource(R.drawable.ic_corazon_lleno);
-        } else {
-            holder.ivLike.setImageResource(R.drawable.ic_corazon);
-        }
-
-        // Usar favorito para pintar el ícono
-        if (publicacion.isFavorito()) {
-            holder.ivBookmark.setImageResource(R.drawable.ic_favoritos_lleno);
-        } else {
-            holder.ivBookmark.setImageResource(R.drawable.ic_favoritos);
-        }
-
-        // Estado del botón seguir
-        if (publicacion.getDioSeguimiento() != null && publicacion.getDioSeguimiento() == 1) {
-            // Seguido
+        // Corazón
+        holder.ivLike.setImageResource(publicacion.isLiked() ? R.drawable.ic_corazon_lleno : R.drawable.ic_corazon);
+        // Favorito
+        holder.ivBookmark.setImageResource(publicacion.isFavorito() ? R.drawable.ic_favoritos_lleno : R.drawable.ic_favoritos);
+        // Seguir
+        if (publicacion.isSiguiendo()) {
             holder.btnFollow.setText("Siguiendo");
             holder.btnFollow.setBackgroundColor(context.getResources().getColor(R.color.teal_700));
             holder.btnFollow.setStrokeWidth(0);
             holder.btnFollow.setTextColor(Color.WHITE);
         } else {
-            // No seguido
             holder.btnFollow.setText("Seguir");
             holder.btnFollow.setBackgroundColor(Color.TRANSPARENT);
             holder.btnFollow.setStrokeWidth(1);
@@ -154,121 +139,97 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             holder.btnFollow.setTextColor(context.getResources().getColor(R.color.gray_dark));
         }
 
-        // Listener del botón Me gusta
-        holder.ivLike.setOnClickListener(v -> {
-            if (likeListener != null) {
-                likeListener.onLikeClicked(publicacion, holder.ivLike, holder.tvLikes);
-            }
-        });
+        // 🔹 Mostrar sección según tipoPublicacion
+        holder.sectionProducto.setVisibility(View.GONE);
+        holder.sectionEvento.setVisibility(View.GONE);
+        holder.sectionPromocion.setVisibility(View.GONE);
 
-        // Listener comentar
-        holder.ivComment.setOnClickListener(v -> {
-            if (commentListener != null) {
-                commentListener.onCommentClicked(publicacion);
-            }
-        });
-
-        // Listener seguir
-        holder.btnFollow.setOnClickListener(v -> {
-            if (followListener != null) {
-                followListener.onFollowClicked(publicacion, holder.btnFollow);
-
-                // Nuevo estado (toggle)
-                int nuevoEstado = (publicacion.getDioSeguimiento() != null && publicacion.getDioSeguimiento() == 1) ? 0 : 1;
-
-                // Recorremos TODAS las publicaciones del mismo emprendimiento
-                for (Publicacion pub : listaPublicaciones) {
-                    if (pub.getIdEmprendimiento().equals(publicacion.getIdEmprendimiento())) {
-                        pub.setDioSeguimiento(nuevoEstado);
-                    }
+        switch (publicacion.getTipoPublicacion()) {
+            case 1: // Producto
+                if (publicacion.getProducto() != null) {
+                    holder.sectionProducto.setVisibility(View.VISIBLE);
+                    holder.tvPrecioProducto.setText("Precio: S/ " + publicacion.getProducto().getPrecio());
+                    holder.tvStockProducto.setText("Stock: " + publicacion.getProducto().getStock());
                 }
+                break;
+            case 2: // Promoción
+                if (publicacion.getPromocion() != null) {
+                    holder.sectionPromocion.setVisibility(View.VISIBLE);
+                    holder.tvDescripcionPromocion.setText(publicacion.getPromocion().getDescripcion());
+                    holder.tvFechasPromocion.setText(
+                            "Válido del " + publicacion.getPromocion().getFechaInicio() +
+                                    " al " + publicacion.getPromocion().getFechaFin()
+                    );
+                }
+                break;
+            case 3: // Evento
+                if (publicacion.getEvento() != null) {
+                    holder.sectionEvento.setVisibility(View.VISIBLE);
+                    holder.tvFechaEvento.setText("Fecha: " + publicacion.getEvento().getFecha());
+                    holder.tvLugarEvento.setText("Lugar: " + publicacion.getEvento().getLugar());
+                }
+                break;
+        }
 
-                // Refrescamos todo el adapter
-                notifyDataSetChanged();
+        // ===== Listeners =====
+        holder.ivLike.setOnClickListener(v -> { if (likeListener != null) likeListener.onLikeClicked(publicacion, holder.ivLike, holder.tvLikes); });
+        holder.ivComment.setOnClickListener(v -> { if (commentListener != null) commentListener.onCommentClicked(publicacion); });
+        holder.btnFollow.setOnClickListener(v -> {
+            if (followListener != null) followListener.onFollowClicked(publicacion, holder.btnFollow);
+            int nuevoEstado = publicacion.isSiguiendo() ? 0 : 1;
+            for (Publicacion pub : listaPublicaciones) {
+                if (pub.getIdEmprendimiento().equals(publicacion.getIdEmprendimiento())) {
+                    pub.setDioSeguimiento(nuevoEstado);
+                }
             }
+            notifyDataSetChanged();
         });
+        holder.ivBookmark.setOnClickListener(v -> { if (favoriteListener != null) favoriteListener.onFavoriteClicked(publicacion, holder.ivBookmark); });
+        holder.tvEntrepreneurName.setOnClickListener(v -> { if (entrepreneurClickListener != null) entrepreneurClickListener.onEntrepreneurClicked(publicacion); });
 
-        // Listener favoritos
-        holder.ivBookmark.setOnClickListener(v -> {
-            if (favoriteListener != null) {
-                favoriteListener.onFavoriteClicked(publicacion, holder.ivBookmark);
-            }
-        });
-
-        // Listener nombre emprendimiento
-        holder.tvEntrepreneurName.setOnClickListener(v -> {
-            if (entrepreneurClickListener != null) {
-                entrepreneurClickListener.onEntrepreneurClicked(publicacion);
-            }
-        });
-
-        // ===== FUNCIONALIDAD VER MÁS / VER MENOS =====
-        // Reiniciar estado
+        // Ver más / Ver menos
         holder.tvProductDescription.setMaxLines(2);
         holder.tvProductDescription.setEllipsize(TextUtils.TruncateAt.END);
         holder.tvVerMas.setText("Ver más");
         holder.tvVerMas.setVisibility(View.GONE);
-
-        // Verificar si el texto necesita "Ver más"
         holder.tvProductDescription.post(() -> {
             int lineCount = holder.tvProductDescription.getLineCount();
-
-            // También verificamos si el texto está truncado
-            if (lineCount >= 2) {
-                android.text.Layout layout = holder.tvProductDescription.getLayout();
-                if (layout != null) {
-                    int ellipsisCount = layout.getEllipsisCount(lineCount - 1);
-                    if (ellipsisCount > 0 || lineCount > 2) {
-                        holder.tvVerMas.setVisibility(View.VISIBLE);
-                    } else {
-                        holder.tvVerMas.setVisibility(View.GONE);
-                    }
-                }
-            } else {
-                holder.tvVerMas.setVisibility(View.GONE);
+            android.text.Layout layout = holder.tvProductDescription.getLayout();
+            if (layout != null && (lineCount > 2 || layout.getEllipsisCount(lineCount - 1) > 0)) {
+                holder.tvVerMas.setVisibility(View.VISIBLE);
             }
         });
-
-        // Listener del botón "Ver más / Ver menos"
         holder.tvVerMas.setOnClickListener(v -> {
             boolean expandido = holder.tvVerMas.getText().toString().equals("Ver menos");
-
             if (expandido) {
-                // Contraer
                 holder.tvProductDescription.setMaxLines(2);
                 holder.tvProductDescription.setEllipsize(TextUtils.TruncateAt.END);
                 holder.tvVerMas.setText("Ver más");
             } else {
-                // Expandir
                 holder.tvProductDescription.setMaxLines(Integer.MAX_VALUE);
                 holder.tvProductDescription.setEllipsize(null);
                 holder.tvVerMas.setText("Ver menos");
             }
         });
 
-        // Listener del botón Más opciones
+        // Más opciones
         holder.ivMoreOptions.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
             popup.inflate(R.menu.menu_publicacion);
-
             popup.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.action_reportar) {
-                    if (reportListener != null) {
-                        reportListener.onReportClicked(publicacion);
-                    }
+                if (item.getItemId() == R.id.action_reportar && reportListener != null) {
+                    reportListener.onReportClicked(publicacion);
                     return true;
-                } else if (item.getItemId() == R.id.action_solicitud) {
-                    if (solicitudListener != null) {
-                        solicitudListener.onSolicitudClicked(publicacion);
-                    }
+                } else if (item.getItemId() == R.id.action_solicitud && solicitudListener != null) {
+                    solicitudListener.onSolicitudClicked(publicacion);
                     return true;
                 }
                 return false;
             });
-
             popup.show();
         });
     }
+
 
     @Override
     public int getItemCount() {
@@ -279,6 +240,11 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         ImageView ivEntrepreneurAvatar, ivProductImage, ivLike, ivComment, ivBookmark, ivMoreOptions;
         TextView tvEntrepreneurName, tvLikes, tvProductTitle, tvPrice, tvProductDescription, tvVerMas;
         MaterialButton btnFollow;
+
+        LinearLayout sectionProducto, sectionEvento, sectionPromocion;
+        TextView tvPrecioProducto, tvStockProducto;
+        TextView tvFechaEvento, tvLugarEvento;
+        TextView tvDescripcionPromocion, tvFechasPromocion;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -296,8 +262,20 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
             tvVerMas = itemView.findViewById(R.id.tvVerMas);
-
             btnFollow = itemView.findViewById(R.id.btnFollow);
+
+            sectionProducto = itemView.findViewById(R.id.sectionProducto);
+            tvPrecioProducto = itemView.findViewById(R.id.tvPrecioProducto);
+            tvStockProducto = itemView.findViewById(R.id.tvStockProducto);
+
+            sectionEvento = itemView.findViewById(R.id.sectionEvento);
+            tvFechaEvento = itemView.findViewById(R.id.tvFechaEvento);
+            tvLugarEvento = itemView.findViewById(R.id.tvLugarEvento);
+
+            sectionPromocion = itemView.findViewById(R.id.sectionPromocion);
+            tvDescripcionPromocion = itemView.findViewById(R.id.tvDescripcionPromocion);
+            tvFechasPromocion = itemView.findViewById(R.id.tvFechasPromocion);
         }
     }
+
 }

@@ -99,13 +99,13 @@ public class FavoritosFragment extends Fragment {
                 // Deseleccionar: mostrar todos los favoritos
                 categoriaSeleccionada = -1;
                 isFiltering = false;
-                cargarFavoritos(idEstudiante);
+               // cargarFavoritos(idEstudiante);
                 etSearchFavoritos.setText(""); // Limpiar búsqueda
             } else {
                 // Seleccionar: filtrar por categoría
                 categoriaSeleccionada = categoria.getIdCategoria();
                 isFiltering = true;
-                filtrarFavoritosPorCategoria(idEstudiante, categoria.getIdCategoria());
+                //filtrarFavoritosPorCategoria(idEstudiante, categoria.getIdCategoria());
                 etSearchFavoritos.setText(""); // Limpiar búsqueda
             }
         });
@@ -137,7 +137,7 @@ public class FavoritosFragment extends Fragment {
 
         // Cargar datos
         cargarCategorias();
-        cargarFavoritos(idEstudiante);
+       // cargarFavoritos(idEstudiante);
 
         // Buscar entre favoritos
         etSearchFavoritos.addTextChangedListener(new TextWatcher() {
@@ -147,7 +147,7 @@ public class FavoritosFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                buscarFavoritos(idEstudiante, s.toString().trim());
+               // buscarFavoritos(idEstudiante, s.toString().trim());
             }
         });
 
@@ -185,7 +185,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
-
+    /*
     private void cargarFavoritos(int idEstudiante) {
         isFiltering = false;
         categoriaSeleccionada = -1;
@@ -352,6 +352,11 @@ public class FavoritosFragment extends Fragment {
         });
     }
 
+
+
+
+    */
+
     private void toggleFavorito(Publicacion publicacion, ImageView ivFavorito) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
@@ -402,7 +407,7 @@ public class FavoritosFragment extends Fragment {
                         }
 
                         if (listaFavoritos.isEmpty()) layoutEmptyFavoritos.setVisibility(View.VISIBLE);
-                        cargarFavoritos(session.getIdEstudiante());
+                        //cargarFavoritos(session.getIdEstudiante());
                         Toast.makeText(getContext(), "Eliminado de favoritos", Toast.LENGTH_SHORT).show();
 
                     } else if ("favorited".equals(status)) {
@@ -425,7 +430,6 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
-
 
     private void mostrarDialogoReportar(Context context, int idPublicacion) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte, null);

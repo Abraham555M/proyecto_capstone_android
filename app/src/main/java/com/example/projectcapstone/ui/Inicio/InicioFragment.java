@@ -107,7 +107,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     // nueva categoría seleccionada
                     categoriaSeleccionada = categoria.getIdCategoria();
                     categoriaAdapter.setCategoriaSeleccionada(categoriaSeleccionada);
-                    filtrarPorCategoria(categoriaSeleccionada);
+                  //  filtrarPorCategoria(categoriaSeleccionada);
                 }
             }
 
@@ -166,7 +166,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         });
 
         rvPublicaciones.setAdapter(publicacionAdapter);
-        configurarBusqueda();
+       // configurarBusqueda();
         cargarCategorias();
         cargarPublicaciones(session.getIdEstudiante());
 
@@ -263,29 +263,91 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 try {
                     String respuesta = new String(responseBody, "UTF-8");
-                    JSONArray jsonArray = new JSONArray(respuesta);
+                    Log.d("DEBUG_JSON", respuesta);
 
+                    JSONArray jsonArray = new JSONArray(respuesta);
                     listaPublicacion.clear();
+
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
-                        int idPublicacion = obj.getInt("id_publicacion");
-                        int idEmprendimiento = obj.getInt("id_emprendimiento");
-                        String nomEmprendimiento = obj.getString("nom_emprendimiento");
-                        String imgEmprendimiento = obj.getString("img_per_emprendimiento");
-                        String titPublicacion = obj.getString("tit_publicacion");
-                        String conPublicacion = obj.getString("con_publicacion");
-                        String imgPublicacion = obj.getString("img_publicacion");
-                        Integer totalInteracciones = obj.getInt("total_me_gusta");
-                        int dioLike = obj.getInt("dio_like");
-                        int siguiendo = obj.getInt("siguiendo");
-                        int esFavorito = obj.getInt("es_favorito");
 
-                        listaPublicacion.add(new Publicacion(idPublicacion, idEmprendimiento, nomEmprendimiento, imgEmprendimiento, titPublicacion, conPublicacion, imgPublicacion, totalInteracciones, dioLike, siguiendo, esFavorito));
-                        Log.d("DEBUG", "Llamando a cargarPublicaciones()");
+                        JSONObject pub = obj.getJSONObject("publicacion");
+                        JSONObject empr = obj.getJSONObject("emprendimiento");
+
+                        int idPublicacion = pub.optInt("id", 0);
+                        int idEmprendimiento = empr.optInt("id", 0);
+                        String nomEmprendimiento = empr.optString("nombre", "");
+                        String imgEmprendimiento = empr.optString("imagen_perfil", "");
+                        String titPublicacion = pub.optString("titulo", "");
+                        String conPublicacion = pub.optString("contenido", "");
+                        String imgPublicacion = pub.optString("imagen", "");
+                        int totalInteracciones = pub.optInt("likes", 0);
+                        int dioLike = pub.optBoolean("dio_like", false) ? 1 : 0;
+                        int siguiendo = empr.optBoolean("siguiendo", false) ? 1 : 0;
+                        int esFavorito = pub.optBoolean("es_favorito", false) ? 1 : 0;
+
+                        int tipoPublicacion = pub.optInt("tipo_publicacion", 1);
+
+                        // Objetos de cada sección
+                        Publicacion.Producto producto = null;
+                        Publicacion.Promocion promocion = null;
+                        Publicacion.Evento evento = null;
+
+                        switch (tipoPublicacion) {
+                            case 1: // Producto
+                                if (obj.has("producto") && !obj.isNull("producto")) {
+                                    JSONObject prod = obj.getJSONObject("producto");
+                                    double precio = prod.optDouble("precio", 0);
+                                    int stock = prod.optInt("stock", 0);
+                                    producto = new Publicacion.Producto(precio, stock);
+                                }
+                                break;
+
+                            case 2: // Promoción
+                                if (obj.has("promocion") && !obj.isNull("promocion")) {
+                                    JSONObject promo = obj.getJSONObject("promocion");
+                                    String descripcion = promo.optString("descripcion", "");
+                                    String fechaInicio = promo.optString("fecha_inicio", "");
+                                    String fechaFin = promo.optString("fecha_fin", "");
+                                    promocion = new Publicacion.Promocion(descripcion, fechaInicio, fechaFin);
+                                }
+                                break;
+
+                            case 3: // Evento
+                                if (obj.has("evento") && !obj.isNull("evento")) {
+                                    JSONObject ev = obj.getJSONObject("evento");
+                                    String fecha = ev.optString("fecha", "");
+                                    String lugar = ev.optString("lugar", "");
+                                    evento = new Publicacion.Evento(fecha, lugar);
+                                }
+                                break;
+                        }
+
+                        listaPublicacion.add(new Publicacion(
+                                idPublicacion,
+                                idEmprendimiento,
+                                nomEmprendimiento,
+                                imgEmprendimiento,
+                                titPublicacion,
+                                conPublicacion,
+                                imgPublicacion,
+                                totalInteracciones,
+                                dioLike,
+                                siguiendo,
+                                esFavorito,
+                                tipoPublicacion,
+                                producto,
+                                evento,
+                                promocion
+                        ));
+
+                        Log.d("DEBUG", "Llamando a cargarPublicaciones() tipo=" + tipoPublicacion);
                     }
+
                     publicacionAdapter.notifyDataSetChanged();
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -296,6 +358,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
+
 
     public void registrarComentario(Integer idPublicacion, int idEstudiante, String conComentario) {
         AsyncHttpClient client = new AsyncHttpClient();
@@ -814,7 +877,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             dialog.dismiss();
         });
     }
-
+ /*
     private void configurarBusqueda() {
         searchTextWatcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -851,6 +914,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
         etSearch.addTextChangedListener(searchTextWatcher);
     }
+    /*
     private void buscarPublicaciones(int idEstudiante, String textoBusqueda, Integer idCategoria) {
         try {
             String encoded = java.net.URLEncoder.encode(textoBusqueda, "UTF-8");
@@ -921,7 +985,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    // --- filtrarPorCategoria: cancelar búsqueda pendiente al empezar (opcional pero recomendable) ---
+    /* --- filtrarPorCategoria: cancelar búsqueda pendiente al empezar (opcional pero recomendable) ---
     private void filtrarPorCategoria(int idCategoria) {
         // cancelar cualquier búsqueda que pueda ejecutarse luego y sobreescribir este filtrado
         if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
@@ -975,6 +1039,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
+    */
+
     private void mostrarDialogoReportarComentario(Context context, int idComentario) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte_comentario, null);
 
