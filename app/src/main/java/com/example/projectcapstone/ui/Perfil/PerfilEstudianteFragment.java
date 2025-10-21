@@ -24,13 +24,19 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -41,6 +47,8 @@ public class PerfilEstudianteFragment extends Fragment {
 
     private TextInputEditText etNombresEd, etApellidoPaEd, etApellidoMaEd, etCorreoEd;
     private AutoCompleteTextView spSexoEd, spSedeEd;
+    private Map<String, Integer> sexoMap = new HashMap<>();
+    private Map<String, Integer> sedeMap = new HashMap<>();
     private EditText etTelefonoEd;
     private MaterialButton btnListo;
     private FrameLayout loaderContainer;
@@ -91,8 +99,11 @@ public class PerfilEstudianteFragment extends Fragment {
                     etApellidoMaEd.setText(json.optString("ape_mat_estudiante", ""));
                     etCorreoEd.setText(json.optString("ema_estudiante", ""));
                     etTelefonoEd.setText(json.optString("tel_estudiante", ""));
-                    spSexoEd.setText(json.optString("sexo", ""), false);
-                    spSedeEd.setText(json.optString("sede", ""), false);
+                    spSexoEd.setText(json.optString("sexo", ""));
+                    spSedeEd.setText(json.optString("sede", ""));
+                    etCorreoEd.setEnabled(false);
+                    etCorreoEd.setFocusable(false);
+                    etCorreoEd.setClickable(false);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -108,64 +119,70 @@ public class PerfilEstudianteFragment extends Fragment {
         });
 
         cargarSedes();
-        cargarSexos();
+        cargarSexo();
     }
 
-    private void cargarSedes() {
-        String url = ServidorConfig.URL_SERVIDOR + "sede/obtener_sedes.php";
+    private void cargarSexo() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sexo.php";
 
-        client.get(url, new AsyncHttpResponseHandler() {
+        client.get(url, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                List<String> nombresSexo = new ArrayList<>();
                 try {
-                    String respuesta = new String(responseBody, StandardCharsets.UTF_8);
-                    JSONArray jsonArray = new JSONArray(respuesta);
-                    ArrayList<String> sedes = new ArrayList<>();
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject sede = jsonArray.getJSONObject(i);
-                        sedes.add(sede.getString("nom_sede"));
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject sexo = response.getJSONObject(i);
+                        int id = sexo.getInt("id_sexo");
+                        String nombre = sexo.getString("nom_sexo");
+                        nombresSexo.add(nombre);
+                        sexoMap.put(nombre, id);
                     }
+                    ArrayAdapter<String> adapterSexo = new ArrayAdapter<>(requireContext(),
+                            android.R.layout.simple_dropdown_item_1line, nombresSexo);
+                    spSexoEd.setAdapter(adapterSexo);
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, sedes);
-                    spSedeEd.setAdapter(adapter);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (JSONException e) {
+                    Toast.makeText(requireContext(), "Error al procesar datos", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) { }
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(requireContext(), "Error al cargar sexo", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    private void cargarSexos() {
-        String url = ServidorConfig.URL_SERVIDOR + "sexo/obtener_sexo.php";
+    private void cargarSedes() {
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = ServidorConfig.URL_SERVIDOR + "estudiante/obtener_sedes.php";
 
-        client.get(url, new AsyncHttpResponseHandler() {
+        client.get(url, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                List<String> nombresSede = new ArrayList<>();
                 try {
-                    String respuesta = new String(responseBody, StandardCharsets.UTF_8);
-                    JSONArray jsonArray = new JSONArray(respuesta);
-                    ArrayList<String> sexos = new ArrayList<>();
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject sexo = jsonArray.getJSONObject(i);
-                        sexos.add(sexo.getString("nom_sexo"));
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject sede = response.getJSONObject(i);
+                        int id = sede.getInt("id_sede");
+                        String nombre = sede.getString("nom_sede");
+                        nombresSede.add(nombre);
+                        sedeMap.put(nombre, id);
                     }
+                    ArrayAdapter<String> adapterSede = new ArrayAdapter<>(requireContext(),
+                            android.R.layout.simple_dropdown_item_1line, nombresSede);
+                    spSedeEd.setAdapter(adapterSede);
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, sexos);
-                    spSexoEd.setAdapter(adapter);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (JSONException e) {
+                    Toast.makeText(requireContext(), "Error al procesar datos", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) { }
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(requireContext(), "Error al cargar sedes", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

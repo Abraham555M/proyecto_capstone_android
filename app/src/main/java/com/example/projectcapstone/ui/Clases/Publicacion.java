@@ -22,7 +22,6 @@ public class Publicacion {
     private Evento evento;
 
     // Constructor general
-    // Nuevo constructor completo
     public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
                        String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones,
                        Integer dioLike, Integer dioSeguimiento, Integer esFavorito, Integer tipoPublicacion,
@@ -42,6 +41,19 @@ public class Publicacion {
         this.producto = producto;
         this.evento = evento;
         this.promocion = promocion;
+    }
+
+    // Constructor para métricas
+    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
+                       String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones) {
+        this.idPublicacion = idPublicacion;
+        this.idEmprendimiento = idEmprendimiento;
+        this.nomEmprendimiento = nomEmprendimiento;
+        this.imgEmprendimiento = imgEmprendimiento;
+        this.titPublicacion = titPublicacion;
+        this.conPublicacion = conPublicacion;
+        this.imgPublicacion = imgPublicacion;
+        this.totalInteracciones = totalInteracciones;
     }
 
     // 🔥 Métodos de estado
