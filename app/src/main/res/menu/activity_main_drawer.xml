@@ -40,5 +40,9 @@
             android:id="@+id/nav_soporte"
             android:icon="@drawable/ic_soporte"
             android:title="Soporte" />
+        <item
+            android:id="@+id/nav_administrador"
+            android:icon="@drawable/ic_administrador"
+            android:title="Administrador" />
     </group>
 </menu>

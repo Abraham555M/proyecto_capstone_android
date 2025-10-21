@@ -1,36 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.Soporte.SoporteFragment">
-
-    <!-- Título superior -->
-    <TextView
-        android:id="@+id/tvTituloSoporte"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Soporte"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:paddingBottom="8dp" />
-
-    <!-- Campo de búsqueda -->
-    <EditText
-        android:id="@+id/etBuscar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="Buscar"
-        android:drawableStart="@android:drawable/ic_menu_search"
-        android:drawablePadding="8dp"
-        android:background="@drawable/bg_search_bar"
-        android:paddingHorizontal="16dp"
-        android:textColorHint="#999"
-        android:layout_marginBottom="12dp" />
 
     <!-- Lista de Preguntas Frecuentes (acordeón) -->
     <ScrollView
@@ -76,7 +53,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_arrow_down"
-                        android:tint="@color/black" />
+                        app:tint="@color/black" />
                 </LinearLayout>
 
                 <TextView
@@ -121,7 +98,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_arrow_down"
-                        android:tint="@color/black" />
+                        app:tint="@color/black" />
                 </LinearLayout>
 
                 <TextView
@@ -164,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_arrow_down"
-                        android:tint="@color/black" />
+                        app:tint="@color/black" />
                 </LinearLayout>
 
                 <TextView
