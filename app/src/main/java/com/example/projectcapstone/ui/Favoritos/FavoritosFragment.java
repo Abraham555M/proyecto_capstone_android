@@ -49,7 +49,6 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 
 public class FavoritosFragment extends Fragment {
-
     private RecyclerView rvCategoriaFavoritos, rvPublicacionesFavoritos;
     private EditText etSearchFavoritos;
     private LinearLayout layoutEmptyFavoritos;
@@ -82,7 +81,6 @@ public class FavoritosFragment extends Fragment {
         layoutEmptyFavoritos = view.findViewById(R.id.layoutEmptyFavoritos);
         tvEmptyFavoritosTitle = view.findViewById(R.id.tvEmptyFavoritosTitle);
         tvEmptyFavoritosSubtitle = view.findViewById(R.id.tvEmptyFavoritosSubtitle);
-        //rvPublicaciones = view.findViewById(R.id.rvPublicaciones);
         session = new SessionManager(requireContext());
         layoutSearchFavoritos = view.findViewById(R.id.layoutSearchFavoritos);
         int idEstudiante = session.getIdEstudiante();
@@ -99,13 +97,13 @@ public class FavoritosFragment extends Fragment {
                 // Deseleccionar: mostrar todos los favoritos
                 categoriaSeleccionada = -1;
                 isFiltering = false;
-               // cargarFavoritos(idEstudiante);
+                cargarFavoritos(idEstudiante);
                 etSearchFavoritos.setText(""); // Limpiar búsqueda
             } else {
                 // Seleccionar: filtrar por categoría
                 categoriaSeleccionada = categoria.getIdCategoria();
                 isFiltering = true;
-                //filtrarFavoritosPorCategoria(idEstudiante, categoria.getIdCategoria());
+                filtrarFavoritosPorCategoria(idEstudiante, categoria.getIdCategoria());
                 etSearchFavoritos.setText(""); // Limpiar búsqueda
             }
         });
@@ -137,7 +135,7 @@ public class FavoritosFragment extends Fragment {
 
         // Cargar datos
         cargarCategorias();
-       // cargarFavoritos(idEstudiante);
+        cargarFavoritos(idEstudiante);
 
         // Buscar entre favoritos
         etSearchFavoritos.addTextChangedListener(new TextWatcher() {
@@ -147,7 +145,7 @@ public class FavoritosFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-               // buscarFavoritos(idEstudiante, s.toString().trim());
+               buscarFavoritos(idEstudiante, s.toString().trim());
             }
         });
 
@@ -185,7 +183,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
-    /*
+
     private void cargarFavoritos(int idEstudiante) {
         isFiltering = false;
         categoriaSeleccionada = -1;
@@ -200,35 +198,83 @@ public class FavoritosFragment extends Fragment {
                     JSONArray array = new JSONArray(new String(responseBody, "UTF-8"));
 
                     for (int i = 0; i < array.length(); i++) {
-                        JSONObject obj = array.getJSONObject(i);
-                        listaFavoritos.add(new Publicacion(
-                                obj.getInt("id_publicacion"),
-                                obj.getInt("id_emprendimiento"),
-                                obj.getString("nom_emprendimiento"),
-                                obj.getString("img_per_emprendimiento"),
-                                obj.getString("tit_publicacion"),
-                                obj.getString("con_publicacion"),
-                                obj.getString("img_publicacion"),
-                                obj.getInt("total_me_gusta"),
-                                obj.getInt("dio_like"),
-                                obj.getInt("siguiendo"),
-                                obj.getInt("es_favorito")
-                        ));
+                        JSONObject item = array.getJSONObject(i);
+
+                        // --- Objetos principales ---
+                        JSONObject pubObj = item.getJSONObject("publicacion");
+                        JSONObject empObj = item.getJSONObject("emprendimiento");
+
+                        // --- Datos generales ---
+                        int idPublicacion = pubObj.getInt("id");
+                        int idEmprendimiento = empObj.getInt("id");
+                        String nomEmprendimiento = empObj.getString("nombre");
+                        String imgEmprendimiento = empObj.optString("imagen_perfil", null);
+                        String titPublicacion = pubObj.getString("titulo");
+                        String conPublicacion = pubObj.getString("contenido");
+                        String imgPublicacion = pubObj.optString("imagen", null);
+                        int totalLikes = pubObj.getInt("likes");
+                        int dioLike = pubObj.getBoolean("dio_like") ? 1 : 0;
+                        int siguiendo = empObj.getBoolean("siguiendo") ? 1 : 0;
+                        int esFavorito = pubObj.getBoolean("es_favorito") ? 1 : 0;
+                        int tipoPublicacion = pubObj.getInt("tipo_publicacion");
+
+                        // --- Variables de tipos específicos ---
+                        Publicacion.Producto producto = null;
+                        Publicacion.Promocion promocion = null;
+                        Publicacion.Evento evento = null;
+
+                        // --- Si existe un objeto según el tipo, lo parseamos ---
+                        if (tipoPublicacion == 1 && item.has("producto")) {
+                            JSONObject prodObj = item.getJSONObject("producto");
+                            producto = new Publicacion.Producto(
+                                    prodObj.optDouble("precio", 0.0),
+                                    prodObj.optInt("stock", 0)
+                            );
+                        } else if (tipoPublicacion == 2 && item.has("promocion")) {
+                            JSONObject promObj = item.getJSONObject("promocion");
+                            promocion = new Publicacion.Promocion(
+                                    promObj.optString("descripcion", ""),
+                                    promObj.optString("fecha_inicio", ""),
+                                    promObj.optString("fecha_fin", "")
+                            );
+                        } else if (tipoPublicacion == 3 && item.has("evento")) {
+                            JSONObject evObj = item.getJSONObject("evento");
+                            evento = new Publicacion.Evento(
+                                    evObj.optString("fecha", ""),
+                                    evObj.optString("lugar", "")
+                            );
+                        }
+
+                        // --- Crear objeto Publicacion ---
+                        Publicacion publicacion = new Publicacion(
+                                idPublicacion,
+                                idEmprendimiento,
+                                nomEmprendimiento,
+                                imgEmprendimiento,
+                                titPublicacion,
+                                conPublicacion,
+                                imgPublicacion,
+                                totalLikes,
+                                dioLike,
+                                siguiendo,
+                                esFavorito,
+                                tipoPublicacion,
+                                producto,
+                                evento,
+                                promocion
+                        );
+
+                        listaFavoritos.add(publicacion);
                     }
 
-                    // Actualiza la vista (el adapter ya fue creado en onCreateView y tiene callbacks)
+                    // --- Actualizar vista ---
                     if (publicacionAdapter != null) {
                         publicacionAdapter.notifyDataSetChanged();
                         tieneFavoritosEnTotal = !listaFavoritos.isEmpty();
-
-                        if (publicacionAdapter != null) {
-                            publicacionAdapter.notifyDataSetChanged();
-                            actualizarEstadoFavoritos();
-                        }
                         actualizarEstadoFavoritos();
                     }
 
-                    // Mostrar/ocultar estado vacío
+                    // --- Mostrar/ocultar layout vacío ---
                     layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
 
                 } catch (Exception e) {
@@ -244,25 +290,22 @@ public class FavoritosFragment extends Fragment {
         });
     }
 
-
     private void buscarFavoritos(int idEstudiante, String texto) {
         if (texto.isEmpty()) {
-            // Si no hay texto, volver al estado anterior
+            // Si no hay texto, restaurar estado previo
             if (categoriaSeleccionada != -1) {
-                // Si hay categoría seleccionada, filtrar por ella
                 filtrarFavoritosPorCategoria(idEstudiante, categoriaSeleccionada);
             } else {
-                // Si no hay categoría, cargar todos
                 isFiltering = false;
                 cargarFavoritos(idEstudiante);
             }
             return;
         }
 
-        // Construir URL con texto de búsqueda Y categoría (si existe)
-        String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_buscar_publicacion.php?texto=" + texto + "&idEstudiante=" + idEstudiante;
+        String url = ServidorConfig.URL_SERVIDOR +
+                "favorito/favorito_buscar_publicacion.php?texto=" + texto + "&idEstudiante=" + idEstudiante;
 
-        // Si hay categoría seleccionada, agregarla a la búsqueda
+        // Si hay categoría seleccionada, agregarla
         if (categoriaSeleccionada != -1) {
             url += "&idCategoria=" + categoriaSeleccionada;
         }
@@ -277,27 +320,84 @@ public class FavoritosFragment extends Fragment {
                     JSONArray array = new JSONArray(new String(responseBody, "UTF-8"));
 
                     for (int i = 0; i < array.length(); i++) {
-                        JSONObject obj = array.getJSONObject(i);
-                        listaFavoritos.add(new Publicacion(
-                                obj.getInt("id_publicacion"),
-                                obj.getInt("id_emprendimiento"),
-                                obj.getString("nom_emprendimiento"),
-                                obj.getString("img_per_emprendimiento"),
-                                obj.getString("tit_publicacion"),
-                                obj.getString("con_publicacion"),
-                                obj.getString("img_publicacion"),
-                                obj.getInt("total_me_gusta"),
-                                obj.getInt("dio_like"),
-                                obj.getInt("siguiendo"),
-                                obj.getInt("es_favorito")
-                        ));
+                        JSONObject item = array.getJSONObject(i);
+
+                        // --- Objetos principales ---
+                        JSONObject pubObj = item.getJSONObject("publicacion");
+                        JSONObject empObj = item.getJSONObject("emprendimiento");
+
+                        // --- Datos generales ---
+                        int idPublicacion = pubObj.getInt("id");
+                        int idEmprendimiento = empObj.getInt("id");
+                        String nomEmprendimiento = empObj.getString("nombre");
+                        String imgEmprendimiento = empObj.optString("imagen_perfil", null);
+                        String titPublicacion = pubObj.getString("titulo");
+                        String conPublicacion = pubObj.getString("contenido");
+                        String imgPublicacion = pubObj.optString("imagen", null);
+                        int totalLikes = pubObj.getInt("likes");
+                        int dioLike = pubObj.getBoolean("dio_like") ? 1 : 0;
+                        int siguiendo = empObj.getBoolean("siguiendo") ? 1 : 0;
+                        int esFavorito = pubObj.getBoolean("es_favorito") ? 1 : 0;
+                        int tipoPublicacion = pubObj.getInt("tipo_publicacion");
+
+                        // --- Variables de tipos específicos ---
+                        Publicacion.Producto producto = null;
+                        Publicacion.Promocion promocion = null;
+                        Publicacion.Evento evento = null;
+
+                        if (tipoPublicacion == 1 && item.has("producto")) {
+                            JSONObject prodObj = item.getJSONObject("producto");
+                            producto = new Publicacion.Producto(
+                                    prodObj.optDouble("precio", 0.0),
+                                    prodObj.optInt("stock", 0)
+                            );
+                        } else if (tipoPublicacion == 2 && item.has("promocion")) {
+                            JSONObject promObj = item.getJSONObject("promocion");
+                            promocion = new Publicacion.Promocion(
+                                    promObj.optString("descripcion", ""),
+                                    promObj.optString("fecha_inicio", ""),
+                                    promObj.optString("fecha_fin", "")
+                            );
+                        } else if (tipoPublicacion == 3 && item.has("evento")) {
+                            JSONObject evObj = item.getJSONObject("evento");
+                            evento = new Publicacion.Evento(
+                                    evObj.optString("fecha", ""),
+                                    evObj.optString("lugar", "")
+                            );
+                        }
+
+                        // --- Crear objeto Publicacion ---
+                        Publicacion publicacion = new Publicacion(
+                                idPublicacion,
+                                idEmprendimiento,
+                                nomEmprendimiento,
+                                imgEmprendimiento,
+                                titPublicacion,
+                                conPublicacion,
+                                imgPublicacion,
+                                totalLikes,
+                                dioLike,
+                                siguiendo,
+                                esFavorito,
+                                tipoPublicacion,
+                                producto,
+                                evento,
+                                promocion
+                        );
+
+                        listaFavoritos.add(publicacion);
                     }
 
-                    publicacionAdapter.notifyDataSetChanged();
-                    actualizarEstadoFavoritos();
+                    if (publicacionAdapter != null) {
+                        publicacionAdapter.notifyDataSetChanged();
+                        actualizarEstadoFavoritos();
+                    }
+
+                    layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
 
                 } catch (Exception e) {
-                    Toast.makeText(getContext(), "Error al buscar favoritos", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar la búsqueda", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -307,10 +407,15 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void filtrarFavoritosPorCategoria(int idEstudiante, int idCategoria) {
         isFiltering = true;
         categoriaSeleccionada = idCategoria;
-        String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_filtrar_categoria.php?idEstudiante=" + idEstudiante + "&idCategoria=" + idCategoria;
+
+        String url = ServidorConfig.URL_SERVIDOR +
+                "favorito/favorito_filtrar_categoria.php?idEstudiante=" + idEstudiante +
+                "&idCategoria=" + idCategoria;
+
         AsyncHttpClient client = new AsyncHttpClient();
 
         client.get(url, new AsyncHttpResponseHandler() {
@@ -319,28 +424,81 @@ public class FavoritosFragment extends Fragment {
                 try {
                     listaFavoritos.clear();
                     JSONArray array = new JSONArray(new String(responseBody, "UTF-8"));
+
                     for (int i = 0; i < array.length(); i++) {
-                        JSONObject obj = array.getJSONObject(i);
-                        listaFavoritos.add(new Publicacion(
-                                obj.getInt("id_publicacion"),
-                                obj.getInt("id_emprendimiento"),
-                                obj.getString("nom_emprendimiento"),
-                                obj.getString("img_per_emprendimiento"),
-                                obj.getString("tit_publicacion"),
-                                obj.getString("con_publicacion"),
-                                obj.getString("img_publicacion"),
-                                obj.getInt("total_me_gusta"),
-                                obj.getInt("dio_like"),
-                                obj.getInt("siguiendo"),
-                                obj.getInt("es_favorito")
-                        ));
+                        JSONObject item = array.getJSONObject(i);
+
+                        JSONObject pubObj = item.getJSONObject("publicacion");
+                        JSONObject empObj = item.getJSONObject("emprendimiento");
+
+                        int idPublicacion = pubObj.getInt("id");
+                        int idEmprendimiento = empObj.getInt("id");
+                        String nomEmprendimiento = empObj.getString("nombre");
+                        String imgEmprendimiento = empObj.optString("imagen_perfil", null);
+                        String titPublicacion = pubObj.getString("titulo");
+                        String conPublicacion = pubObj.getString("contenido");
+                        String imgPublicacion = pubObj.optString("imagen", null);
+                        int totalLikes = pubObj.getInt("likes");
+                        int dioLike = pubObj.getBoolean("dio_like") ? 1 : 0;
+                        int siguiendo = empObj.getBoolean("siguiendo") ? 1 : 0;
+                        int esFavorito = pubObj.getBoolean("es_favorito") ? 1 : 0;
+                        int tipoPublicacion = pubObj.getInt("tipo_publicacion");
+
+                        Publicacion.Producto producto = null;
+                        Publicacion.Promocion promocion = null;
+                        Publicacion.Evento evento = null;
+
+                        if (tipoPublicacion == 1 && item.has("producto")) {
+                            JSONObject prodObj = item.getJSONObject("producto");
+                            producto = new Publicacion.Producto(
+                                    prodObj.optDouble("precio", 0.0),
+                                    prodObj.optInt("stock", 0)
+                            );
+                        } else if (tipoPublicacion == 2 && item.has("promocion")) {
+                            JSONObject promObj = item.getJSONObject("promocion");
+                            promocion = new Publicacion.Promocion(
+                                    promObj.optString("descripcion", ""),
+                                    promObj.optString("fecha_inicio", ""),
+                                    promObj.optString("fecha_fin", "")
+                            );
+                        } else if (tipoPublicacion == 3 && item.has("evento")) {
+                            JSONObject evObj = item.getJSONObject("evento");
+                            evento = new Publicacion.Evento(
+                                    evObj.optString("fecha", ""),
+                                    evObj.optString("lugar", "")
+                            );
+                        }
+
+                        Publicacion publicacion = new Publicacion(
+                                idPublicacion,
+                                idEmprendimiento,
+                                nomEmprendimiento,
+                                imgEmprendimiento,
+                                titPublicacion,
+                                conPublicacion,
+                                imgPublicacion,
+                                totalLikes,
+                                dioLike,
+                                siguiendo,
+                                esFavorito,
+                                tipoPublicacion,
+                                producto,
+                                evento,
+                                promocion
+                        );
+
+                        listaFavoritos.add(publicacion);
                     }
 
-                    publicacionAdapter.notifyDataSetChanged();
-                    actualizarEstadoFavoritos();
+                    if (publicacionAdapter != null) {
+                        publicacionAdapter.notifyDataSetChanged();
+                        actualizarEstadoFavoritos();
+                    }
+
                     layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Toast.makeText(getContext(), "Error al filtrar favoritos", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -351,11 +509,6 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
-
-
-
-
-    */
 
     private void toggleFavorito(Publicacion publicacion, ImageView ivFavorito) {
         AsyncHttpClient client = new AsyncHttpClient();
@@ -407,7 +560,7 @@ public class FavoritosFragment extends Fragment {
                         }
 
                         if (listaFavoritos.isEmpty()) layoutEmptyFavoritos.setVisibility(View.VISIBLE);
-                        //cargarFavoritos(session.getIdEstudiante());
+                        cargarFavoritos(session.getIdEstudiante());
                         Toast.makeText(getContext(), "Eliminado de favoritos", Toast.LENGTH_SHORT).show();
 
                     } else if ("favorited".equals(status)) {
@@ -580,6 +733,7 @@ public class FavoritosFragment extends Fragment {
 
         dialog.show();
     }
+
     public void registrarComentario(Integer idPublicacion, int idEstudiante, String conComentario) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
@@ -613,6 +767,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments, int idEstudiante) {
         String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion + "&idEstudiante=" + idEstudiante;
 
@@ -659,6 +814,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void registrarReporte(int idPublicacion, int idTipoReporte) {
         int idEstudiante = session.getIdEstudiante();
 
@@ -699,6 +855,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void registrarColaboracion(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento, String mensaje, AlertDialog dialog) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
@@ -739,6 +896,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void mostrarDialogoExito(String titulo, String mensaje) {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_res_positiva, null);
 
@@ -758,6 +916,7 @@ public class FavoritosFragment extends Fragment {
 
         btnAceptar.setOnClickListener(v -> dialog.dismiss());
     }
+
     private void registrarLikeComentario(int idComentario, int idEstudiante, Comentario comentario, ImageView imgLike, TextView textLikeCount) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
@@ -801,6 +960,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void cargarTiposReporte(Context context) {
         String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_listar_tipos.php";
         AsyncHttpClient client = new AsyncHttpClient();
@@ -830,6 +990,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     public void registrarLike(Integer idPublicacion, int idEstudiante, Publicacion publicacion, ImageView ivLike, TextView tvLikes) {
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams();
@@ -969,6 +1130,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void eliminarComentario(int idComentario, int idPublicacion, ComentarioAdapter adapter,
                                     List<Comentario> lista, LinearLayout layoutEmpty, RecyclerView recycler) {
         AsyncHttpClient client = new AsyncHttpClient();
@@ -1004,6 +1166,7 @@ public class FavoritosFragment extends Fragment {
             }
         });
     }
+
     private void actualizarEstadoFavoritos() {
         // Usar la variable que indica si HAY favoritos en total (sin filtros)
         if (tieneFavoritosEnTotal) {

@@ -70,6 +70,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     private TextWatcher searchTextWatcher;
     private Handler searchHandler = new Handler();
     private Runnable searchRunnable;
+    private View layoutEmptyState;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,6 +81,10 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         rvCategoria = rootView.findViewById(R.id.rvCategoria);
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
         etSearch = rootView.findViewById(R.id.etSearch);
+        // Inicializar vistas
+        rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
+        layoutEmptyState = rootView.findViewById(R.id.layoutEmptyState);
+
         // Configuración horizontal
         rvCategoria.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
@@ -167,6 +172,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         configurarBusqueda();
         cargarCategorias();
         cargarPublicaciones(session.getIdEstudiante());
+        mostrarEstadoVacio(false); // inicia oculto
 
         return rootView;
     }
@@ -1109,10 +1115,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     }
 
                     publicacionAdapter.notifyDataSetChanged();
-
-                    if (listaPublicacion.isEmpty()) {
-                        Toast.makeText(getContext(), "No hay publicaciones en esta categoría", Toast.LENGTH_SHORT).show();
-                    }
+                    // 👉 Mostrar u ocultar el estado vacío
+                    mostrarEstadoVacio(listaPublicacion.isEmpty());
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1126,6 +1130,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
+
 
     private void mostrarDialogoReportarComentario(Context context, int idComentario) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte_comentario, null);
@@ -1249,6 +1254,18 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void mostrarEstadoVacio(boolean mostrar) {
+        if (layoutEmptyState == null || rvPublicaciones == null) return;
+
+        if (mostrar) {
+            rvPublicaciones.setVisibility(View.GONE);
+            layoutEmptyState.setVisibility(View.VISIBLE);
+        } else {
+            rvPublicaciones.setVisibility(View.VISIBLE);
+            layoutEmptyState.setVisibility(View.GONE);
+        }
     }
 
     @Override
