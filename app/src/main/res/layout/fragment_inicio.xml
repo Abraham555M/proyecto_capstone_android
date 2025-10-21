@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp">
+        android:paddingVertical="16dp"
+        android:paddingHorizontal="8dp">
 
         <!-- Header con título -->
         <LinearLayout
@@ -20,84 +20,67 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingBottom="20dp">
+            android:layout_marginBottom="16dp">
 
             <View
                 android:layout_width="4dp"
-                android:layout_height="28dp"
+                android:layout_height="26dp"
                 android:background="#FBAE3C"
-                android:layout_marginEnd="12dp" />
+                android:layout_marginEnd="10dp" />
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Descubre"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#212121" />
-
         </LinearLayout>
 
-        <!-- Barra de búsqueda mejorada -->
-        <LinearLayout
+        <!-- Barra de búsqueda -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="28dp"
-            android:paddingHorizontal="20dp"
-            android:gravity="center_vertical">
+            android:layout_height="52dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="3dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#FFFFFF">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp"
-                android:backgroundTint="#FFFFFF"
-                android:layout_marginEnd="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="20dp">
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_buscar"
+                    app:tint="#9E9E9E"
+                    android:layout_marginEnd="10dp" />
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_buscar"
-                        app:tint="#9E9E9E"
-                        android:layout_marginEnd="12dp" />
-
-                    <EditText
-                        android:id="@+id/etSearch"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="¿Qué estás buscando?"
-                        android:textSize="15sp"
-                        android:textColor="#212121"
-                        android:textColorHint="#BDBDBD"
-                        android:background="@null"
-                        android:maxLines="1"
-                        android:inputType="text" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="¿Qué estás buscando?"
+                    android:textSize="15sp"
+                    android:textColor="#212121"
+                    android:textColorHint="#BDBDBD"
+                    android:background="@null"
+                    android:maxLines="1"
+                    android:inputType="text" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Sección de Categorías -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -106,27 +89,25 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#212121"
-                android:paddingHorizontal="20dp"
-                android:paddingBottom="16dp" />
+                android:paddingBottom="12dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvCategoria"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingHorizontal="12dp"
+                android:paddingHorizontal="2dp"
+                android:paddingBottom="2dp"
                 android:orientation="horizontal"
                 tools:listitem="@layout/item_categoria_inicio" />
-
         </LinearLayout>
 
-        <!-- Divider sutil -->
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#F5F5F5"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="24dp" />
+            android:background="#E0E0E0"
+            android:layout_marginBottom="20dp" />
 
         <!-- Sección de Publicaciones -->
         <LinearLayout
@@ -134,16 +115,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Publicaciones recientes"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_marginBottom="12dp" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPublicaciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:clipToPadding="false"
+                android:paddingBottom="8dp"
                 tools:listitem="@layout/item_publicacion_inicio" />
-
         </LinearLayout>
 
     </LinearLayout>
-
 </androidx.core.widget.NestedScrollView>
