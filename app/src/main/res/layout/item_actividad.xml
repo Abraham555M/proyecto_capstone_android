@@ -15,58 +15,111 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         android:orientation="horizontal"
+        android:padding="16dp"
         android:gravity="center_vertical">
 
-        <!-- Contenedor del ícono con fondo circular -->
-        <FrameLayout
+        <!-- Imagen de perfil del usuario que generó la notificación -->
+        <androidx.cardview.widget.CardView
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="16dp">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_icono_actividad" />
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp">
 
             <ImageView
-                android:id="@+id/imgTipoActividad"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_corazon"
-                android:contentDescription="Tipo de actividad"
-                app:tint="#3F51B5" />
-        </FrameLayout>
+                android:id="@+id/ivFotoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_user_avatar"
+                app:tint="@color/darker_gray"/>
+        </androidx.cardview.widget.CardView>
 
-        <!-- Contenido de texto -->
+        <!-- Contenido de la notificación -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
 
+            <!-- Mensaje de la notificación -->
             <TextView
-                android:id="@+id/tvDescripcionActividad"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvMensajeNotificacion"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Juan comentó en tu publicación"
+                android:text="Juan Pérez le dio like a tu publicación"
                 android:textColor="#212121"
                 android:textSize="14sp"
-                android:textStyle="bold"
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:lineSpacingExtra="2dp" />
 
+            <!-- Contenido relacionado (opcional) -->
             <TextView
-                android:id="@+id/tvFechaActividad"
+                android:id="@+id/tvContenidoRelacionado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="&quot;Mi experiencia en el proyecto de construcción...&quot;"
+                android:textColor="#757575"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <!-- Fecha y hora -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hace 2 horas"
-                android:textColor="#9E9E9E"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="6dp">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_calendario"
+                    app:tint="#9E9E9E"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tvTiempoNotificacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hace 5 minutos"
+                    android:textColor="#9E9E9E"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
+
+        <!-- Icono de tipo de notificación -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvIconoTipo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            android:layout_marginStart="8dp"
+            app:cardBackgroundColor="#E3F2FD">
+
+            <ImageView
+                android:id="@+id/ivIconoTipo"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_corazon"
+                app:tint="#1976D2" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Indicador de no leída (punto) -->
+        <View
+            android:id="@+id/indicadorNoLeida"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@drawable/bg_estado_revisado"
+            android:layout_marginStart="8dp"
+            android:visibility="visible" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
