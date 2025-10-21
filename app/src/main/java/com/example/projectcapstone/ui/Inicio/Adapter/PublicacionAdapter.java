@@ -1,5 +1,7 @@
 package com.example.projectcapstone.ui.Inicio.Adapter;
 
+import static androidx.core.util.TypedValueCompat.dpToPx;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -23,6 +25,7 @@ import com.bumptech.glide.Glide;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.Publicacion;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -87,7 +90,10 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public void setFavoriteListener(OnFavoriteClickListener favoriteListener) {
         this.favoriteListener = favoriteListener;
     }
-
+    private int dpToPx(int dp) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
     public void setEntrepreneurClickListener(OnEntrepreneurClickListener listener) {
         this.entrepreneurClickListener = listener;
     }
@@ -128,16 +134,19 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         // Seguir
         if (publicacion.isSiguiendo()) {
             holder.btnFollow.setText("Siguiendo");
-            holder.btnFollow.setBackgroundColor(context.getResources().getColor(R.color.teal_700));
+            holder.btnFollow.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FBAE3C")));
             holder.btnFollow.setStrokeWidth(0);
             holder.btnFollow.setTextColor(Color.WHITE);
         } else {
             holder.btnFollow.setText("Seguir");
-            holder.btnFollow.setBackgroundColor(Color.TRANSPARENT);
-            holder.btnFollow.setStrokeWidth(1);
-            holder.btnFollow.setStrokeColor(ColorStateList.valueOf(context.getResources().getColor(R.color.gray_light)));
-            holder.btnFollow.setTextColor(context.getResources().getColor(R.color.gray_dark));
+            holder.btnFollow.setBackgroundTintList(ColorStateList.valueOf(Color.TRANSPARENT));
+            holder.btnFollow.setStrokeWidth(dpToPx(2)); // Borde más grueso para destacar
+            holder.btnFollow.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#FBAE3C")));
+            holder.btnFollow.setTextColor(Color.parseColor("#FBAE3C"));
         }
+
+
+
 
         // 🔹 Mostrar sección según tipoPublicacion
         holder.sectionProducto.setVisibility(View.GONE);
@@ -241,7 +250,8 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         TextView tvEntrepreneurName, tvLikes, tvProductTitle, tvPrice, tvProductDescription, tvVerMas;
         MaterialButton btnFollow;
 
-        LinearLayout sectionProducto, sectionEvento, sectionPromocion;
+        // ✅ CAMBIO: De LinearLayout a MaterialCardView
+        MaterialCardView sectionProducto, sectionEvento, sectionPromocion;
         TextView tvPrecioProducto, tvStockProducto;
         TextView tvFechaEvento, tvLugarEvento;
         TextView tvDescripcionPromocion, tvFechasPromocion;
@@ -264,6 +274,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             tvVerMas = itemView.findViewById(R.id.tvVerMas);
             btnFollow = itemView.findViewById(R.id.btnFollow);
 
+            // ✅ Ahora se castean correctamente a MaterialCardView
             sectionProducto = itemView.findViewById(R.id.sectionProducto);
             tvPrecioProducto = itemView.findViewById(R.id.tvPrecioProducto);
             tvStockProducto = itemView.findViewById(R.id.tvStockProducto);

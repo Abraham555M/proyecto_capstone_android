@@ -80,7 +80,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         session = new SessionManager(requireContext());
         rvCategoria = rootView.findViewById(R.id.rvCategoria);
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
-        etSearch = rootView.findViewById(R.id.etSearch);
         // Configuración horizontal
         rvCategoria.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
