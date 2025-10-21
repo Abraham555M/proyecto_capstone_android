@@ -26,22 +26,18 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
-
 
 import cz.msebera.android.httpclient.Header;
 
 public class MetricasFragment extends Fragment {
 
-    private TextView tvTotalPublicaciones, tvTotalSeguidores, tvInteraccionesTotales, tvPromedioComentarios;
+    private TextView tvPromocionesActivas, tvTotalFavoritos, tvInteraccionesTotales, tvPromedioComentarios;
     private RecyclerView rvDestacadas;
     private LineChart chartCrecimiento;
     private PublicacionDestacadaAdapter adapter;
@@ -55,8 +51,8 @@ public class MetricasFragment extends Fragment {
         session = new SessionManager(getContext());
 
         // 🔹 Vincular vistas
-        tvTotalPublicaciones = rootView.findViewById(R.id.tvTotalPublicaciones);
-        tvTotalSeguidores = rootView.findViewById(R.id.tvTotalSeguidores);
+        tvPromocionesActivas = rootView.findViewById(R.id.tvPromocionesActivas);
+        tvTotalFavoritos = rootView.findViewById(R.id.tvTotalFavoritos);
         tvInteraccionesTotales = rootView.findViewById(R.id.tvInteraccionesTotales);
         tvPromedioComentarios = rootView.findViewById(R.id.tvPromedioComentarios);
         rvDestacadas = rootView.findViewById(R.id.rvPublicacionesDestacadas);
@@ -91,9 +87,9 @@ public class MetricasFragment extends Fragment {
                     if (json.getString("status").equals("success")) {
                         JSONObject data = json.getJSONObject("data");
 
-                        // ✅ Asignar datos a las métricas
-                        tvTotalPublicaciones.setText(String.valueOf(data.getInt("total_publicaciones")));
-                        tvTotalSeguidores.setText(String.valueOf(data.getInt("total_seguidores")));
+                        // ✅ Asignar datos a las métricas principales
+                        tvPromocionesActivas.setText(String.valueOf(data.getInt("promociones_activas")));
+                        tvTotalFavoritos.setText(String.valueOf(data.getInt("total_favoritos")));
                         tvInteraccionesTotales.setText(String.valueOf(data.getInt("interacciones_totales")));
                         tvPromedioComentarios.setText(String.valueOf(data.getDouble("promedio_comentarios")));
 
@@ -141,7 +137,6 @@ public class MetricasFragment extends Fragment {
             }
         });
     }
-
 
     private void configurarGrafico(JSONArray crecimientoArray) {
         try {
