@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
 import android.widget.Button;
@@ -102,7 +103,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
                         // ✅ Navegamos al Home
                         NavController navController = Navigation.findNavController(requireView());
-                        navController.navigate(R.id.action_nav_inicio_sesion_to_nav_inicio);
+                        NavOptions navOptions = new NavOptions.Builder()
+                                .setPopUpTo(R.id.nav_start_upn, true)
+                                .build();
+                        navController.navigate(R.id.nav_inicio, null, navOptions);
 
                         mostrarAlertaPersonalizada("Bienvenido", "Inicio de sesión exitoso", true);
 

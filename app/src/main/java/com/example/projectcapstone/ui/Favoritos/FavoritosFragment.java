@@ -61,28 +61,35 @@ public class FavoritosFragment extends Fragment {
     private boolean tieneFavoritosEnTotal = false;
     private TipoReporteAdapter tipoReporteAdapter;
     private List<TipoReporte> listaTipoReporte = new ArrayList<>();
-
     private List<Comentario> listaComentarios = new ArrayList<>();
     private boolean isFiltering = false;
-    private LinearLayout layoutSearchFavoritos;
+    private LinearLayout layoutSearchFavoritos, layoutCategoriasSection, layoutPublicacionesSection;
     private int categoriaSeleccionada = -1;
+    private View dividerFavoritos;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_favoritos, container, false);
 
-        // Referencias de UI
         rvCategoriaFavoritos = view.findViewById(R.id.rvCategoriaFavoritos);
         rvPublicacionesFavoritos = view.findViewById(R.id.rvPublicacionesFavoritos);
         etSearchFavoritos = view.findViewById(R.id.etSearchFavoritos);
         layoutEmptyFavoritos = view.findViewById(R.id.layoutEmptyFavoritos);
+        layoutSearchFavoritos = view.findViewById(R.id.layoutSearchFavoritos);
         tvEmptyFavoritosTitle = view.findViewById(R.id.tvEmptyFavoritosTitle);
         tvEmptyFavoritosSubtitle = view.findViewById(R.id.tvEmptyFavoritosSubtitle);
-        session = new SessionManager(requireContext());
         layoutSearchFavoritos = view.findViewById(R.id.layoutSearchFavoritos);
+        layoutCategoriasSection = view.findViewById(R.id.layoutCategoriasSection);
+        dividerFavoritos = view.findViewById(R.id.dividerFavoritos);
+        layoutPublicacionesSection = view.findViewById(R.id.layoutPublicacionesSection);
+        tvEmptyFavoritosTitle = view.findViewById(R.id.tvEmptyFavoritosTitle);
+        tvEmptyFavoritosSubtitle = view.findViewById(R.id.tvEmptyFavoritosSubtitle);
+
+
+        session = new SessionManager(requireContext());
+
         int idEstudiante = session.getIdEstudiante();
 
         // Configurar categorías (horizontal)
@@ -90,29 +97,24 @@ public class FavoritosFragment extends Fragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
         );
         categoriaAdapter = new CategoriaAdapter(getContext(), listaCategorias);
+        rvCategoriaFavoritos.setAdapter(categoriaAdapter);
 
-        // Asignar el listener correctamente
         categoriaAdapter.setOnItemClickListener(categoria -> {
             if (categoria == null) {
-                // Deseleccionar: mostrar todos los favoritos
                 categoriaSeleccionada = -1;
                 isFiltering = false;
                 cargarFavoritos(idEstudiante);
-                etSearchFavoritos.setText(""); // Limpiar búsqueda
+                etSearchFavoritos.setText("");
             } else {
-                // Seleccionar: filtrar por categoría
                 categoriaSeleccionada = categoria.getIdCategoria();
                 isFiltering = true;
                 filtrarFavoritosPorCategoria(idEstudiante, categoria.getIdCategoria());
-                etSearchFavoritos.setText(""); // Limpiar búsqueda
+                etSearchFavoritos.setText("");
             }
         });
-        rvCategoriaFavoritos.setAdapter(categoriaAdapter);
 
         // Configurar publicaciones (vertical)
         rvPublicacionesFavoritos.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Crea el adapter con TODOS los callbacks (igual que en InicioFragment)
         publicacionAdapter = new PublicacionAdapter(
                 requireContext(),
                 listaFavoritos,
@@ -133,19 +135,16 @@ public class FavoritosFragment extends Fragment {
         );
         rvPublicacionesFavoritos.setAdapter(publicacionAdapter);
 
-        // Cargar datos
+        // Cargar datos iniciales
         cargarCategorias();
         cargarFavoritos(idEstudiante);
 
         // Buscar entre favoritos
         etSearchFavoritos.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-               buscarFavoritos(idEstudiante, s.toString().trim());
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
+                buscarFavoritos(idEstudiante, s.toString().trim());
             }
         });
 
@@ -604,7 +603,7 @@ public class FavoritosFragment extends Fragment {
 
         // Adapter con callback de selección
         tipoReporteAdapter = new TipoReporteAdapter(listaTipoReporte, tipo -> {
-            // 👉 en vez de registrar directamente, mostramos confirmación
+            // En vez de registrar directamente, mostramos confirmación
             mostrarDialogoConfirmar(context, idPublicacion, tipo.getIdTipoReporte());
             dialog.dismiss(); // cerramos el dialogo de opciones
         });
@@ -1168,15 +1167,15 @@ public class FavoritosFragment extends Fragment {
     }
 
     private void actualizarEstadoFavoritos() {
-        // Usar la variable que indica si HAY favoritos en total (sin filtros)
         if (tieneFavoritosEnTotal) {
-            // SIEMPRE mostrar controles de búsqueda si el usuario tiene favoritos
+            // Mostrar controles cuando hay favoritos
             rvCategoriaFavoritos.setVisibility(View.VISIBLE);
             layoutSearchFavoritos.setVisibility(View.VISIBLE);
+            layoutCategoriasSection.setVisibility(View.VISIBLE);
+            dividerFavoritos.setVisibility(View.VISIBLE);
+            layoutPublicacionesSection.setVisibility(View.VISIBLE);
 
-            // Solo cambiar el estado de la lista y mensaje vacío
             if (listaFavoritos.isEmpty()) {
-                // Cambiar texto según el contexto
                 String textoBusqueda = etSearchFavoritos.getText().toString().trim();
                 if (!textoBusqueda.isEmpty()) {
                     tvEmptyFavoritosTitle.setText("Sin resultados");
@@ -1184,9 +1183,6 @@ public class FavoritosFragment extends Fragment {
                 } else if (isFiltering) {
                     tvEmptyFavoritosTitle.setText("Sin favoritos aquí");
                     tvEmptyFavoritosSubtitle.setText("No hay favoritos en esta categoría");
-                } else {
-                    tvEmptyFavoritosTitle.setText("No se encontraron resultados");
-                    tvEmptyFavoritosSubtitle.setText("Intenta con otra búsqueda o categoría");
                 }
                 layoutEmptyFavoritos.setVisibility(View.VISIBLE);
                 rvPublicacionesFavoritos.setVisibility(View.GONE);
@@ -1195,13 +1191,16 @@ public class FavoritosFragment extends Fragment {
                 rvPublicacionesFavoritos.setVisibility(View.VISIBLE);
             }
         } else {
-            // NO tiene favoritos en absoluto: ocultar TODO y mostrar mensaje inicial
+            // Ocultar TODO y mostrar solo el mensaje vacío inicial
             tvEmptyFavoritosTitle.setText("Aún no tienes favoritos");
-            tvEmptyFavoritosSubtitle.setText("Guarda tus publicaciones favoritas para verlas más tarde 💕");
+            tvEmptyFavoritosSubtitle.setText("Guarda las publicaciones que te gusten para verlas más tarde 💕");
             layoutEmptyFavoritos.setVisibility(View.VISIBLE);
             rvPublicacionesFavoritos.setVisibility(View.GONE);
             rvCategoriaFavoritos.setVisibility(View.GONE);
             layoutSearchFavoritos.setVisibility(View.GONE);
+            layoutCategoriasSection.setVisibility(View.GONE);
+            dividerFavoritos.setVisibility(View.GONE);
+            layoutPublicacionesSection.setVisibility(View.GONE);
         }
     }
 }
