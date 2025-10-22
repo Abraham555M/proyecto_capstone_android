@@ -15,7 +15,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Encabezado moderno con gradiente simulado -->
+        <!-- Card con filtro de fechas -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,22 +32,60 @@
                 android:gravity="center">
 
                 <TextView
-                    android:id="@+id/tvTituloMetricas"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📊 Panel de Métricas"
+                    android:text="📊 Filtro de Métricas"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF"
-                    android:textSize="24sp"
-                    android:letterSpacing="0.02" />
+                    android:textSize="22sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Analiza el rendimiento de tu emprendimiento"
-                    android:textColor="#FFFFFFCC"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/etFechaInicio"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:hint="Desde"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:inputType="none"
+                        android:background="@drawable/edittext_bg_white"
+                        android:padding="10dp"
+                        android:textColor="#212121"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/etFechaFin"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:hint="Hasta"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:inputType="none"
+                        android:background="@drawable/edittext_bg_white"
+                        android:padding="10dp"
+                        android:textColor="#212121"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnFiltrarMetricas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Filtrar"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#FF9800"
+                        android:padding="10dp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

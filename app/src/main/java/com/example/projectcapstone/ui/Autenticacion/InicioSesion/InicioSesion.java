@@ -1,5 +1,6 @@
 package com.example.projectcapstone.ui.Autenticacion.InicioSesion;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -20,6 +21,7 @@ import androidx.navigation.Navigation;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.projectcapstone.MainActivity;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -92,24 +94,18 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     Log.d("LOGIN_RESPONSE", response); // ✅ Para ver la respuesta completa del servidor
 
                     if (json.getString("status").equals("success")) {
-                        // ✅ Obtenemos el objeto usuario del JSON
                         JSONObject user = json.getJSONObject("usuario");
 
-                        // ✅ Guardamos la sesión
+                        // Guardar sesión correctamente
                         SessionManager sessionManager = new SessionManager(requireContext());
                         sessionManager.guardarSesion(user);
 
                         Log.d("SESION", "Sesión guardada con éxito para: " + user.getString("nombre"));
 
-                        // ✅ Navegamos al Home
-                        NavController navController = Navigation.findNavController(requireView());
-                        NavOptions navOptions = new NavOptions.Builder()
-                                .setPopUpTo(R.id.nav_start_upn, true)
-                                .build();
-                        navController.navigate(R.id.nav_inicio, null, navOptions);
-
-                        mostrarAlertaPersonalizada("Bienvenido", "Inicio de sesión exitoso", true);
-
+                        // ✅ Lanzar MainActivity
+                        Intent intent = new Intent(requireActivity(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     } else {
                         mostrarAlertaPersonalizada("Acceso denegado",
                                 "Correo o contraseña incorrectos. Inténtalo nuevamente.", false);
