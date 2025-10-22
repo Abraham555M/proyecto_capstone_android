@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.text.Layout;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,32 +152,46 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         });
 
         // Click en todo el comentario para mostrar opciones
-        holder.itemView.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Acciones del comentario");
+        holder.imgOptions.setOnClickListener(v -> {
+            // Crear el menú anclado al ícono de opciones
+            androidx.appcompat.widget.PopupMenu popupMenu = new androidx.appcompat.widget.PopupMenu(context, holder.imgOptions);
+            popupMenu.getMenuInflater().inflate(R.menu.menu_comentario, popupMenu.getMenu());
 
-            String[] opciones;
+            // Si el comentario es del usuario actual → mostrar "Eliminar", ocultar "Reportar"
             if (comentario.getIdEstudiante() == idEstudianteActual) {
-                opciones = new String[]{"Eliminar comentario", "Cancelar"};
+                popupMenu.getMenu().findItem(R.id.action_reportar).setVisible(false);
+                popupMenu.getMenu().findItem(R.id.action_solicitud).setVisible(true);
             } else {
-                opciones = new String[]{"Reportar comentario", "Cancelar"};
+                popupMenu.getMenu().findItem(R.id.action_reportar).setVisible(true);
+                popupMenu.getMenu().findItem(R.id.action_solicitud).setVisible(false);
             }
 
-            builder.setItems(opciones, (dialog, which) -> {
-                if (comentario.getIdEstudiante() == idEstudianteActual) {
-                    if (which == 0) {
-                        mostrarDialogoConfirmarEliminar(comentario);
-                    }
-                } else {
-                    if (which == 0 && reportListener != null) {
-                        reportListener.onReportCommentClick(comentario);
-                    }
+            // Acción al hacer clic en una opción
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.action_reportar && reportListener != null) {
+                    reportListener.onReportCommentClick(comentario);
+                    return true;
+                } else if (id == R.id.action_solicitud && deleteListener != null) {
+                    mostrarDialogoConfirmarEliminar(comentario);
+                    return true;
                 }
-                dialog.dismiss();
+                return false;
             });
 
-            builder.show();
+            // Forzar íconos visibles en el menú (si los agregas luego)
+            try {
+                java.lang.reflect.Field mFieldPopup = popupMenu.getClass().getDeclaredField("mPopup");
+                mFieldPopup.setAccessible(true);
+                Object mPopup = mFieldPopup.get(popupMenu);
+                mPopup.getClass().getDeclaredMethod("setForceShowIcon", boolean.class).invoke(mPopup, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            popupMenu.show();
         });
+
     }
 
     private void mostrarDialogoConfirmarEliminar(Comentario comentario) {
@@ -217,28 +232,36 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
     }
 
     private String getTiempoRelativo(String fechaComentario) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         try {
-            Date fecha = sdf.parse(fechaComentario);
-            if (fecha != null) {
-                long tiempoComentario = fecha.getTime();
-                long ahora = System.currentTimeMillis();
-                long diferencia = ahora - tiempoComentario;
+            // 1️⃣ Indicar formato original
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
-                if (diferencia < DateUtils.DAY_IN_MILLIS) {
-                    long horas = diferencia / DateUtils.HOUR_IN_MILLIS;
-                    if (horas <= 0) return "Hace un momento";
-                    else if (horas == 1) return "Hace 1 hora";
-                    else return "Hace " + horas + " horas";
-                } else {
-                    long dias = diferencia / DateUtils.DAY_IN_MILLIS;
-                    return dias == 1 ? "Hace 1 día" : "Hace " + dias + " días";
-                }
+            // 2️⃣ Forzar interpretación en zona horaria del servidor (Perú = UTC-5)
+            sdf.setTimeZone(java.util.TimeZone.getTimeZone("America/Lima"));
+
+            Date fecha = sdf.parse(fechaComentario);
+            if (fecha == null) return "";
+
+            // 3️⃣ Calcular diferencia con hora local del dispositivo
+            long diferencia = System.currentTimeMillis() - fecha.getTime();
+
+            if (diferencia < 60_000) {
+                return "Hace un momento";
+            } else if (diferencia < 3_600_000) {
+                long minutos = diferencia / 60_000;
+                return "Hace " + minutos + (minutos == 1 ? " minuto" : " minutos");
+            } else if (diferencia < 86_400_000) {
+                long horas = diferencia / 3_600_000;
+                return "Hace " + horas + (horas == 1 ? " hora" : " horas");
+            } else {
+                long dias = diferencia / 86_400_000;
+                return "Hace " + dias + (dias == 1 ? " día" : " días");
             }
+
         } catch (ParseException e) {
             e.printStackTrace();
+            return "";
         }
-        return "";
     }
 
     public static class ComentarioViewHolder extends RecyclerView.ViewHolder {
@@ -246,6 +269,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
         ImageView imgAvatar, imgLike;
         View layoutLike;
         boolean isExpanded = false;
+        ImageView imgOptions;
 
         public ComentarioViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -257,6 +281,7 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Co
             textLikeCount = itemView.findViewById(R.id.text_like_count);
             layoutLike = itemView.findViewById(R.id.layout_like);
             textVerMas = itemView.findViewById(R.id.text_ver_mas);
+            imgOptions = itemView.findViewById(R.id.img_options);
         }
     }
 }

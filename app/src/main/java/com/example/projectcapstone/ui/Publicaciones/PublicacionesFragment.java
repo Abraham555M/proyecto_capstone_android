@@ -72,7 +72,7 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                 categoria -> {
                     int idCategoria = categoria.getIdCategoria();
                     idEmprendimientoSeleccionado = categoria.getIdEmprendimiento();
-                    Toast.makeText(getContext(), "Filtrando por: " + categoria.getNombre(), Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(getContext(), "Filtrando por: " + categoria.getNombre(), Toast.LENGTH_SHORT).show();
                     cargarPublicacionesPorCategoria(idCategoria, idEmprendimientoSeleccionado);
         });
         recyclerEmprendimientos.setAdapter(emprendimientoAdapter);
@@ -198,19 +198,9 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     if (categorias.isEmpty()) {
                         recyclerEmprendimientos.setVisibility(View.GONE);
                         txtSinEmprendimientos.setVisibility(View.VISIBLE);
-
-                        // mover "Mis Publicaciones" debajo del mensaje
-                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) tvMisPublicaciones.getLayoutParams();
-                        params.topToBottom = R.id.txtSinEmprendimientos;
-                        tvMisPublicaciones.setLayoutParams(params);
                     } else {
                         recyclerEmprendimientos.setVisibility(View.VISIBLE);
                         txtSinEmprendimientos.setVisibility(View.GONE);
-
-                        // volver a colocar "Mis Publicaciones" debajo del RecyclerView
-                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) tvMisPublicaciones.getLayoutParams();
-                        params.topToBottom = R.id.recyclerEmprendimientos;
-                        tvMisPublicaciones.setLayoutParams(params);
                     }
 
                 } catch (Exception e) {

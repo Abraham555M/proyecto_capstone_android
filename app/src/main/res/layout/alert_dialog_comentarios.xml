@@ -64,13 +64,11 @@
             android:layout_height="1dp"
             android:background="#F5F5F5" />
 
-        <!-- RecyclerView -->
+        <!-- RecyclerView con altura FIJA -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_comments"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:maxHeight="400dp"
+            android:layout_height="400dp"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
             android:clipToPadding="false"
@@ -81,7 +79,7 @@
         <LinearLayout
             android:id="@+id/layout_empty_state"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
+            android:layout_height="400dp"
             android:orientation="vertical"
             android:gravity="center"
             android:visibility="gone"
