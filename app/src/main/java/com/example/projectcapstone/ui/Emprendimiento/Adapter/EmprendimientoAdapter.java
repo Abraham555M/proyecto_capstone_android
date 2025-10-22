@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.Emprendimiento;
+import com.google.android.material.button.MaterialButton;
 import com.squareup.picasso.Picasso;
 import android.widget.ImageButton;
 import java.util.List;
@@ -81,7 +82,7 @@ public class EmprendimientoAdapter extends RecyclerView.Adapter<EmprendimientoAd
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgEm;
         TextView tvNombre;
-        ImageButton btnEditar, btnEliminar;
+        MaterialButton btnEditar, btnEliminar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
