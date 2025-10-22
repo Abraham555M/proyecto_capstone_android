@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,11 +34,13 @@ public class NotificacionesFragment extends Fragment {
     private RecyclerView recyclerSolicitudes;
     private SoporteAdapter soporteAdapter;
     private ArrayList<Soporte> listaSoportes;
+    private LinearLayout emptyStateSolicitudes;
 
     // 🔹 Actividades
     private RecyclerView recyclerActividad;
     private ActividadAdapter actividadAdapter;
     private ArrayList<Notificacion> listaNotificaciones;
+    private LinearLayout emptyStateActividad;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,6 +55,7 @@ public class NotificacionesFragment extends Fragment {
         listaSoportes = new ArrayList<>();
         soporteAdapter = new SoporteAdapter(requireContext(), listaSoportes);
         recyclerSolicitudes.setAdapter(soporteAdapter);
+        emptyStateSolicitudes = rootView.findViewById(R.id.emptyStateSolicitudes);
 
         // ----- RecyclerView de Actividad -----
         recyclerActividad = rootView.findViewById(R.id.recyclerActividad);
@@ -60,6 +63,7 @@ public class NotificacionesFragment extends Fragment {
         listaNotificaciones = new ArrayList<>();
         actividadAdapter = new ActividadAdapter(requireContext(), listaNotificaciones);
         recyclerActividad.setAdapter(actividadAdapter);
+        emptyStateActividad = rootView.findViewById(R.id.emptyStateActividad);
 
         // Cargar datos
         cargarNotificacionesSoporte();
@@ -100,19 +104,26 @@ public class NotificacionesFragment extends Fragment {
 
                     soporteAdapter.notifyDataSetChanged();
 
+                    // 🔸 Mostrar/ocultar mensaje vacío
                     if (listaSoportes.isEmpty()) {
-                        Toast.makeText(getContext(), "No tienes solicitudes de soporte registradas.", Toast.LENGTH_SHORT).show();
+                        recyclerSolicitudes.setVisibility(View.GONE);
+                        emptyStateSolicitudes.setVisibility(View.VISIBLE);
+                    } else {
+                        recyclerSolicitudes.setVisibility(View.VISIBLE);
+                        emptyStateSolicitudes.setVisibility(View.GONE);
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Error al procesar datos del servidor.", Toast.LENGTH_SHORT).show();
+                    recyclerSolicitudes.setVisibility(View.GONE);
+                    emptyStateSolicitudes.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error al conectar con el servidor.", Toast.LENGTH_SHORT).show();
+                recyclerSolicitudes.setVisibility(View.GONE);
+                emptyStateSolicitudes.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -136,7 +147,6 @@ public class NotificacionesFragment extends Fragment {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
 
-                        // Se crea el objeto usando tu clase Notificacion
                         Notificacion noti = new Notificacion(
                                 obj.getInt("id_notificacion"),
                                 obj.getString("titulo"),
@@ -153,19 +163,26 @@ public class NotificacionesFragment extends Fragment {
 
                     actividadAdapter.notifyDataSetChanged();
 
+                    // 🔸 Mostrar/ocultar mensaje vacío
                     if (listaNotificaciones.isEmpty()) {
-                        Toast.makeText(getContext(), "No tienes notificaciones de actividad.", Toast.LENGTH_SHORT).show();
+                        recyclerActividad.setVisibility(View.GONE);
+                        emptyStateActividad.setVisibility(View.VISIBLE);
+                    } else {
+                        recyclerActividad.setVisibility(View.VISIBLE);
+                        emptyStateActividad.setVisibility(View.GONE);
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Error al procesar las notificaciones.", Toast.LENGTH_SHORT).show();
+                    recyclerActividad.setVisibility(View.GONE);
+                    emptyStateActividad.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error al conectar con el servidor.", Toast.LENGTH_SHORT).show();
+                recyclerActividad.setVisibility(View.GONE);
+                emptyStateActividad.setVisibility(View.VISIBLE);
             }
         });
     }

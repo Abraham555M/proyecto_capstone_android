@@ -1193,7 +1193,7 @@ public class FavoritosFragment extends Fragment {
         } else {
             // Ocultar TODO y mostrar solo el mensaje vacío inicial
             tvEmptyFavoritosTitle.setText("Aún no tienes favoritos");
-            tvEmptyFavoritosSubtitle.setText("Guarda las publicaciones que te gusten para verlas más tarde 💕");
+            tvEmptyFavoritosSubtitle.setText("Guarda las publicaciones que te gusten para verlas más tarde");
             layoutEmptyFavoritos.setVisibility(View.VISIBLE);
             rvPublicacionesFavoritos.setVisibility(View.GONE);
             rvCategoriaFavoritos.setVisibility(View.GONE);

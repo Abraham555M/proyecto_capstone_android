@@ -212,7 +212,7 @@
     <fragment
         android:id="@+id/nav_administrador"
         android:name="com.example.projectcapstone.ui.Administrador.AdministradorFragment"
-        android:label="fragment_administrador"
+        android:label="Área Administrativa"
         tools:layout="@layout/fragment_administrador" />
 
 </navigation>
