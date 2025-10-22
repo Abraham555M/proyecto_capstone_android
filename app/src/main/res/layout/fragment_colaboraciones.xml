@@ -1,28 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9F9F9"
     tools:context=".ui.Colaboraciones.ColaboracionesFragment">
 
-    <!-- Título -->
-    <TextView
-        android:id="@+id/tvTituloColaboraciones"
+    <!-- Card de Filtros -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Colaboraciones"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:padding="16dp"
-        android:textColor="#000" />
+        android:layout_margin="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        android:backgroundTint="#FFFFFF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="#FFFFFF">
+
+            <!-- Header con línea de acento -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="24dp"
+                    android:background="#FBAE3C"
+                    android:layout_marginEnd="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Filtrar Colaboraciones"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121" />
+            </LinearLayout>
+
+            <!-- Campos de fecha -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <!-- Fecha Inicio -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputFechaInicio"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:hint="Fecha Inicio"
+                    app:boxStrokeColor="#FBAE3C"
+                    app:boxStrokeWidth="2dp"
+                    app:hintTextColor="#FBAE3C"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:startIconDrawable="@drawable/ic_calendario"
+                    app:startIconTint="#FBAE3C">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFechaInicio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:inputType="none"
+                        android:textSize="14sp"
+                        android:textColor="#212121" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Fecha Fin -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputFechaFin"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:hint="Fecha Fin"
+                    app:boxStrokeColor="#FBAE3C"
+                    app:boxStrokeWidth="2dp"
+                    app:hintTextColor="#FBAE3C"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:startIconDrawable="@drawable/ic_calendario"
+                    app:startIconTint="#FBAE3C">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFechaFin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:cursorVisible="false"
+                        android:inputType="none"
+                        android:textSize="14sp"
+                        android:textColor="#212121" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <!-- RecyclerView para mostrar las colaboraciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerColaboraciones"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:paddingHorizontal="8dp"
         android:clipToPadding="false"
         android:scrollbars="vertical" />
