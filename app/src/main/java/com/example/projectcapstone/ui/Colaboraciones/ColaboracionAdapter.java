@@ -46,6 +46,7 @@ public class ColaboracionAdapter extends RecyclerView.Adapter<ColaboracionAdapte
         Colaboracion colaboracion = listaColaboraciones.get(position);
 
         holder.tvMensajeColaboracion.setText(colaboracion.getMen_colaboracion());
+        holder.tvTiempo.setText(obtenerTiempoTranscurrido(colaboracion.getFch_colaboracion()));
 
         // Imagen de publicación
         if (colaboracion.getPublicacion() != null && colaboracion.getPublicacion().getImagenUrl() != null) {
@@ -110,11 +111,7 @@ public class ColaboracionAdapter extends RecyclerView.Adapter<ColaboracionAdapte
 
             popup.setOnMenuItemClickListener(item -> {
                 if (item.getTitle().equals("Eliminar")) {
-                    colaboracion.setEst_colaboracion(4);
-                    listaColaboraciones.remove(position);
-                    notifyItemRemoved(position);
-                    actualizarEstadoEnServidor(colaboracion.getId_colaboracion(), 4);
-                    Toast.makeText(context, "Colaboración eliminada", Toast.LENGTH_SHORT).show();
+                    mostrarDialogoEliminar(colaboracion, position);
                 }
                 return true;
             });
@@ -155,6 +152,7 @@ public class ColaboracionAdapter extends RecyclerView.Adapter<ColaboracionAdapte
         TextView tvMensajeColaboracion, tvConfirmacion;
         Button btnAceptar, btnRechazar;
         LinearLayout layoutBotones;
+        TextView tvTiempo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -165,6 +163,67 @@ public class ColaboracionAdapter extends RecyclerView.Adapter<ColaboracionAdapte
             btnRechazar = itemView.findViewById(R.id.btnRechazar);
             tvConfirmacion = itemView.findViewById(R.id.tvConfirmacion);
             btnOpciones = itemView.findViewById(R.id.btnOpciones);
+            tvTiempo = itemView.findViewById(R.id.tvTiempo);
         }
+    }
+
+    private String obtenerTiempoTranscurrido(String fechaColaboracion) {
+        try {
+            java.text.SimpleDateFormat formato = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            java.util.Date fecha = formato.parse(fechaColaboracion);
+            java.util.Date ahora = new java.util.Date();
+
+            long diffMillis = ahora.getTime() - fecha.getTime();
+            long diffMin = diffMillis / (1000 * 60);
+            long diffHoras = diffMin / 60;
+            long diffDias = diffHoras / 24;
+
+            if (diffDias > 0) {
+                return "Hace " + diffDias + (diffDias == 1 ? " día" : " días");
+            } else if (diffHoras > 0) {
+                return "Hace " + diffHoras + (diffHoras == 1 ? " hora" : " horas");
+            } else if (diffMin > 0) {
+                return "Hace " + diffMin + (diffMin == 1 ? " minuto" : " minutos");
+            } else {
+                return "Hace menos de un minuto";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private void mostrarDialogoEliminar(Colaboracion colaboracion, int position) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View vista = inflater.inflate(R.layout.alert_dialog_opciones, null);
+        builder.setView(vista);
+
+        // Referencias
+        TextView tvTitulo = vista.findViewById(R.id.tvTituloError);
+        Button btnNo = vista.findViewById(R.id.btnNo);
+        Button btnSi = vista.findViewById(R.id.btnSi);
+
+        tvTitulo.setText("¿Deseas eliminar esta colaboración?");
+
+        android.app.AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
+
+        // Botón NO
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        // Botón SÍ
+        btnSi.setOnClickListener(v -> {
+            dialog.dismiss();
+
+            // Actualizamos la lista local y BD
+            colaboracion.setEst_colaboracion(4);
+            listaColaboraciones.remove(position);
+            notifyItemRemoved(position);
+            actualizarEstadoEnServidor(colaboracion.getId_colaboracion(), 4);
+
+            Toast.makeText(context, "Colaboración eliminada", Toast.LENGTH_SHORT).show();
+        });
     }
 }

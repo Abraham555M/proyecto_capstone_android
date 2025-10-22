@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     android:background="@color/white"
@@ -66,7 +67,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="¿Cómo vender?"
+                        android:text="¿Qué información es obligatoria para completar mi registro de emprendimiento?"
                         android:textStyle="bold"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -83,7 +84,7 @@
                     android:id="@+id/tvRespuesta1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mattis id volutpat placerat."
+                    android:text="Se nesesita completar los campos como el titulo del emprendimiento, agregar una descripcion sobre la tienda y agregar una foto del emprendimiento"
                     android:textSize="14sp"
                     android:paddingHorizontal="8dp"
                     android:visibility="gone" />
@@ -111,7 +112,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="¿Cómo Comprar?"
+                        android:text="¿Cómo puedo registar mi emprendimiento?"
                         android:textStyle="bold"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -121,14 +122,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_arrow_down"
-                        android:tint="@color/black" />
+                        app:tint="@color/black" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvRespuesta2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mattis id volutpat placerat."
+                    android:text="En la sección del menu hay uno llamado Emprendimiento, luego debes seleccionar una categoria y te redirige para crear un empendimiento"
                     android:textSize="14sp"
                     android:paddingHorizontal="8dp"
                     android:visibility="gone" />
@@ -154,7 +155,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="¿Cómo Crear una publicacion?"
+                        android:text="¿Cómo crear una publicacion?"
                         android:textStyle="bold"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -164,14 +165,100 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_arrow_down"
-                        android:tint="@color/black" />
+                        app:tint="@color/black" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvRespuesta3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mattis id volutpat placerat."
+                    android:text="En la sección del menu hay uno llamado Publicaciones, luego debes agergar una categoría de un emprendimiento y presionar agregar publicación"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_faq_item"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutPregunta4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="¿Cómo puedo editar o eliminar una publicacion creada?"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/iconExpand4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_down"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRespuesta4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="En la seccion de publicaciones y listar todas las publicaciones, en cada item de la publicacion hay dos botones para editar y eliminar"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="8dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_faq_item"
+                android:layout_marginBottom="6dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutPregunta5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="¿Donde puedo revisar las colaboraciones?"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/iconExpand5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_arrow_down"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRespuesta5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="En el menu de la colaboracion, puedo revisar todas las notificaciones de colaboraciones y podras aceptar o rechazar una colaboracion"
                     android:textSize="14sp"
                     android:paddingHorizontal="8dp"
                     android:visibility="gone" />

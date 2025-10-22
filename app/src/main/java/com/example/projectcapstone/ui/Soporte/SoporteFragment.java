@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,16 +29,31 @@ import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cz.msebera.android.httpclient.Header;
 
 public class SoporteFragment extends Fragment {
 
-    private LinearLayout layoutPregunta1, layoutPregunta2, layoutPregunta3;
-    private TextView tvRespuesta1, tvRespuesta2, tvRespuesta3;
-    private ImageView iconExpand1, iconExpand2, iconExpand3;
-    private EditText etSolicitud;
+    private LinearLayout layoutPregunta1, layoutPregunta2, layoutPregunta3, layoutPregunta4, layoutPregunta5;
+    private TextView tvRespuesta1, tvRespuesta2, tvRespuesta3, tvRespuesta4, tvRespuesta5;
+    private ImageView iconExpand1, iconExpand2, iconExpand3, iconExpand4, iconExpand5;
+    private EditText etSolicitud, etBuscar;
     private Button btnEnviar;
     private SessionManager session;
+
+    // ✅ Clase auxiliar para búsqueda
+    private static class ItemFAQ {
+        String texto;
+        LinearLayout layout;
+        ItemFAQ(String texto, LinearLayout layout) {
+            this.texto = texto.toLowerCase();
+            this.layout = layout;
+        }
+    }
+
+    private List<ItemFAQ> listaPreguntas;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,22 +64,53 @@ public class SoporteFragment extends Fragment {
         layoutPregunta1 = rootView.findViewById(R.id.layoutPregunta1);
         layoutPregunta2 = rootView.findViewById(R.id.layoutPregunta2);
         layoutPregunta3 = rootView.findViewById(R.id.layoutPregunta3);
+        layoutPregunta4 = rootView.findViewById(R.id.layoutPregunta4);
+        layoutPregunta5 = rootView.findViewById(R.id.layoutPregunta5);
 
         tvRespuesta1 = rootView.findViewById(R.id.tvRespuesta1);
         tvRespuesta2 = rootView.findViewById(R.id.tvRespuesta2);
         tvRespuesta3 = rootView.findViewById(R.id.tvRespuesta3);
+        tvRespuesta4 = rootView.findViewById(R.id.tvRespuesta4);
+        tvRespuesta5 = rootView.findViewById(R.id.tvRespuesta5);
 
         iconExpand1 = rootView.findViewById(R.id.iconExpand1);
         iconExpand2 = rootView.findViewById(R.id.iconExpand2);
         iconExpand3 = rootView.findViewById(R.id.iconExpand3);
+        iconExpand4 = rootView.findViewById(R.id.iconExpand4);
+        iconExpand5 = rootView.findViewById(R.id.iconExpand5);
 
         etSolicitud = rootView.findViewById(R.id.etSolicitud);
+        etBuscar = rootView.findViewById(R.id.etBuscar); // ✅ agregado
         btnEnviar = rootView.findViewById(R.id.btnEnviar);
 
         // Configurar listeners para expandir/colapsar preguntas
         configurarAcordeon(layoutPregunta1, tvRespuesta1, iconExpand1);
         configurarAcordeon(layoutPregunta2, tvRespuesta2, iconExpand2);
         configurarAcordeon(layoutPregunta3, tvRespuesta3, iconExpand3);
+        configurarAcordeon(layoutPregunta4, tvRespuesta4, iconExpand4);
+        configurarAcordeon(layoutPregunta5, tvRespuesta5, iconExpand5);
+
+        // ✅ Inicializar lista para búsqueda
+        listaPreguntas = new ArrayList<>();
+        listaPreguntas.add(new ItemFAQ("¿Qué información es obligatoria para completar mi registro de emprendimiento?", layoutPregunta1));
+        listaPreguntas.add(new ItemFAQ("¿Cómo puedo registar mi emprendimiento?", layoutPregunta2));
+        listaPreguntas.add(new ItemFAQ("¿Cómo crear una publicacion?", layoutPregunta3));
+        listaPreguntas.add(new ItemFAQ("¿Cómo puedo editar o eliminar una publicacion creada?", layoutPregunta4));
+        listaPreguntas.add(new ItemFAQ("¿Donde puedo revisar las colaboraciones?", layoutPregunta5));
+
+        // ✅ Activar búsqueda dinámica
+        etBuscar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filtrarPreguntas(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         session = new SessionManager(requireContext());
 
@@ -70,6 +118,17 @@ public class SoporteFragment extends Fragment {
         btnEnviar.setOnClickListener(v -> enviarSolicitud());
 
         return rootView;
+    }
+
+    private void filtrarPreguntas(String query) {
+        String textoBusqueda = query.toLowerCase();
+        for (ItemFAQ item : listaPreguntas) {
+            if (item.texto.contains(textoBusqueda)) {
+                item.layout.setVisibility(View.VISIBLE);
+            } else {
+                item.layout.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void configurarAcordeon(LinearLayout layoutPregunta, TextView respuesta, ImageView icono) {
