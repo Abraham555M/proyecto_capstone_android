@@ -8,128 +8,80 @@
     android:background="#F9F9F9"
     tools:context=".ui.Colaboraciones.ColaboracionesFragment">
 
-    <!-- Card de Filtros -->
-    <androidx.cardview.widget.CardView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
-        android:backgroundTint="#FFFFFF">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:background="#FFFFFF">
+            android:padding="16dp">
 
-            <!-- Header con línea de acento -->
-            <LinearLayout
+            <!-- Sección: Colaboraciones Activas -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:text="Colaboraciones Activas"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="12dp" />
 
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="24dp"
-                    android:background="#FBAE3C"
-                    android:layout_marginEnd="12dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Filtrar Colaboraciones"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121" />
-            </LinearLayout>
-
-            <!-- Campos de fecha -->
-            <LinearLayout
+            <!-- Contenedor de RecyclerView + estado vacío -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
+                android:layout_marginBottom="24dp">
 
-                <!-- Fecha Inicio -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/textInputFechaInicio"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
+                <!-- Lista de colaboraciones -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerColaboraciones"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:hint="Fecha Inicio"
-                    app:boxStrokeColor="#FBAE3C"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="#FBAE3C"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:startIconDrawable="@drawable/ic_calendario"
-                    app:startIconTint="#FBAE3C">
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_colaboracion" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etFechaInicio"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:cursorVisible="false"
-                        android:inputType="none"
-                        android:textSize="14sp"
-                        android:textColor="#212121" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Fecha Fin -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/textInputFechaFin"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
+                <!-- Estado vacío -->
+                <LinearLayout
+                    android:id="@+id/emptyStateColaboraciones"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:hint="Fecha Fin"
-                    app:boxStrokeColor="#FBAE3C"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="#FBAE3C"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:startIconDrawable="@drawable/ic_calendario"
-                    app:startIconTint="#FBAE3C">
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etFechaFin"
-                        android:layout_width="match_parent"
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/ic_empty_folder"
+                        app:tint="#BDBDBD"
+                        android:contentDescription="Sin colaboraciones"
+                        android:alpha="0.6" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:cursorVisible="false"
-                        android:inputType="none"
-                        android:textSize="14sp"
-                        android:textColor="#212121" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:text="No hay colaboraciones registradas"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#757575"
+                        android:layout_marginTop="16dp" />
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Empieza una nueva colaboración para verla aquí"
+                        android:textSize="14sp"
+                        android:textColor="#9E9E9E"
+                        android:textAlignment="center"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+
+            </FrameLayout>
 
         </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <!-- RecyclerView para mostrar las colaboraciones -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerColaboraciones"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingHorizontal="8dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical" />
-
+    </ScrollView>
 </LinearLayout>

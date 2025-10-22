@@ -1,15 +1,13 @@
 package com.example.projectcapstone.ui.Colaboraciones;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
@@ -30,9 +28,8 @@ public class ColaboracionesFragment extends Fragment {
     private RecyclerView recyclerColaboraciones;
     private ColaboracionAdapter adapter;
     private List<Colaboracion> listaColaboraciones;
-
+    private LinearLayout emptyStateColaboraciones;
     private SessionManager session;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,6 +37,7 @@ public class ColaboracionesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_colaboraciones, container, false);
 
         recyclerColaboraciones = view.findViewById(R.id.recyclerColaboraciones);
+        emptyStateColaboraciones = view.findViewById(R.id.emptyStateColaboraciones);
         recyclerColaboraciones.setLayoutManager(new LinearLayoutManager(getContext()));
 
         listaColaboraciones = new ArrayList<>();
@@ -47,7 +45,6 @@ public class ColaboracionesFragment extends Fragment {
         recyclerColaboraciones.setAdapter(adapter);
         session = new SessionManager(requireContext());
 
-        // Cargar datos desde la base de datos
         cargarColaboracionesDesdeServidor();
 
         return view;
@@ -95,20 +92,34 @@ public class ColaboracionesFragment extends Fragment {
                         }
 
                         adapter.notifyDataSetChanged();
+
+                        // Mostrar u ocultar el mensaje vacío
+                        if (listaColaboraciones.isEmpty()) {
+                            emptyStateColaboraciones.setVisibility(View.VISIBLE);
+                            recyclerColaboraciones.setVisibility(View.GONE);
+                        } else {
+                            emptyStateColaboraciones.setVisibility(View.GONE);
+                            recyclerColaboraciones.setVisibility(View.VISIBLE);
+                        }
                     } else {
-                        Toast.makeText(getContext(), "Sin colaboraciones disponibles", Toast.LENGTH_SHORT).show();
+                        mostrarEstadoVacio();
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Error procesando datos", Toast.LENGTH_SHORT).show();
+                    mostrarEstadoVacio();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                mostrarEstadoVacio();
             }
         });
+    }
+
+    private void mostrarEstadoVacio() {
+        recyclerColaboraciones.setVisibility(View.GONE);
+        emptyStateColaboraciones.setVisibility(View.VISIBLE);
     }
 }
