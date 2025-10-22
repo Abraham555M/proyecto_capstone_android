@@ -1,177 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="#FAFAFA">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingVertical="16dp"
-        android:paddingHorizontal="8dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="#FAFAFA">
 
-        <!-- Header con título -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
-
-            <View
-                android:layout_width="4dp"
-                android:layout_height="26dp"
-                android:background="#FBAE3C"
-                android:layout_marginEnd="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Descubre"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#212121" />
-        </LinearLayout>
-
-        <!-- Barra de búsqueda -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="3dp"
-            android:layout_marginBottom="24dp"
-            android:backgroundTint="#FFFFFF">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/ic_buscar"
-                    app:tint="#9E9E9E"
-                    android:layout_marginEnd="10dp" />
-
-                <EditText
-                    android:id="@+id/etSearch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="¿Qué estás buscando?"
-                    android:textSize="15sp"
-                    android:textColor="#212121"
-                    android:textColorHint="#BDBDBD"
-                    android:background="@null"
-                    android:maxLines="1"
-                    android:inputType="text" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Sección de Categorías -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="24dp">
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Categorías"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:paddingBottom="12dp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvCategoria"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingHorizontal="2dp"
-                android:paddingBottom="2dp"
-                android:orientation="horizontal"
-                tools:listitem="@layout/item_categoria_inicio" />
-        </LinearLayout>
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#E0E0E0"
-            android:layout_marginBottom="20dp" />
-
-        <!-- Sección de Publicaciones -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Publicaciones recientes"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#212121"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Lista de publicaciones -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPublicaciones"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:clipToPadding="false"
-                android:paddingBottom="8dp"
-                tools:listitem="@layout/item_publicacion_inicio" />
-
-            <!-- Vista vacía cuando no hay publicaciones -->
+            <!-- Header con título -->
             <LinearLayout
-                android:id="@+id/layoutEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="26dp"
+                    android:background="#FBAE3C"
+                    android:layout_marginEnd="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Descubre"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121" />
+            </LinearLayout>
+
+            <!-- Barra de búsqueda -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="3dp"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_buscar"
+                        app:tint="#9E9E9E"
+                        android:layout_marginEnd="10dp" />
+
+                    <EditText
+                        android:id="@+id/etSearch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="¿Qué estás buscando?"
+                        android:textSize="15sp"
+                        android:textColor="#212121"
+                        android:textColorHint="#BDBDBD"
+                        android:background="@null"
+                        android:maxLines="1"
+                        android:inputType="text" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Sección de Categorías -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:padding="24dp"
-                android:layout_marginTop="20dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="90dp"
-                    android:layout_height="90dp"
-                    android:src="@drawable/ic_vacio_publicacion"
-                    android:contentDescription="Sin publicaciones"
-                    app:tint="#BDBDBD"
-                    android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No hay publicaciones con esta categoría"
-                    android:textSize="16sp"
-                    android:textColor="#757575"
-                    android:gravity="center"
-                    android:lineSpacingExtra="2dp" />
+                    android:text="Categorías"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:paddingBottom="12dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCategoria"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Prueba seleccionando otra categoría o vuelve más tarde."
-                    android:textSize="14sp"
-                    android:textColor="#9E9E9E"
-                    android:gravity="center"
-                    android:layout_marginTop="6dp" />
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="2dp"
+                    android:paddingBottom="2dp"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/item_categoria_inicio" />
             </LinearLayout>
-        </LinearLayout>
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Sección de Publicaciones -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Publicaciones recientes"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Lista de publicaciones -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPublicaciones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp"
+                    tools:listitem="@layout/item_publicacion_inicio" />
+
+                <!-- Vista vacía cuando no hay publicaciones -->
+                <LinearLayout
+                    android:id="@+id/layoutEmptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:src="@drawable/ic_vacio_publicacion"
+                        android:contentDescription="Sin publicaciones"
+                        app:tint="#BDBDBD"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No hay publicaciones con esta categoría"
+                        android:textSize="16sp"
+                        android:textColor="#757575"
+                        android:gravity="center"
+                        android:lineSpacingExtra="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Prueba seleccionando otra categoría o vuelve más tarde."
+                        android:textSize="14sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

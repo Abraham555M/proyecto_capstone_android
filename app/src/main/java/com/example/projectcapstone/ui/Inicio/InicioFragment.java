@@ -12,6 +12,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -50,6 +51,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -71,6 +73,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     private Handler searchHandler = new Handler();
     private Runnable searchRunnable;
     private View layoutEmptyState;
+    private SwipeRefreshLayout swipeRefresh;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,12 +81,16 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         View rootView = inflater.inflate(R.layout.fragment_inicio, container, false);
 
         session = new SessionManager(requireContext());
+
+        swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
         rvCategoria = rootView.findViewById(R.id.rvCategoria);
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
         etSearch = rootView.findViewById(R.id.etSearch);
         // Inicializar vistas
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
         layoutEmptyState = rootView.findViewById(R.id.layoutEmptyState);
+        // Configurar SwipeRefreshLayout
+        configurarSwipeRefresh();
 
         // Configuración horizontal
         rvCategoria.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -175,6 +182,45 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         mostrarEstadoVacio(false); // inicia oculto
 
         return rootView;
+    }
+
+    private void configurarSwipeRefresh() {
+        // Configurar colores del indicador de carga
+        swipeRefresh.setColorSchemeColors(
+                getResources().getColor(R.color.success_color, null),
+                getResources().getColor(R.color.success_color, null)
+        );
+
+        // O si usas el color naranja de tu diseño:
+        swipeRefresh.setColorSchemeResources(android.R.color.holo_orange_dark);
+
+        // Listener para el evento de refresh
+        swipeRefresh.setOnRefreshListener(() -> {
+            refrescarContenido();
+        });
+    }
+
+    private void refrescarContenido() {
+        // Limpiar búsqueda
+        if (etSearch != null) {
+            manualTextChange = true;
+            etSearch.setText("");
+            manualTextChange = false;
+        }
+
+        // Resetear categoría seleccionada
+        categoriaSeleccionada = null;
+        if (categoriaAdapter != null) {
+            categoriaAdapter.setCategoriaSeleccionada(null);
+        }
+
+        // Recargar categorías y publicaciones
+        cargarCategorias();
+        cargarPublicaciones(session.getIdEstudiante());
+
+        // IMPORTANTE: Detener el indicador de carga después de que termine
+        // Si tus métodos cargar... son asíncronos, debes llamar esto en sus callbacks
+        swipeRefresh.setRefreshing(false);
     }
 
     private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments, int idEstudiante) {
@@ -347,7 +393,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
 
                         Log.d("DEBUG", "Llamando a cargarPublicaciones() tipo=" + tipoPublicacion);
                     }
-
+                    Collections.shuffle(listaPublicacion);
                     publicacionAdapter.notifyDataSetChanged();
 
                 } catch (Exception e) {
