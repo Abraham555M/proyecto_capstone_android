@@ -161,7 +161,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPublicacion;
         TextView txtTitulo, txtDescripcion, txtVerMas;
-        ImageButton btnEditar, btnEliminar;
+        MaterialButton btnEditar, btnEliminar;
 
         // Mantenemos el estado de expansión aquí
         boolean isExpanded = false;
