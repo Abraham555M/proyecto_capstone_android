@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private SessionManager session;
 
-    // Referencias del header
     private TextView tvNombreEstudiante;
     private ImageView imageViewProfile;
 
@@ -51,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         session = new SessionManager(this);
 
-        // Configuración de navegación
+        // -------------------------------
+        // 🔹 Configuración de navegación
+        // -------------------------------
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavInflater navInflater = navController.getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
@@ -80,19 +81,39 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        // -------------------------
-        // 🔹 Obtener referencias del header del Navigation Drawer
-        // -------------------------
+        // -------------------------------
+        // 🔹 Control de visibilidad ADMIN
+        // -------------------------------
+        navigationView.post(() -> {
+            int tipoUsuario = session.getTipoUsuario();
+            Log.d("TIPO_USUARIO", "Tipo de usuario: " + tipoUsuario);
+
+            MenuItem itemAdmin = navigationView.getMenu().findItem(R.id.nav_administrador);
+            if (itemAdmin != null) {
+                if (tipoUsuario == 2) {
+                    itemAdmin.setVisible(true);
+                    Log.d("MENU", "🧩 Usuario administrador — menú visible");
+                } else {
+                    itemAdmin.setVisible(false);
+                    Log.d("MENU", "🔒 Usuario normal — menú oculto");
+                }
+            } else {
+                Log.e("MENU", "❌ No se encontró el ítem nav_administrador en el menú");
+            }
+        });
+
+        // -------------------------------
+        // 🔹 Header del Drawer
+        // -------------------------------
         View headerView = navigationView.getHeaderView(0);
         tvNombreEstudiante = headerView.findViewById(R.id.tvNombreEstudiante);
         imageViewProfile = headerView.findViewById(R.id.imageViewProfile);
 
-        // 🔹 Cargar datos reales del estudiante logueado
         cargarInformacionPerfil();
 
-        // -------------------------
-        // 🔹 Ocultar Toolbar y Drawer en fragmentos específicos
-        // -------------------------
+        // -------------------------------
+        // 🔹 Control de toolbar y drawer
+        // -------------------------------
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta ||
                     destination.getId() == R.id.nav_inicio_sesion ||
@@ -129,10 +150,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            // 🔒 Cerrar sesión
             session.cerrarSesion();
 
-            // 🧭 Redirigir al fragmento de inicio de sesión o pantalla principal
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
             NavOptions navOptions = new NavOptions.Builder()
                     .setPopUpTo(navController.getGraph().getStartDestinationId(), true)
@@ -163,8 +182,6 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     String nombre = jsonObject.optString("nombre", "Sin nombre");
-
-                    // Mostrar nombre en el header
                     tvNombreEstudiante.setText(nombre);
 
                 } catch (Exception e) {
