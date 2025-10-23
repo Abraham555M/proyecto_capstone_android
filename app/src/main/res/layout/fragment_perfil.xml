@@ -242,17 +242,26 @@
                     android:gravity="center"
                     android:layout_marginBottom="24dp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCrearEmprendimiento"
+                    style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="44dp"
                     android:text="Crear Emprendimiento"
-                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="24dp"
+                    android:minWidth="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:cornerRadius="22dp"
                     android:backgroundTint="#FBAE3C"
-                    android:paddingHorizontal="32dp"
-                    android:paddingVertical="12dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textColor="@android:color/white"
+                    android:layout_gravity="center"
+                    app:iconGravity="textStart"
+                    app:rippleColor="@color/white" />
+
+
 
             </LinearLayout>
 

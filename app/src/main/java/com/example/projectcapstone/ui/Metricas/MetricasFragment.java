@@ -168,7 +168,7 @@ public class MetricasFragment extends Fragment {
                         configurarGrafico(crecimientoArray);
 
                     } else {
-                        Toast.makeText(getContext(), "⚠️ No se pudieron obtener las métricas", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "⚠️ No se pudieron obtener las métricas", Toast.LENGTH_SHORT).show();
                         Log.e("METRICAS_ERROR", json.optString("message"));
                     }
 

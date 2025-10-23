@@ -112,20 +112,24 @@
                             <!-- Botón de acción en empty state -->
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnCrearPrimero"
+                                style="@style/Widget.MaterialComponents.Button"
                                 android:layout_width="match_parent"
                                 android:layout_height="56dp"
                                 android:text="Crear Emprendimiento"
-                                android:textColor="#FFFFFF"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
-                                app:cornerRadius="12dp"
-                                app:icon="@drawable/ic_add"
+                                android:paddingHorizontal="24dp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:minWidth="0dp"
+                                android:backgroundTint="#FBAE3C"
+                                android:textColor="@android:color/white"
+                                app:cornerRadius="28dp"
                                 app:iconGravity="textStart"
-                                app:iconTint="#FFFFFF"
+                                app:iconTint="@android:color/white"
                                 app:iconSize="20dp"
-                                app:backgroundTint="#FBAE3C"
-                                app:elevation="2dp"
-                                app:rippleColor="#FFFFFF" />
+                                app:rippleColor="@android:color/white"
+                                app:elevation="4dp" />
 
                         </LinearLayout>
 

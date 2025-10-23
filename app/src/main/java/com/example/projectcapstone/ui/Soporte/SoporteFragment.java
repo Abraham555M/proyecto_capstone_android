@@ -40,7 +40,7 @@ public class SoporteFragment extends Fragment {
     private TextView tvRespuesta1, tvRespuesta2, tvRespuesta3, tvRespuesta4, tvRespuesta5;
     private ImageView iconExpand1, iconExpand2, iconExpand3, iconExpand4, iconExpand5;
     private EditText etSolicitud, etBuscar;
-    private Button btnEnviar;
+    private MaterialButton btnEnviar;
     private SessionManager session;
 
     // ✅ Clase auxiliar para búsqueda

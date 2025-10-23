@@ -237,15 +237,22 @@
                 <!-- Botón Hecho -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnListo"
+                    style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:layout_marginBottom="16dp"
-                    android:backgroundTint="@color/orange_button"
                     android:text="Actualizar"
-                    android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp" />
+                    android:paddingHorizontal="24dp"
+                    android:minWidth="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#FBAE3C"
+                    android:textColor="@android:color/white"
+                    app:cornerRadius="28dp"
+                    app:rippleColor="@android:color/white"
+                    app:elevation="4dp"
+                    android:layout_marginBottom="16dp" />
 
             </LinearLayout>
 

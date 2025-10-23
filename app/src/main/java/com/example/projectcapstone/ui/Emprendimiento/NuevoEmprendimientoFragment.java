@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -55,7 +56,7 @@ public class NuevoEmprendimientoFragment extends Fragment {
     private ImageButton btnCamera;
     private EditText etNombreTienda;
     private EditText etDescripcion;
-    private Button btnCrear;
+    private MaterialButton btnCrear;
     private int id_estudiante;
 
     private Uri imageUri; // para guardar la URI de la foto seleccionada

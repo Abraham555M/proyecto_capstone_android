@@ -30,6 +30,7 @@ import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Perfil.Adapter.ColaboradoresPerfilAdapter;
 import com.example.projectcapstone.ui.Perfil.Adapter.EmprendimientoPerfilAdapter;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -47,7 +48,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     private EmprendimientoPerfilAdapter emprendimientoAdapter;
     private List<EmprendimientoPerfil> listaEmprendimientos;
     private LinearLayout layoutEmptyMessage;
-    private Button btnCrearEmprendimiento;
+    private MaterialButton btnCrearEmprendimiento;
     private ImageView ivColaboraciones, ivEditar;
     private SessionManager session;
     private AlertDialog dialogColaboraciones;

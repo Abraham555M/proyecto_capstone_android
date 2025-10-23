@@ -25,6 +25,7 @@ import com.example.projectcapstone.ui.Publicaciones.Adapter.CategoriaPublicacion
 import com.example.projectcapstone.ui.Publicaciones.Adapter.CategoriaPublicacionAdapter;
 import com.example.projectcapstone.ui.Publicaciones.Adapter.Publicacion;
 import com.example.projectcapstone.ui.Publicaciones.Adapter.PublicacionAdapter;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -45,7 +46,7 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
     private CategoriaPublicacionAdapter emprendimientoAdapter;
     private List<Publicacion> publicaciones;
     private List<CategoriaPublicacion> categorias;
-    private Button btnAgregarPublicacion;
+    private MaterialButton btnAgregarPublicacion;
     private SessionManager session;
     private TextView tvSinPublicaciones, tvSinEmprendimientos;
     private int idEmprendimientoSeleccionado = -1;
