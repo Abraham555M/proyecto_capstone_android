@@ -15,13 +15,34 @@ public class Publicacion {
     private Integer dioSeguimiento;
     private Integer esFavorito;
     private Integer tipoPublicacion; // 1=Producto,2=Promocion,3=Evento
-
+    private Integer esActualizado;
     // 🔹 Campos específicos según tipo
     private Producto producto;
     private Promocion promocion;
     private Evento evento;
 
-    // Constructor general
+    public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
+                       String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones,
+                       Integer dioLike, Integer dioSeguimiento, Integer esFavorito, Integer tipoPublicacion,
+                       Producto producto, Evento evento, Promocion promocion, Integer esActualizado) {
+        this.idPublicacion = idPublicacion;
+        this.idEmprendimiento = idEmprendimiento;
+        this.nomEmprendimiento = nomEmprendimiento;
+        this.imgEmprendimiento = imgEmprendimiento;
+        this.titPublicacion = titPublicacion;
+        this.conPublicacion = conPublicacion;
+        this.imgPublicacion = imgPublicacion;
+        this.totalInteracciones = totalInteracciones;
+        this.dioLike = dioLike;
+        this.dioSeguimiento = dioSeguimiento;
+        this.esFavorito = esFavorito;
+        this.tipoPublicacion = tipoPublicacion;
+        this.producto = producto;
+        this.evento = evento;
+        this.promocion = promocion;
+        this.esActualizado = esActualizado;
+    }
+
     public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
                        String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones,
                        Integer dioLike, Integer dioSeguimiento, Integer esFavorito, Integer tipoPublicacion,
@@ -56,7 +77,15 @@ public class Publicacion {
         this.totalInteracciones = totalInteracciones;
     }
 
-    // 🔥 Métodos de estado
+    public Integer getEsActualizado() {
+        return esActualizado;
+    }
+
+    public void setEsActualizado(Integer esActualizado) {
+        this.esActualizado = esActualizado;
+    }
+
+    // Métodos de estado
     public boolean isFavorito() {
         return esFavorito != null && esFavorito == 1;
     }

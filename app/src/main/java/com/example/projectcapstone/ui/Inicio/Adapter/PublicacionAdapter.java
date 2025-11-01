@@ -145,8 +145,13 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             holder.btnFollow.setTextColor(Color.parseColor("#FBAE3C"));
         }
 
-
-
+        // Etiqueta actualizado
+        // 🔹 Mostrar etiqueta "ACTUALIZADO" según el campo esActualizado
+        if (publicacion.getEsActualizado() == 1) {
+            holder.tvActualizado.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvActualizado.setVisibility(View.GONE);
+        }
 
         // 🔹 Mostrar sección según tipoPublicacion
         holder.sectionProducto.setVisibility(View.GONE);
@@ -252,7 +257,7 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
 
         // ✅ CAMBIO: De LinearLayout a MaterialCardView
         MaterialCardView sectionProducto, sectionEvento, sectionPromocion;
-        TextView tvPrecioProducto, tvStockProducto;
+        TextView tvPrecioProducto, tvStockProducto, tvActualizado;
         TextView tvFechaEvento, tvLugarEvento;
         TextView tvDescripcionPromocion, tvFechasPromocion;
 
@@ -286,6 +291,8 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             sectionPromocion = itemView.findViewById(R.id.sectionPromocion);
             tvDescripcionPromocion = itemView.findViewById(R.id.tvDescripcionPromocion);
             tvFechasPromocion = itemView.findViewById(R.id.tvFechasPromocion);
+
+            tvActualizado = itemView.findViewById(R.id.tvActualizado);
         }
     }
 

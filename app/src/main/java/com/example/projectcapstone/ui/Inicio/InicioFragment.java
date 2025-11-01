@@ -335,8 +335,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         int dioLike = pub.optBoolean("dio_like", false) ? 1 : 0;
                         int siguiendo = empr.optBoolean("siguiendo", false) ? 1 : 0;
                         int esFavorito = pub.optBoolean("es_favorito", false) ? 1 : 0;
-
                         int tipoPublicacion = pub.optInt("tipo_publicacion", 1);
+                        int esActualizado = pub.optInt("es_actualizado", 0);
 
                         // Objetos de cada sección
                         Publicacion.Producto producto = null;
@@ -388,7 +388,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                                 tipoPublicacion,
                                 producto,
                                 evento,
-                                promocion
+                                promocion,
+                                esActualizado
                         ));
 
                         Log.d("DEBUG", "Llamando a cargarPublicaciones() tipo=" + tipoPublicacion);
@@ -1000,6 +1001,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                             int dioLike = pub.optBoolean("dio_like", false) ? 1 : 0; // El JSON retorna booleanos (false/true)
                             int esFavorito = pub.optBoolean("es_favorito", false) ? 1 : 0; // El JSON retorna booleanos (false/true)
                             int tipoPublicacion = pub.optInt("tipo_publicacion", 1);
+                            int esActualizado = pub.optInt("es_actualizado", 0);
 
                             int idEmprendimiento = empr.optInt("id", 0);
                             String nomEmprendimiento = empr.optString("nombre", "");
@@ -1048,7 +1050,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                                     tipoPublicacion,
                                     producto,
                                     evento,
-                                    promocion
+                                    promocion,
+                                    esActualizado
                             );
 
                             listaPublicacion.add(publicacion);
@@ -1107,6 +1110,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         int esFavorito = pub.getBoolean("es_favorito") ? 1 : 0;
                         int dioLike = pub.getBoolean("dio_like") ? 1 : 0;
                         int tipoPublicacion = pub.getInt("tipo_publicacion");
+                        int esActualizado = pub.optInt("es_actualizado", 0);
 
                         // ----- Datos del emprendimiento -----
                         JSONObject emp = item.getJSONObject("emprendimiento");
@@ -1154,7 +1158,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                                 tipoPublicacion,
                                 producto,
                                 evento,
-                                promocion
+                                promocion,
+                                esActualizado
                         );
 
                         listaPublicacion.add(publicacion);
