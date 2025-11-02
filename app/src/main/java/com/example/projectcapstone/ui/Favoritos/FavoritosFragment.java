@@ -216,6 +216,7 @@ public class FavoritosFragment extends Fragment {
                         int siguiendo = empObj.getBoolean("siguiendo") ? 1 : 0;
                         int esFavorito = pubObj.getBoolean("es_favorito") ? 1 : 0;
                         int tipoPublicacion = pubObj.getInt("tipo_publicacion");
+                        int esActualizado = pubObj.optInt("es_actualizado", 0);
 
                         // --- Variables de tipos específicos ---
                         Publicacion.Producto producto = null;
@@ -260,7 +261,8 @@ public class FavoritosFragment extends Fragment {
                                 tipoPublicacion,
                                 producto,
                                 evento,
-                                promocion
+                                promocion,
+                                esActualizado
                         );
 
                         listaFavoritos.add(publicacion);
@@ -338,6 +340,7 @@ public class FavoritosFragment extends Fragment {
                         int siguiendo = empObj.getBoolean("siguiendo") ? 1 : 0;
                         int esFavorito = pubObj.getBoolean("es_favorito") ? 1 : 0;
                         int tipoPublicacion = pubObj.getInt("tipo_publicacion");
+                        int esActualizado = pubObj.optInt("es_actualizado", 0);
 
                         // --- Variables de tipos específicos ---
                         Publicacion.Producto producto = null;
@@ -381,7 +384,8 @@ public class FavoritosFragment extends Fragment {
                                 tipoPublicacion,
                                 producto,
                                 evento,
-                                promocion
+                                promocion,
+                                esActualizado
                         );
 
                         listaFavoritos.add(publicacion);
@@ -442,6 +446,7 @@ public class FavoritosFragment extends Fragment {
                         int siguiendo = empObj.getBoolean("siguiendo") ? 1 : 0;
                         int esFavorito = pubObj.getBoolean("es_favorito") ? 1 : 0;
                         int tipoPublicacion = pubObj.getInt("tipo_publicacion");
+                        int esActualizado = pubObj.optInt("es_actualizado", 0);
 
                         Publicacion.Producto producto = null;
                         Publicacion.Promocion promocion = null;
@@ -483,7 +488,8 @@ public class FavoritosFragment extends Fragment {
                                 tipoPublicacion,
                                 producto,
                                 evento,
-                                promocion
+                                promocion,
+                                esActualizado
                         );
 
                         listaFavoritos.add(publicacion);
