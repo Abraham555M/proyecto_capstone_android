@@ -56,7 +56,7 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
-public class InicioFragment extends Fragment implements View.OnClickListener {
+public class InicioFragment extends Fragment {
     private CategoriaAdapter categoriaAdapter;
     private PublicacionAdapter publicacionAdapter;
     private TipoReporteAdapter tipoReporteAdapter;
@@ -103,32 +103,36 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             // Remover temporalmente el TextWatcher para no disparar onTextChanged con setText("")
             if (searchTextWatcher != null) etSearch.removeTextChangedListener(searchTextWatcher);
 
+            // Validar que categoria no sea null
             if (categoria == null) {
+                // Si es null, simplemente recargar todo
                 categoriaSeleccionada = null;
                 categoriaAdapter.setCategoriaSeleccionada(null);
                 cargarPublicaciones(session.getIdEstudiante());
             } else {
+                // Toggle de categoría
                 if (categoriaSeleccionada != null && categoriaSeleccionada.equals(categoria.getIdCategoria())) {
-                    // el usuario tocó la misma categoría → la deseleccionamos y mostramos todo
+                    // El usuario tocó la misma categoría → la deseleccionamos y mostramos todo
                     categoriaSeleccionada = null;
                     categoriaAdapter.setCategoriaSeleccionada(null);
                     cargarPublicaciones(session.getIdEstudiante());
                 } else {
-                    // nueva categoría seleccionada
+                    // Nueva categoría seleccionada
                     categoriaSeleccionada = categoria.getIdCategoria();
                     categoriaAdapter.setCategoriaSeleccionada(categoriaSeleccionada);
                     filtrarPorCategoria(categoriaSeleccionada);
                 }
             }
 
-            // limpiar campo búsqueda SIN disparar TextWatcher
+            // Limpiar campo búsqueda SIN disparar TextWatcher
             manualTextChange = true;
             if (etSearch != null) etSearch.setText("");
             manualTextChange = false;
 
-            // volver a agregar el watcher
+            // Volver a agregar el watcher
             if (searchTextWatcher != null) etSearch.addTextChangedListener(searchTextWatcher);
         });
+
         rvCategoria.setAdapter(categoriaAdapter);
 
         // Configuración vertical de publicaciones
@@ -218,9 +222,8 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
         cargarCategorias();
         cargarPublicaciones(session.getIdEstudiante());
 
-        // IMPORTANTE: Detener el indicador de carga después de que termine
-        // Si tus métodos cargar... son asíncronos, debes llamar esto en sus callbacks
-        swipeRefresh.setRefreshing(false);
+        // Mostrar mensaje opcional
+        Toast.makeText(getContext(), "Contenido actualizado", Toast.LENGTH_SHORT).show();
     }
 
     private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments, int idEstudiante) {
@@ -338,13 +341,12 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         int tipoPublicacion = pub.optInt("tipo_publicacion", 1);
                         int esActualizado = pub.optInt("es_actualizado", 0);
 
-                        // Objetos de cada sección
                         Publicacion.Producto producto = null;
                         Publicacion.Promocion promocion = null;
                         Publicacion.Evento evento = null;
 
                         switch (tipoPublicacion) {
-                            case 1: // Producto
+                            case 1:
                                 if (obj.has("producto") && !obj.isNull("producto")) {
                                     JSONObject prod = obj.getJSONObject("producto");
                                     double precio = prod.optDouble("precio", 0);
@@ -353,7 +355,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                                 }
                                 break;
 
-                            case 2: // Promoción
+                            case 2:
                                 if (obj.has("promocion") && !obj.isNull("promocion")) {
                                     JSONObject promo = obj.getJSONObject("promocion");
                                     String descripcion = promo.optString("descripcion", "");
@@ -363,7 +365,7 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                                 }
                                 break;
 
-                            case 3: // Evento
+                            case 3:
                                 if (obj.has("evento") && !obj.isNull("evento")) {
                                     JSONObject ev = obj.getJSONObject("evento");
                                     String fecha = ev.optString("fecha", "");
@@ -397,18 +399,32 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     Collections.shuffle(listaPublicacion);
                     publicacionAdapter.notifyDataSetChanged();
 
+                    // Ocultar estado vacío al cargar todas las publicaciones
+                    mostrarEstadoVacio(listaPublicacion.isEmpty());
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                } finally {
+                    // Detener el indicador de refresh si está activo
+                    if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                        swipeRefresh.setRefreshing(false);
+                    }
                 }
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+
+                // Detener el indicador de refresh si está activo
+                if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                    swipeRefresh.setRefreshing(false);
+                }
             }
         });
     }
+
 
     public void registrarComentario(Integer idPublicacion, int idEstudiante, String conComentario) {
         AsyncHttpClient client = new AsyncHttpClient();
@@ -637,23 +653,48 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     String status = json.getString("status");
 
                     if (status.equals("seguido")) {
-                        // Cuando se sigue
-                        btnFollow.setText("Siguiendo");
-                        btnFollow.setBackgroundColor(getResources().getColor(R.color.teal_700));
-                        btnFollow.setStrokeWidth(0); // quitar borde
-                        btnFollow.setTextColor(Color.WHITE);
+                        // Animación: escala y cambio suave de color
+                        btnFollow.animate()
+                                .scaleX(0.9f)
+                                .scaleY(0.9f)
+                                .setDuration(100)
+                                .withEndAction(() -> {
+                                    btnFollow.setText("Siguiendo");
+                                    btnFollow.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FBAE3C")));
+                                    btnFollow.setStrokeWidth(0);
+                                    btnFollow.setTextColor(Color.WHITE);
 
-                        Toast.makeText(getContext(), "Ahora sigues este emprendimiento", Toast.LENGTH_SHORT).show();
+                                    // Vuelve al tamaño normal con efecto rebote
+                                    btnFollow.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .setDuration(100)
+                                            .start();
+
+                                    Toast.makeText(getContext(), "Ahora sigues este emprendimiento", Toast.LENGTH_SHORT).show();
+                                }).start();
 
                     } else if (status.equals("no_seguido")) {
-                        // Cuando se deja de seguir → vuelve al estilo XML original
-                        btnFollow.setText("Seguir");
-                        btnFollow.setBackgroundColor(Color.TRANSPARENT); // fondo transparente
-                        btnFollow.setStrokeWidth(1); // vuelve a borde gris
-                        btnFollow.setStrokeColor(ColorStateList.valueOf(getResources().getColor(R.color.gray_light)));
-                        btnFollow.setTextColor(getResources().getColor(R.color.gray_dark));
+                        // Animación: pequeña escala antes de cambiar estilo
+                        btnFollow.animate()
+                                .scaleX(0.9f)
+                                .scaleY(0.9f)
+                                .setDuration(100)
+                                .withEndAction(() -> {
+                                    btnFollow.setText("Seguir");
+                                    btnFollow.setBackgroundColor(Color.TRANSPARENT);
+                                    btnFollow.setStrokeWidth(1);
+                                    btnFollow.setStrokeColor(ColorStateList.valueOf(getResources().getColor(R.color.gray_light)));
+                                    btnFollow.setTextColor(getResources().getColor(R.color.gray_dark));
 
-                        Toast.makeText(getContext(), "Has dejado de seguir", Toast.LENGTH_SHORT).show();
+                                    btnFollow.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .setDuration(100)
+                                            .start();
+
+                                    Toast.makeText(getContext(), "Has dejado de seguir", Toast.LENGTH_SHORT).show();
+                                }).start();
 
                     } else {
                         Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
@@ -1081,7 +1122,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
     }
 
     private void filtrarPorCategoria(int idCategoria) {
-        // Cancelar búsqueda pendiente
         if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
 
         String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_filtrar_categoria.php?idEstudiante="
@@ -1100,7 +1140,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject item = jsonArray.getJSONObject(i);
 
-                        // ----- Datos de publicación -----
                         JSONObject pub = item.getJSONObject("publicacion");
                         int idPublicacion = pub.getInt("id");
                         String titPublicacion = pub.getString("titulo");
@@ -1112,14 +1151,12 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                         int tipoPublicacion = pub.getInt("tipo_publicacion");
                         int esActualizado = pub.optInt("es_actualizado", 0);
 
-                        // ----- Datos del emprendimiento -----
                         JSONObject emp = item.getJSONObject("emprendimiento");
                         int idEmprendimiento = emp.getInt("id");
                         String nomEmprendimiento = emp.getString("nombre");
                         String imgEmprendimiento = emp.optString("imagen_perfil", null);
                         int siguiendo = emp.getBoolean("siguiendo") ? 1 : 0;
 
-                        // ----- Datos específicos según tipo -----
                         Publicacion.Producto producto = null;
                         Publicacion.Promocion promocion = null;
                         Publicacion.Evento evento = null;
@@ -1142,7 +1179,6 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                             evento = new Publicacion.Evento(fecha, lugar);
                         }
 
-                        // ----- Crear objeto Publicacion -----
                         Publicacion publicacion = new Publicacion(
                                 idPublicacion,
                                 idEmprendimiento,
@@ -1166,22 +1202,30 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
                     }
 
                     publicacionAdapter.notifyDataSetChanged();
-                    // 👉 Mostrar u ocultar el estado vacío
                     mostrarEstadoVacio(listaPublicacion.isEmpty());
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
+                } finally {
+                    // Detener el indicador de refresh si está activo
+                    if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                        swipeRefresh.setRefreshing(false);
+                    }
                 }
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+
+                // Detener el indicador de refresh si está activo
+                if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                    swipeRefresh.setRefreshing(false);
+                }
             }
         });
     }
-
 
     private void mostrarDialogoReportarComentario(Context context, int idComentario) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte_comentario, null);
@@ -1317,10 +1361,5 @@ public class InicioFragment extends Fragment implements View.OnClickListener {
             rvPublicaciones.setVisibility(View.VISIBLE);
             layoutEmptyState.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-
     }
 }
