@@ -97,7 +97,6 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
             }
         });
 
-
         recyclerEmprendimientos.setAdapter(emprendimientoAdapter);
         session = new SessionManager(requireContext());
 
@@ -113,30 +112,6 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
         cargarEmprendimientos();
         cargarPublicaciones();
-
-        tvMisEmprendimientos = rootView.findViewById(R.id.tvMisEmprendimientos);
-
-        tvMisEmprendimientos.setOnClickListener(v -> {
-            filtroActivo = !filtroActivo; // cambia el estado
-
-            if (filtroActivo) {
-                // 🔸 Cambiar color y texto cuando está activo
-                tvMisEmprendimientos.setTextColor(Color.parseColor("#FBAE3C"));
-                tvMisEmprendimientos.setText("Mis Emprendimientos (Filtro ON)");
-
-                if (idCategoriaSeleccionada != -1 && idEmprendimientoSeleccionado != -1) {
-                    cargarPublicacionesPorCategoria(idCategoriaSeleccionada, idEmprendimientoSeleccionado);
-                } else {
-                    Toast.makeText(getContext(), "Selecciona una categoría para aplicar el filtro", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // 🔹 Volver al estado normal
-                tvMisEmprendimientos.setTextColor(Color.BLACK);
-                tvMisEmprendimientos.setText("Mis Emprendimientos (Filtro OFF)");
-                cargarPublicaciones(); // mostrar todas las publicaciones
-            }
-        });
-
 
         return rootView;
     }
@@ -208,6 +183,7 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
             }
         });
     }
+
     private void cargarEmprendimientos() {
         int idEstudiante = session.getIdEstudiante();
         String URL = ServidorConfig.URL_SERVIDOR + "publicacion/listar_categorias_publicacion.php?id_estudiante=" + idEstudiante;
