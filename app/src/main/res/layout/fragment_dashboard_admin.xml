@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📊 Dashboard de Actividad"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Filtro de fechas -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnFiltrar"
+                android:text="Filtrar por Fecha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#2196F3"
+                android:textColor="#FFF"/>
+        </LinearLayout>
+
+        <!-- Gráfico de líneas -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chartLine"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Gráfico de barras -->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/chartBar"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Gráfico de torta -->
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chartPie"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginBottom="24dp"/>
+
+    </LinearLayout>
+</ScrollView>
