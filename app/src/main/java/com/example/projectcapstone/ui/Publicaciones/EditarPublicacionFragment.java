@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Publicaciones.Adapter.TipoPublicacion;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -43,7 +44,7 @@ public class EditarPublicacionFragment extends Fragment {
 
     private Spinner spTipoPublicacion;
     private EditText etNombrePublicacion, etDescripcion;
-    private Button btnActualizar;
+    private MaterialButton btnActualizar;
     private LinearLayout layoutProductoE, layoutEventoE, layoutPromocionE;
     private ArrayList<TipoPublicacion> listaTipos = new ArrayList<>();
     private ArrayAdapter<TipoPublicacion> adapter;

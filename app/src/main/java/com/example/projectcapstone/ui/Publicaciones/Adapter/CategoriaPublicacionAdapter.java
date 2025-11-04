@@ -99,6 +99,12 @@ public class CategoriaPublicacionAdapter extends RecyclerView.Adapter<CategoriaP
         return categorias.size();
     }
 
+    public void clearSelection() {
+        int previousSelected = selectedPosition;
+        selectedPosition = RecyclerView.NO_POSITION;
+        notifyItemChanged(previousSelected);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCategoria;
         TextView txtNombre;

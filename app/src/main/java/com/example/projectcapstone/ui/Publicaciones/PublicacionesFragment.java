@@ -84,9 +84,12 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                 idCategoriaSeleccionada = -1;
                 idEmprendimientoSeleccionado = -1;
                 filtroActivo = false;
+
+                // 🔥 Limpia selección visual en el adapter
+                emprendimientoAdapter.clearSelection();
+
                 cargarPublicaciones();
             } else {
-                // Nuevo filtro
                 idCategoriaSeleccionada = idCategoria;
                 idEmprendimientoSeleccionado = idEmprendimiento;
                 filtroActivo = true;
