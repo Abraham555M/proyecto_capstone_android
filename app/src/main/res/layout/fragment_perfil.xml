@@ -260,13 +260,7 @@
                     android:layout_gravity="center"
                     app:iconGravity="textStart"
                     app:rippleColor="@color/white" />
-
-
-
             </LinearLayout>
-
         </LinearLayout>
-
     </LinearLayout>
-
 </ScrollView>
