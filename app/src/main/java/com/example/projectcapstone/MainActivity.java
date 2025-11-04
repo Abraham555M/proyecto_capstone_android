@@ -1,5 +1,6 @@
 package com.example.projectcapstone;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -22,7 +23,9 @@ import androidx.navigation.ui.NavigationUI;
 import com.example.projectcapstone.databinding.ActivityMainBinding;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -159,6 +162,47 @@ public class MainActivity extends AppCompatActivity {
 
             navController.navigate(R.id.nav_start_upn, null, navOptions);
             Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (id == R.id.action_notificaciones) {
+            // Crear el diálogo
+            Dialog dialog = new Dialog(MainActivity.this);
+            dialog.setContentView(R.layout.alert_dialog_configuracion_notificaciones);
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            dialog.setCancelable(false);
+
+            // Referencias de vistas dentro del diálogo
+            ImageView btnCerrar = dialog.findViewById(R.id.btnCerrarNotificaciones);
+            MaterialButton btnCancelar = dialog.findViewById(R.id.btnCancelarNotificaciones);
+            MaterialButton btnGuardar = dialog.findViewById(R.id.btnGuardarNotificaciones);
+
+            SwitchMaterial switchTodas = dialog.findViewById(R.id.switchTodasNotificaciones);
+            SwitchMaterial switchPublicaciones = dialog.findViewById(R.id.switchPublicaciones);
+            SwitchMaterial switchComentarios = dialog.findViewById(R.id.switchComentarios);
+            SwitchMaterial switchLikes = dialog.findViewById(R.id.switchLikes);
+
+            // Acciones
+            btnCerrar.setOnClickListener(v -> dialog.dismiss());
+            btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+            btnGuardar.setOnClickListener(v -> {
+                boolean todas = switchTodas.isChecked();
+                boolean publicaciones = switchPublicaciones.isChecked();
+                boolean comentarios = switchComentarios.isChecked();
+                boolean likes = switchLikes.isChecked();
+
+                Toast.makeText(MainActivity.this,
+                        "Configuración guardada:\n" +
+                                "Todas: " + todas + "\n" +
+                                "Publicaciones: " + publicaciones + "\n" +
+                                "Comentarios: " + comentarios + "\n" +
+                                "Likes: " + likes,
+                        Toast.LENGTH_LONG).show();
+
+                dialog.dismiss();
+            });
+
+            dialog.show();
             return true;
         }
 
