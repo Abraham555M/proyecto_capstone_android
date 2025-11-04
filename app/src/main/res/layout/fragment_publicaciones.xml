@@ -27,21 +27,15 @@
             android:layout_marginTop="8dp" />
 
         <!-- 🔹 Scroll horizontal solo para categorías -->
-        <HorizontalScrollView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerEmprendimientos"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:scrollbars="none">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerEmprendimientos"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                tools:listitem="@layout/item_categoria_publicacion"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
+            android:layout_height="120dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            tools:listitem="@layout/item_categoria_publicacion" />
 
         <TextView
             android:id="@+id/txtSinEmprendimientos"

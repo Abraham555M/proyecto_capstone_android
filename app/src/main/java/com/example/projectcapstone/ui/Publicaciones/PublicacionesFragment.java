@@ -2,6 +2,7 @@ package com.example.projectcapstone.ui.Publicaciones;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +51,10 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
     private SessionManager session;
     private TextView tvSinPublicaciones, tvSinEmprendimientos;
     private int idEmprendimientoSeleccionado = -1;
+    private TextView tvMisEmprendimientos;
+    private boolean filtroActivo = false;
+    private int idCategoriaSeleccionada = -1;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -69,13 +74,27 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
         );
         categorias = new ArrayList<>();
         emprendimientoAdapter = new CategoriaPublicacionAdapter(
-                categorias,getContext(),
-                categoria -> {
-                    int idCategoria = categoria.getIdCategoria();
-                    idEmprendimientoSeleccionado = categoria.getIdEmprendimiento();
-                    // Toast.makeText(getContext(), "Filtrando por: " + categoria.getNombre(), Toast.LENGTH_SHORT).show();
-                    cargarPublicacionesPorCategoria(idCategoria, idEmprendimientoSeleccionado);
+        categorias, getContext(),
+        categoria -> {
+            int idCategoria = categoria.getIdCategoria();
+            int idEmprendimiento = categoria.getIdEmprendimiento();
+
+            // Si el usuario toca la misma categoría que ya estaba seleccionada, limpiar filtro
+            if (idCategoriaSeleccionada == idCategoria) {
+                idCategoriaSeleccionada = -1;
+                idEmprendimientoSeleccionado = -1;
+                filtroActivo = false;
+                cargarPublicaciones();
+            } else {
+                // Nuevo filtro
+                idCategoriaSeleccionada = idCategoria;
+                idEmprendimientoSeleccionado = idEmprendimiento;
+                filtroActivo = true;
+                cargarPublicacionesPorCategoria(idCategoria, idEmprendimiento);
+            }
         });
+
+
         recyclerEmprendimientos.setAdapter(emprendimientoAdapter);
         session = new SessionManager(requireContext());
 
@@ -91,6 +110,30 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
         cargarEmprendimientos();
         cargarPublicaciones();
+
+        tvMisEmprendimientos = rootView.findViewById(R.id.tvMisEmprendimientos);
+
+        tvMisEmprendimientos.setOnClickListener(v -> {
+            filtroActivo = !filtroActivo; // cambia el estado
+
+            if (filtroActivo) {
+                // 🔸 Cambiar color y texto cuando está activo
+                tvMisEmprendimientos.setTextColor(Color.parseColor("#FBAE3C"));
+                tvMisEmprendimientos.setText("Mis Emprendimientos (Filtro ON)");
+
+                if (idCategoriaSeleccionada != -1 && idEmprendimientoSeleccionado != -1) {
+                    cargarPublicacionesPorCategoria(idCategoriaSeleccionada, idEmprendimientoSeleccionado);
+                } else {
+                    Toast.makeText(getContext(), "Selecciona una categoría para aplicar el filtro", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // 🔹 Volver al estado normal
+                tvMisEmprendimientos.setTextColor(Color.BLACK);
+                tvMisEmprendimientos.setText("Mis Emprendimientos (Filtro OFF)");
+                cargarPublicaciones(); // mostrar todas las publicaciones
+            }
+        });
+
 
         return rootView;
     }
