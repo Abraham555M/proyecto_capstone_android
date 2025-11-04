@@ -162,20 +162,27 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
             case 1: // Producto
                 if (publicacion.getProducto() != null) {
                     holder.sectionProducto.setVisibility(View.VISIBLE);
-                    holder.tvPrecioProducto.setText("Precio: S/ " + publicacion.getProducto().getPrecio());
-                    holder.tvStockProducto.setText("Stock: " + publicacion.getProducto().getStock());
+                    double precio = publicacion.getProducto().getPrecio();
+                    String precioFormateado = String.format("S/ %.2f", precio);
+                    holder.tvPrecioProducto.setText("Precio: " + precioFormateado);
+
+                    holder.tvStockProducto.setText("Stock: " + publicacion.getProducto().getStock() + " ud");
                 }
                 break;
+
             case 2: // Promoción
                 if (publicacion.getPromocion() != null) {
                     holder.sectionPromocion.setVisibility(View.VISIBLE);
-                    holder.tvDescripcionPromocion.setText(publicacion.getPromocion().getDescripcion());
+                    String descripcionPromocion = "S/ " + publicacion.getPromocion().getDescripcion();
+                    holder.tvDescripcionPromocion.setText(descripcionPromocion);
+
                     holder.tvFechasPromocion.setText(
                             "Válido del " + publicacion.getPromocion().getFechaInicio() +
                                     " al " + publicacion.getPromocion().getFechaFin()
                     );
                 }
                 break;
+
             case 3: // Evento
                 if (publicacion.getEvento() != null) {
                     holder.sectionEvento.setVisibility(View.VISIBLE);
@@ -260,7 +267,6 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         });
 
     }
-
 
     @Override
     public int getItemCount() {

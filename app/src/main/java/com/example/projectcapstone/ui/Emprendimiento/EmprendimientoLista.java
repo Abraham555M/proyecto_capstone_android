@@ -275,11 +275,11 @@ public class EmprendimientoLista extends Fragment {
                     String message = json.optString("message", "Operación completada");
 
                     if (status.equalsIgnoreCase("success")) {
-                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                         dialogEditar.dismiss();
+                        mostrarDialogExito("Actualización exitosa", message, true);
                         cargarEmprendimientos(); // Recargar lista
                     } else {
-                        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                        mostrarDialogExito("Error", message, false);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -324,6 +324,31 @@ public class EmprendimientoLista extends Fragment {
             eliminarEmprendimiento(empr);
         });
 
+        dialog.show();
+    }
+
+    private void mostrarDialogExito(String titulo, String mensaje, boolean esExito) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloExito);
+        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeExito);
+        com.google.android.material.button.MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
 
