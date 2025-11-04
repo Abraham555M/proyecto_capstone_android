@@ -37,7 +37,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@android:drawable/ic_menu_upload"
-                android:tint="@android:color/darker_gray"
+                app:tint="@android:color/darker_gray"
                 android:contentDescription="Icono de subir foto" />
 
             <TextView

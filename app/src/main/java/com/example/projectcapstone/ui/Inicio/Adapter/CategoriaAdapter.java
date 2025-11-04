@@ -67,7 +67,7 @@ public class CategoriaAdapter extends RecyclerView.Adapter<CategoriaAdapter.Cate
 
         if (isSelected) {
             holder.itemView.setBackgroundResource(0);
-            holder.tvNombre.setTextColor(context.getResources().getColor(R.color.blue_primary));
+            holder.tvNombre.setTextColor(android.graphics.Color.parseColor("#FBAE3C"));
         } else {
             holder.itemView.setBackgroundResource(0);
             holder.tvNombre.setTextColor(context.getResources().getColor(R.color.gray_dark));
