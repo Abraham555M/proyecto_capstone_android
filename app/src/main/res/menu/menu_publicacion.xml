@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_reportar"
-        android:title="Reportar" />
+        android:orderInCategory="100"
+        android:title="Reportar"
+        android:icon="@drawable/ic_flag"
+        app:iconTint="@color/black"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_solicitud"
-        android:title="Colaborar" />
+        android:orderInCategory="100"
+        android:title="Colaborar"
+        android:icon="@drawable/ic_colaboraciones"
+        app:iconTint="@color/black"
+        app:showAsAction="never" />
 </menu>

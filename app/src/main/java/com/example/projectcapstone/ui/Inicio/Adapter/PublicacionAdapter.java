@@ -230,18 +230,35 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         holder.ivMoreOptions.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(v.getContext(), v);
             popup.inflate(R.menu.menu_publicacion);
+
+            // Forzar a mostrar los íconos en el menú
+            try {
+                java.lang.reflect.Field mFieldPopup = popup.getClass().getDeclaredField("mPopup");
+                mFieldPopup.setAccessible(true);
+                Object mPopup = mFieldPopup.get(popup);
+                Class<?> popupHelper = Class.forName(mPopup.getClass().getName());
+                java.lang.reflect.Method setForceIcons = popupHelper.getMethod("setForceShowIcon", boolean.class);
+                setForceIcons.invoke(mPopup, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Listener de los items del menú
             popup.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == R.id.action_reportar && reportListener != null) {
+                int id = item.getItemId();
+                if (id == R.id.action_reportar && reportListener != null) {
                     reportListener.onReportClicked(publicacion);
                     return true;
-                } else if (item.getItemId() == R.id.action_solicitud && solicitudListener != null) {
+                } else if (id == R.id.action_solicitud && solicitudListener != null) {
                     solicitudListener.onSolicitudClicked(publicacion);
                     return true;
                 }
                 return false;
             });
+
             popup.show();
         });
+
     }
 
 
