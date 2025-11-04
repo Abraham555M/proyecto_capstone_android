@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.os.Handler;
@@ -72,9 +73,10 @@ public class InicioFragment extends Fragment {
     private TextWatcher searchTextWatcher;
     private Handler searchHandler = new Handler();
     private Runnable searchRunnable;
-    private View layoutEmptyState;
+    private FrameLayout layoutEmptyState;
     private SwipeRefreshLayout swipeRefresh;
-
+    private TextView tvEmptyTitle;
+    private TextView tvEmptySubtitle;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -89,6 +91,11 @@ public class InicioFragment extends Fragment {
         // Inicializar vistas
         rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
         layoutEmptyState = rootView.findViewById(R.id.layoutEmptyState);
+
+        layoutEmptyState = rootView.findViewById(R.id.layoutEmptyState);
+        rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
+        tvEmptyTitle = rootView.findViewById(R.id.tvEmptyTitle);
+        tvEmptySubtitle = rootView.findViewById(R.id.tvEmptySubtitle);
         // Configurar SwipeRefreshLayout
         configurarSwipeRefresh();
 
@@ -183,8 +190,7 @@ public class InicioFragment extends Fragment {
         configurarBusqueda();
         cargarCategorias();
         cargarPublicaciones(session.getIdEstudiante());
-        mostrarEstadoVacio(false); // inicia oculto
-
+        mostrarEstadoVacio(false, null, null); // inicia oculto
         return rootView;
     }
 
@@ -399,9 +405,14 @@ public class InicioFragment extends Fragment {
                     Collections.shuffle(listaPublicacion);
                     publicacionAdapter.notifyDataSetChanged();
 
-                    // Ocultar estado vacío al cargar todas las publicaciones
-                    mostrarEstadoVacio(listaPublicacion.isEmpty());
-
+                    // Mostrar u ocultar estado vacío al cargar todas las publicaciones
+                    if (listaPublicacion.isEmpty()) {
+                        mostrarEstadoVacio(true,
+                                "No hay publicaciones disponibles",
+                                "Vuelve más tarde para ver nuevas publicaciones.");
+                    } else {
+                        mostrarEstadoVacio(false, null, null);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
@@ -1099,9 +1110,23 @@ public class InicioFragment extends Fragment {
                         }
 
                         publicacionAdapter.notifyDataSetChanged();
+                        if (listaPublicacion.isEmpty()) {
+                            String titulo, subtitulo;
 
-                        if (listaPublicacion.isEmpty() && !textoBusqueda.isEmpty()) {
-                            Toast.makeText(getContext(), "No se encontraron publicaciones", Toast.LENGTH_SHORT).show();
+                            if (!textoBusqueda.isEmpty()) {
+                                titulo = "No se encontraron resultados para \"" + textoBusqueda + "\"";
+                                subtitulo = "Intenta con otras palabras clave o verifica la ortografía.";
+                            } else if (idCategoria != null) {
+                                titulo = "No hay publicaciones con esta categoría";
+                                subtitulo = "Prueba seleccionando otra categoría o vuelve más tarde.";
+                            } else {
+                                titulo = "No hay publicaciones disponibles";
+                                subtitulo = "Vuelve más tarde para ver nuevas publicaciones.";
+                            }
+
+                            mostrarEstadoVacio(true, titulo, subtitulo);
+                        } else {
+                            mostrarEstadoVacio(false, null, null);
                         }
 
                     } catch (Exception e) {
@@ -1202,7 +1227,15 @@ public class InicioFragment extends Fragment {
                     }
 
                     publicacionAdapter.notifyDataSetChanged();
-                    mostrarEstadoVacio(listaPublicacion.isEmpty());
+
+                    // Mostrar u ocultar estado vacío con mensaje de categoría
+                    if (listaPublicacion.isEmpty()) {
+                        mostrarEstadoVacio(true,
+                                "No hay publicaciones con esta categoría",
+                                "Prueba seleccionando otra categoría o vuelve más tarde.");
+                    } else {
+                        mostrarEstadoVacio(false, null, null);
+                    }
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1351,12 +1384,20 @@ public class InicioFragment extends Fragment {
         });
     }
 
-    private void mostrarEstadoVacio(boolean mostrar) {
+    private void mostrarEstadoVacio(boolean mostrar, String titulo, String subtitulo) {
         if (layoutEmptyState == null || rvPublicaciones == null) return;
 
         if (mostrar) {
             rvPublicaciones.setVisibility(View.GONE);
             layoutEmptyState.setVisibility(View.VISIBLE);
+
+            // Personalizar mensajes
+            if (titulo != null && tvEmptyTitle != null) {
+                tvEmptyTitle.setText(titulo);
+            }
+            if (subtitulo != null && tvEmptySubtitle != null) {
+                tvEmptySubtitle.setText(subtitulo);
+            }
         } else {
             rvPublicaciones.setVisibility(View.VISIBLE);
             layoutEmptyState.setVisibility(View.GONE);

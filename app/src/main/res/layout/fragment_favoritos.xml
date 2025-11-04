@@ -101,6 +101,7 @@
                 android:layout_marginBottom="20dp" />
 
             <!-- 📄 Sección de publicaciones favoritas -->
+            <!-- 📄 Sección de publicaciones favoritas -->
             <LinearLayout
                 android:id="@+id/layoutPublicacionesSection"
                 android:layout_width="match_parent"
@@ -116,15 +117,62 @@
                     android:textColor="#212121"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Lista de publicaciones favoritas -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvPublicacionesFavoritos"
+                <!-- Contenedor para lista Y estado vacío -->
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:clipToPadding="false"
-                    android:paddingBottom="8dp"
-                    tools:listitem="@layout/item_publicacion_favorito" />
+                    android:minHeight="300dp">
+
+                    <!-- Lista de publicaciones favoritas -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvPublicacionesFavoritos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:clipToPadding="false"
+                        android:paddingBottom="8dp"
+                        tools:listitem="@layout/item_publicacion_favorito" />
+
+                    <!-- Vista vacía LOCAL (solo para esta sección) -->
+                    <LinearLayout
+                        android:id="@+id/layoutEmptyPublicaciones"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="24dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="90dp"
+                            android:layout_height="90dp"
+                            android:src="@drawable/ic_empty_folder"
+                            android:contentDescription="Sin publicaciones"
+                            app:tint="#BDBDBD"
+                            android:layout_marginBottom="16dp" />
+
+                        <TextView
+                            android:id="@+id/tvEmptyPublicacionesTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sin favoritos aquí"
+                            android:textSize="16sp"
+                            android:textColor="#757575"
+                            android:gravity="center"
+                            android:lineSpacingExtra="2dp" />
+
+                        <TextView
+                            android:id="@+id/tvEmptyPublicacionesSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No hay favoritos en esta categoría"
+                            android:textSize="14sp"
+                            android:textColor="#9E9E9E"
+                            android:gravity="center"
+                            android:layout_marginTop="6dp" />
+                    </LinearLayout>
+                </FrameLayout>
             </LinearLayout>
 
         </LinearLayout>

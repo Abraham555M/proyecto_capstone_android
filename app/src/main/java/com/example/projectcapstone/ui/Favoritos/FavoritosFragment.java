@@ -66,7 +66,9 @@ public class FavoritosFragment extends Fragment {
     private LinearLayout layoutSearchFavoritos, layoutCategoriasSection, layoutPublicacionesSection;
     private int categoriaSeleccionada = -1;
     private View dividerFavoritos;
-
+    private LinearLayout layoutEmptyPublicaciones;
+    private TextView tvEmptyPublicacionesTitle;
+    private TextView tvEmptyPublicacionesSubtitle;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -86,7 +88,9 @@ public class FavoritosFragment extends Fragment {
         layoutPublicacionesSection = view.findViewById(R.id.layoutPublicacionesSection);
         tvEmptyFavoritosTitle = view.findViewById(R.id.tvEmptyFavoritosTitle);
         tvEmptyFavoritosSubtitle = view.findViewById(R.id.tvEmptyFavoritosSubtitle);
-
+        layoutEmptyPublicaciones = view.findViewById(R.id.layoutEmptyPublicaciones);
+        tvEmptyPublicacionesTitle = view.findViewById(R.id.tvEmptyPublicacionesTitle);
+        tvEmptyPublicacionesSubtitle = view.findViewById(R.id.tvEmptyPublicacionesSubtitle);
 
         session = new SessionManager(requireContext());
 
@@ -396,8 +400,7 @@ public class FavoritosFragment extends Fragment {
                         actualizarEstadoFavoritos();
                     }
 
-                    layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
-
+                    actualizarEstadoFavoritos();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error al procesar la búsqueda", Toast.LENGTH_SHORT).show();
@@ -500,7 +503,7 @@ public class FavoritosFragment extends Fragment {
                         actualizarEstadoFavoritos();
                     }
 
-                    layoutEmptyFavoritos.setVisibility(listaFavoritos.isEmpty() ? View.VISIBLE : View.GONE);
+                    actualizarEstadoFavoritos();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1180,27 +1183,30 @@ public class FavoritosFragment extends Fragment {
             layoutCategoriasSection.setVisibility(View.VISIBLE);
             dividerFavoritos.setVisibility(View.VISIBLE);
             layoutPublicacionesSection.setVisibility(View.VISIBLE);
+            layoutEmptyFavoritos.setVisibility(View.GONE); // Ocultar vacío global
 
             if (listaFavoritos.isEmpty()) {
+                // Mostrar mensaje vacío LOCAL (en área de publicaciones)
                 String textoBusqueda = etSearchFavoritos.getText().toString().trim();
                 if (!textoBusqueda.isEmpty()) {
-                    tvEmptyFavoritosTitle.setText("Sin resultados");
-                    tvEmptyFavoritosSubtitle.setText("No se encontraron favoritos con '" + textoBusqueda + "'");
+                    tvEmptyPublicacionesTitle.setText("Sin resultados");
+                    tvEmptyPublicacionesSubtitle.setText("No se encontraron favoritos con '" + textoBusqueda + "'");
                 } else if (isFiltering) {
-                    tvEmptyFavoritosTitle.setText("Sin favoritos aquí");
-                    tvEmptyFavoritosSubtitle.setText("No hay favoritos en esta categoría");
+                    tvEmptyPublicacionesTitle.setText("Sin favoritos aquí");
+                    tvEmptyPublicacionesSubtitle.setText("No hay favoritos en esta categoría");
                 }
-                layoutEmptyFavoritos.setVisibility(View.VISIBLE);
+                layoutEmptyPublicaciones.setVisibility(View.VISIBLE);
                 rvPublicacionesFavoritos.setVisibility(View.GONE);
             } else {
-                layoutEmptyFavoritos.setVisibility(View.GONE);
+                layoutEmptyPublicaciones.setVisibility(View.GONE);
                 rvPublicacionesFavoritos.setVisibility(View.VISIBLE);
             }
         } else {
-            // Ocultar TODO y mostrar solo el mensaje vacío inicial
+            // Ocultar TODO y mostrar solo el mensaje vacío GLOBAL (pantalla completa)
             tvEmptyFavoritosTitle.setText("Aún no tienes favoritos");
             tvEmptyFavoritosSubtitle.setText("Guarda las publicaciones que te gusten para verlas más tarde");
             layoutEmptyFavoritos.setVisibility(View.VISIBLE);
+            layoutEmptyPublicaciones.setVisibility(View.GONE);
             rvPublicacionesFavoritos.setVisibility(View.GONE);
             rvCategoriaFavoritos.setVisibility(View.GONE);
             layoutSearchFavoritos.setVisibility(View.GONE);
