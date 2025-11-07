@@ -3,23 +3,216 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@id/nav_start_upn">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.example.projectcapstone.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/nav_metricas"
+        android:name="com.example.projectcapstone.ui.Metricas.MetricasFragment"
+        android:label="Mis Metricas"
+        tools:layout="@layout/fragment_metricas" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.projectcapstone.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_emprendimiento"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoFragment"
+        android:label="Emprendimiento"
+        tools:layout="@layout/fragment_emprendimiento">
+        <action
+            android:id="@+id/action_nav_emprendimiento_to_nuevoEmprendimientoFragment"
+            app:destination="@id/nuevoEmprendimientoFragment" />
+        <action
+            android:id="@+id/action_nav_emprendimiento_to_nav_emprendimiento_lista"
+            app:destination="@id/nav_emprendimiento_lista" />
+    </fragment>
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.projectcapstone.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_publicaciones"
+        android:name="com.example.projectcapstone.ui.Publicaciones.PublicacionesFragment"
+        android:label="Publicaciones"
+        tools:layout="@layout/fragment_publicaciones" >
+        <action
+            android:id="@+id/action_nav_publicaciones_to_nuevaPublicacionFragment"
+            app:destination="@id/nuevaPublicacionFragment" />
+        <action
+            android:id="@+id/action_nav_publicaciones_to_editarPublicacionFragment"
+            app:destination="@id/editarPublicacionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_crear_cuenta"
+        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.CrearCuenta"
+        android:label="CrearCuenta"
+        tools:layout="@layout/fragment_crear_cuenta" >
+
+        <action
+                android:id="@+id/action_nav_crear_cuenta_to_nav_validar_correo_crear"
+                app:destination="@id/nav_validar_correo_crear" />
+        <action
+            android:id="@+id/action_nav_crear_cuenta_to_nav_start_upn"
+            app:destination="@id/nav_start_upn" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_inicio_sesion"
+        android:name="com.example.projectcapstone.ui.Autenticacion.InicioSesion.InicioSesion"
+        android:label="fragment_inicio_sesion"
+        tools:layout="@layout/fragment_inicio_sesion" >
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_inicio"
+            app:destination="@id/nav_inicio" />
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_validar_correo_recuperar"
+            app:destination="@id/nav_validar_correo_recuperar" />
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_start_upn"
+            app:destination="@id/nav_start_upn" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_start_upn"
+        android:name="com.example.projectcapstone.ui.Autenticacion.InicioSesion.StartUpn"
+        android:label="fragment_start"
+        tools:layout="@layout/fragment_start" >
+        <action
+            android:id="@+id/action_nav_start_upn_to_nav_crear_cuenta"
+            app:destination="@id/nav_crear_cuenta" />
+        <action
+            android:id="@+id/action_nav_start_upn_to_nav_inicio_sesion"
+            app:destination="@id/nav_inicio_sesion" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_validar_correo_recuperar"
+        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ValidarCorreoRecuperar"
+        android:label="fragment_validar_correo_recuperar"
+        tools:layout="@layout/fragment_validar_correo_recuperar" >
+        <action
+            android:id="@+id/action_nav_validar_correo_recuperar_to_nav_confirmar_password"
+            app:destination="@id/nav_confirmar_password" />
+        <action
+            android:id="@+id/action_nav_validar_correo_recuperar_to_nav_inicio_sesion"
+            app:destination="@id/nav_inicio_sesion" />
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_confirmar_password"
+        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.ConfirmarPassword"
+        android:label="fragment_confirmar_password"
+        tools:layout="@layout/fragment_confirmar_cambio_password">
+
+        <action
+            android:id="@+id/action_nav_confirmar_password_to_nav_cambiar_password"
+            app:destination="@id/nav_cambiar_password" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_inicio"
+        android:name="com.example.projectcapstone.ui.Inicio.InicioFragment"
+        android:label="Inicio"
+        tools:layout="@layout/fragment_inicio" >
+        <action
+            android:id="@+id/action_nav_inicio_to_nav_perfil_emprendedor"
+            app:destination="@id/nav_perfil_emprendedor" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_validar_correo_crear"
+        android:name="com.example.projectcapstone.ui.Autenticacion.CrearCuenta.ValidarCorreoCrear"
+        android:label="fragment_validar_correo_crear"
+        tools:layout="@layout/fragment_validar_correo_crear" >
+        <action
+            android:id="@+id/action_nav_validar_correo_crear_to_nav_inicio"
+            app:destination="@id/nav_inicio" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_notificaciones"
+        android:name="com.example.projectcapstone.ui.Notificaciones.NotificacionesFragment"
+        android:label="Notificaciones"
+        tools:layout="@layout/fragment_notificaciones" />
+    <fragment
+        android:id="@+id/nav_favoritos"
+        android:name="com.example.projectcapstone.ui.Favoritos.FavoritosFragment"
+        android:label="Favoritos"
+        tools:layout="@layout/fragment_favoritos" />
+    <fragment
+        android:id="@+id/nav_perfil"
+        android:name="com.example.projectcapstone.ui.Perfil.PerfilFragment"
+        android:label="Mi perfil"
+        tools:layout="@layout/fragment_perfil" >
+        <action
+            android:id="@+id/action_nav_perfil_to_nav_emprendimiento"
+            app:destination="@id/nav_emprendimiento" />
+        <action
+            android:id="@+id/action_nav_perfil_to_nav_perfil_estudiante"
+            app:destination="@id/nav_perfil_estudiante" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_colaboraciones"
+        android:name="com.example.projectcapstone.ui.Colaboraciones.ColaboracionesFragment"
+        android:label="Colaboraciones"
+        tools:layout="@layout/fragment_colaboraciones" />
+    <fragment
+        android:id="@+id/nav_soporte"
+        android:name="com.example.projectcapstone.ui.Soporte.SoporteFragment"
+        android:label="Soporte"
+        tools:layout="@layout/fragment_soporte" />
+    <fragment
+        android:id="@+id/nuevoEmprendimientoFragment"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.NuevoEmprendimientoFragment"
+        android:label="Registrar Emprendimiento"
+        tools:layout="@layout/fragment_nuevo_emprendimiento" />
+
+    <fragment
+        android:id="@+id/nav_cambiar_password"
+        android:name="com.example.projectcapstone.ui.Autenticacion.RecuperarPassword.CambiarPassword"
+        android:label="fragment_cambiar_password"
+        tools:layout="@layout/fragment_cambiar_password">
+        <action
+            android:id="@+id/action_nav_cambiar_password_to_nav_inicio_sesion"
+            app:destination="@id/nav_inicio_sesion" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_emprendimiento_lista"
+        android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoLista"
+        android:label="Lista de Emprendimientos"
+        tools:layout="@layout/fragment_emprendimiento_lista" />
+    <fragment
+        android:id="@+id/nav_perfil_emprendedor"
+        android:name="com.example.projectcapstone.ui.Inicio.PerfilEmprendedorFragment"
+        android:label="Pefil"
+        tools:layout="@layout/fragment_perfil_emprendedor">
+        <action
+            android:id="@+id/action_nav_perfil_emprendedor_to_nav_publicaciones_del_emprendimiento"
+            app:destination="@id/nav_publicaciones_del_emprendimiento" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_publicaciones_del_emprendimiento"
+        android:name="com.example.projectcapstone.ui.Inicio.PublicacionesEmprendimientoFragment"
+        android:label="Mis publicaciones"
+        tools:layout="@layout/fragment_publicaciones_emprendimiento" />
+    <fragment
+        android:id="@+id/nuevaPublicacionFragment"
+        android:name="com.example.projectcapstone.ui.Publicaciones.NuevaPublicacionFragment"
+        android:label="Registrar Publicación"
+        tools:layout="@layout/fragment_nueva_publicacion" />
+    <fragment
+        android:id="@+id/nav_perfil_estudiante"
+        android:name="com.example.projectcapstone.ui.Perfil.PerfilEstudianteFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_perfil_estudiante" />
+    <fragment
+        android:id="@+id/editarPublicacionFragment"
+        android:name="com.example.projectcapstone.ui.Publicaciones.EditarPublicacionFragment"
+        android:label="Actualizar Publicación"
+        tools:layout="@layout/fragment_editar_publicacion" />
+    <fragment
+        android:id="@+id/nav_administrador"
+        android:name="com.example.projectcapstone.ui.Administrador.AdministradorFragment"
+        android:label="Área Administrativa"
+        tools:layout="@layout/fragment_administrador" />
+
 </navigation>

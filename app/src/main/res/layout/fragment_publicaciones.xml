@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".ui.Publicaciones.PublicacionesFragment">
+
+    <!-- 🟠 Sección de categorías / emprendimientos -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tvMisEmprendimientos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mis Emprendimientos"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- 🔹 Scroll horizontal solo para categorías -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scrollbars="none">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerEmprendimientos"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                tools:listitem="@layout/item_categoria_publicacion"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/txtSinEmprendimientos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aún no tienes emprendimientos registrados."
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- 🔵 Sección de publicaciones con scroll vertical -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tvMisPublicaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mis Publicaciones"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- 🔸 RecyclerView vertical con su propio scroll -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerPublicaciones"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="vertical"
+            android:layout_marginTop="8dp"
+            tools:listitem="@layout/item_publicacion" />
+
+        <TextView
+            android:id="@+id/txtSinPublicaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aún no has realizado publicaciones."
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:gravity="center"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+
+    <!-- 🟤 Botón para agregar publicación -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAgregarPublicacion"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:text="Agregar Publicación"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="24dp"
+        android:minWidth="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:backgroundTint="#FBAE3C"
+        android:textColor="@android:color/white"
+        app:cornerRadius="22dp"
+        app:rippleColor="@android:color/white"
+        app:elevation="3dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp" />
+
+</LinearLayout>
+

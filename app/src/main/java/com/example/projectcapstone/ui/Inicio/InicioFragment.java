@@ -1,0 +1,1406 @@
+package com.example.projectcapstone.ui.Inicio;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.projectcapstone.R;
+import com.example.projectcapstone.ui.Clases.Categoria;
+import com.example.projectcapstone.ui.Clases.Comentario;
+import com.example.projectcapstone.ui.Clases.Publicacion;
+import com.example.projectcapstone.ui.Clases.TipoReporte;
+import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
+import com.example.projectcapstone.ui.Inicio.Adapter.CategoriaAdapter;
+import com.example.projectcapstone.ui.Inicio.Adapter.ComentarioAdapter;
+import com.example.projectcapstone.ui.Inicio.Adapter.PublicacionAdapter;
+import com.example.projectcapstone.ui.Inicio.Adapter.TipoReporteAdapter;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
+
+public class InicioFragment extends Fragment {
+    private CategoriaAdapter categoriaAdapter;
+    private PublicacionAdapter publicacionAdapter;
+    private TipoReporteAdapter tipoReporteAdapter;
+    private List<Categoria> listaCategoria = new ArrayList<>();
+    private List<Publicacion> listaPublicacion = new ArrayList<>();
+    private List<TipoReporte> listaTipoReporte = new ArrayList<>();
+    private List<Comentario> listaComentarios = new ArrayList<>();
+    private RecyclerView rvCategoria, rvPublicaciones;
+    private SessionManager session;
+    private EditText etSearch;
+    private Integer categoriaSeleccionada = null; // id de la categoría actualmente activa
+    private boolean manualTextChange = false;
+    private TextWatcher searchTextWatcher;
+    private Handler searchHandler = new Handler();
+    private Runnable searchRunnable;
+    private FrameLayout layoutEmptyState;
+    private SwipeRefreshLayout swipeRefresh;
+    private TextView tvEmptyTitle;
+    private TextView tvEmptySubtitle;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_inicio, container, false);
+
+        session = new SessionManager(requireContext());
+
+        swipeRefresh = rootView.findViewById(R.id.swipeRefresh);
+        rvCategoria = rootView.findViewById(R.id.rvCategoria);
+        rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
+        etSearch = rootView.findViewById(R.id.etSearch);
+        // Inicializar vistas
+        rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
+        layoutEmptyState = rootView.findViewById(R.id.layoutEmptyState);
+
+        layoutEmptyState = rootView.findViewById(R.id.layoutEmptyState);
+        rvPublicaciones = rootView.findViewById(R.id.rvPublicaciones);
+        tvEmptyTitle = rootView.findViewById(R.id.tvEmptyTitle);
+        tvEmptySubtitle = rootView.findViewById(R.id.tvEmptySubtitle);
+        // Configurar SwipeRefreshLayout
+        configurarSwipeRefresh();
+
+        // Configuración horizontal
+        rvCategoria.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        categoriaAdapter = new CategoriaAdapter(getContext(), listaCategoria);
+        categoriaAdapter.setOnItemClickListener(categoria -> {
+            // Cancelar búsqueda pendiente
+            if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+
+            // Remover temporalmente el TextWatcher para no disparar onTextChanged con setText("")
+            if (searchTextWatcher != null) etSearch.removeTextChangedListener(searchTextWatcher);
+
+            // Validar que categoria no sea null
+            if (categoria == null) {
+                // Si es null, simplemente recargar todo
+                categoriaSeleccionada = null;
+                categoriaAdapter.setCategoriaSeleccionada(null);
+                cargarPublicaciones(session.getIdEstudiante());
+            } else {
+                // Toggle de categoría
+                if (categoriaSeleccionada != null && categoriaSeleccionada.equals(categoria.getIdCategoria())) {
+                    // El usuario tocó la misma categoría → la deseleccionamos y mostramos todo
+                    categoriaSeleccionada = null;
+                    categoriaAdapter.setCategoriaSeleccionada(null);
+                    cargarPublicaciones(session.getIdEstudiante());
+                } else {
+                    // Nueva categoría seleccionada
+                    categoriaSeleccionada = categoria.getIdCategoria();
+                    categoriaAdapter.setCategoriaSeleccionada(categoriaSeleccionada);
+                    filtrarPorCategoria(categoriaSeleccionada);
+                }
+            }
+
+            // Limpiar campo búsqueda SIN disparar TextWatcher
+            manualTextChange = true;
+            if (etSearch != null) etSearch.setText("");
+            manualTextChange = false;
+
+            // Volver a agregar el watcher
+            if (searchTextWatcher != null) etSearch.addTextChangedListener(searchTextWatcher);
+        });
+
+        rvCategoria.setAdapter(categoriaAdapter);
+
+        // Configuración vertical de publicaciones
+        rvPublicaciones.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        publicacionAdapter = new PublicacionAdapter(
+                requireContext(),
+                listaPublicacion,
+                (publicacion, ivLike, tvLikes) -> registrarLike(
+                        publicacion.getIdPublicacion(),
+                        session.getIdEstudiante(), // ID del estudiante logueado
+                        publicacion,
+                        ivLike,
+                        tvLikes
+                ),
+                publicacion -> mostrarDialogoReportar(requireContext(), publicacion.getIdPublicacion()),
+                publicacion -> mostrarDialogoSolicitud(requireContext(),
+                        session.getIdEstudiante(),  // estudiante logueado
+                        publicacion.getIdPublicacion(),
+                        publicacion.getIdEmprendimiento()),
+                publicacion -> mostrarDialogoComentarios(requireContext(), publicacion.getIdPublicacion()),
+                (publicacion, ivBookmark) -> registrarFavorito(
+                        publicacion.getIdPublicacion(),
+                        session.getIdEstudiante(), // estudiante logueado
+                        publicacion,
+                        ivBookmark
+                )
+        );
+
+        // Listener para el botón SEGUIR
+        publicacionAdapter.setFollowListener((publicacion, btnFollow) -> {
+            registrarSeguimiento(
+                    session.getIdEstudiante(),
+                    publicacion.getIdEmprendimiento(),
+                    btnFollow
+            );
+        });
+
+        // Listener para cuando se presiona el nombre del emprendedor
+        publicacionAdapter.setEntrepreneurClickListener(publicacion -> {
+            Bundle bundle = new Bundle();
+            bundle.putInt("idEmprendimiento", publicacion.getIdEmprendimiento());
+
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_inicio_to_nav_perfil_emprendedor, bundle);
+        });
+
+        rvPublicaciones.setAdapter(publicacionAdapter);
+        configurarBusqueda();
+        cargarCategorias();
+        cargarPublicaciones(session.getIdEstudiante());
+        mostrarEstadoVacio(false, null, null); // inicia oculto
+        return rootView;
+    }
+
+    private void configurarSwipeRefresh() {
+        // Configurar colores del indicador de carga
+        swipeRefresh.setColorSchemeColors(
+                getResources().getColor(R.color.success_color, null),
+                getResources().getColor(R.color.success_color, null)
+        );
+
+        // O si usas el color naranja de tu diseño:
+        swipeRefresh.setColorSchemeResources(android.R.color.holo_orange_dark);
+
+        // Listener para el evento de refresh
+        swipeRefresh.setOnRefreshListener(() -> {
+            refrescarContenido();
+        });
+    }
+
+    private void refrescarContenido() {
+        // Limpiar búsqueda
+        if (etSearch != null) {
+            manualTextChange = true;
+            etSearch.setText("");
+            manualTextChange = false;
+        }
+
+        // Resetear categoría seleccionada
+        categoriaSeleccionada = null;
+        if (categoriaAdapter != null) {
+            categoriaAdapter.setCategoriaSeleccionada(null);
+        }
+
+        // Recargar categorías y publicaciones
+        cargarCategorias();
+        cargarPublicaciones(session.getIdEstudiante());
+
+        // Mostrar mensaje opcional
+        Toast.makeText(getContext(), "Contenido actualizado", Toast.LENGTH_SHORT).show();
+    }
+
+    private void cargarComentariosPublicacion(int idPublicacion, ComentarioAdapter comentarioAdapter, List<Comentario> listaComentarios, LinearLayout layoutEmpty, RecyclerView recyclerComments, int idEstudiante) {
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_comentarios.php?idPublicacion=" + idPublicacion + "&idEstudiante=" + idEstudiante;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaComentarios.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int idComentario = obj.getInt("id_comentario");
+                        String conComentario = obj.getString("con_comentario");
+                        String fchComentario = obj.getString("fch_comentario");
+                        String nomEstudiante = obj.getString("estudiante");
+                        int totalLikes = obj.getInt("total_likes");
+                        boolean dioLike = obj.getInt("dio_like") == 1;
+                        int idEstudianteComentario = obj.getInt("id_estudiante");
+
+                        listaComentarios.add(new Comentario(idComentario, conComentario, fchComentario, nomEstudiante,dioLike, totalLikes, idEstudianteComentario));
+                    }
+
+                    if (listaComentarios.isEmpty()) {
+                        layoutEmpty.setVisibility(View.VISIBLE);
+                        recyclerComments.setVisibility(View.GONE);
+                    } else {
+                        layoutEmpty.setVisibility(View.GONE);
+                        recyclerComments.setVisibility(View.VISIBLE);
+                    }
+
+                    comentarioAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cargarCategorias() {
+        String url = ServidorConfig.URL_SERVIDOR + "categoria/categoria_listar.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaCategoria.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int idCategoria = obj.getInt("id_categoria");
+                        String nomCategoria = obj.getString("nom_categoria");
+                        String imgCategoria = obj.getString("img_categoria");
+
+                        listaCategoria.add(new Categoria(idCategoria, nomCategoria, imgCategoria));
+                    }
+                    categoriaAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cargarPublicaciones(int idEstudiante) {
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_listar_inicio.php?idEstudiante=" + idEstudiante;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    Log.d("DEBUG_JSON", respuesta);
+
+                    JSONArray jsonArray = new JSONArray(respuesta);
+                    listaPublicacion.clear();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+
+                        JSONObject pub = obj.getJSONObject("publicacion");
+                        JSONObject empr = obj.getJSONObject("emprendimiento");
+
+                        int idPublicacion = pub.optInt("id", 0);
+                        int idEmprendimiento = empr.optInt("id", 0);
+                        String nomEmprendimiento = empr.optString("nombre", "");
+                        String imgEmprendimiento = empr.optString("imagen_perfil", "");
+                        String titPublicacion = pub.optString("titulo", "");
+                        String conPublicacion = pub.optString("contenido", "");
+                        String imgPublicacion = pub.optString("imagen", "");
+                        int totalInteracciones = pub.optInt("likes", 0);
+                        int dioLike = pub.optBoolean("dio_like", false) ? 1 : 0;
+                        int siguiendo = empr.optBoolean("siguiendo", false) ? 1 : 0;
+                        int esFavorito = pub.optBoolean("es_favorito", false) ? 1 : 0;
+                        int tipoPublicacion = pub.optInt("tipo_publicacion", 1);
+                        int esActualizado = pub.optInt("es_actualizado", 0);
+
+                        Publicacion.Producto producto = null;
+                        Publicacion.Promocion promocion = null;
+                        Publicacion.Evento evento = null;
+
+                        switch (tipoPublicacion) {
+                            case 1:
+                                if (obj.has("producto") && !obj.isNull("producto")) {
+                                    JSONObject prod = obj.getJSONObject("producto");
+                                    double precio = prod.optDouble("precio", 0);
+                                    int stock = prod.optInt("stock", 0);
+                                    producto = new Publicacion.Producto(precio, stock);
+                                }
+                                break;
+
+                            case 2:
+                                if (obj.has("promocion") && !obj.isNull("promocion")) {
+                                    JSONObject promo = obj.getJSONObject("promocion");
+                                    String descripcion = promo.optString("descripcion", "");
+                                    String fechaInicio = promo.optString("fecha_inicio", "");
+                                    String fechaFin = promo.optString("fecha_fin", "");
+                                    promocion = new Publicacion.Promocion(descripcion, fechaInicio, fechaFin);
+                                }
+                                break;
+
+                            case 3:
+                                if (obj.has("evento") && !obj.isNull("evento")) {
+                                    JSONObject ev = obj.getJSONObject("evento");
+                                    String fecha = ev.optString("fecha", "");
+                                    String lugar = ev.optString("lugar", "");
+                                    evento = new Publicacion.Evento(fecha, lugar);
+                                }
+                                break;
+                        }
+
+                        listaPublicacion.add(new Publicacion(
+                                idPublicacion,
+                                idEmprendimiento,
+                                nomEmprendimiento,
+                                imgEmprendimiento,
+                                titPublicacion,
+                                conPublicacion,
+                                imgPublicacion,
+                                totalInteracciones,
+                                dioLike,
+                                siguiendo,
+                                esFavorito,
+                                tipoPublicacion,
+                                producto,
+                                evento,
+                                promocion,
+                                esActualizado
+                        ));
+
+                        Log.d("DEBUG", "Llamando a cargarPublicaciones() tipo=" + tipoPublicacion);
+                    }
+                    Collections.shuffle(listaPublicacion);
+                    publicacionAdapter.notifyDataSetChanged();
+
+                    // Mostrar u ocultar estado vacío al cargar todas las publicaciones
+                    if (listaPublicacion.isEmpty()) {
+                        mostrarEstadoVacio(true,
+                                "No hay publicaciones disponibles",
+                                "Vuelve más tarde para ver nuevas publicaciones.");
+                    } else {
+                        mostrarEstadoVacio(false, null, null);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                } finally {
+                    // Detener el indicador de refresh si está activo
+                    if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                        swipeRefresh.setRefreshing(false);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+
+                // Detener el indicador de refresh si está activo
+                if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                    swipeRefresh.setRefreshing(false);
+                }
+            }
+        });
+    }
+
+
+    public void registrarComentario(Integer idPublicacion, int idEstudiante, String conComentario) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+        params.put("conComentario", conComentario);
+
+        String url = ServidorConfig.URL_SERVIDOR + "comentario/comentario_registrar.php";
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    if (json.getString("status").equals("success")) {
+                        Toast.makeText(getContext(), "Comentario agregado", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void registrarFavorito(Integer idPublicacion, int idEstudiante, Publicacion publicacion, ImageView ivFavorito) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+
+        String url = ServidorConfig.URL_SERVIDOR + "favorito/favorito_registrar_publicacion.php";
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("favorited")) {
+                        publicacion.setFavorito(true);
+                        ivFavorito.setImageResource(R.drawable.ic_favoritos_lleno);
+
+                        ivFavorito.animate()
+                                .scaleX(1.3f).scaleY(1.3f) // aumenta tamaño
+                                .setDuration(150)
+                                .withEndAction(() -> ivFavorito.animate()
+                                        .scaleX(1f).scaleY(1f) // vuelve a su tamaño original
+                                        .setDuration(150))
+                                .start();
+
+                    } else if (status.equals("unfavorited")) {
+                        publicacion.setFavorito(false);
+                        ivFavorito.setImageResource(R.drawable.ic_favoritos);
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void registrarLike(Integer idPublicacion, int idEstudiante, Publicacion publicacion, ImageView ivLike, TextView tvLikes) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+
+        String url = ServidorConfig.URL_SERVIDOR + "interaccion/interaccion_registrar_like.php";
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("liked")) {
+                        publicacion.setLiked(true);
+                        publicacion.setTotalInteracciones(publicacion.getTotalInteracciones() + 1);
+                        ivLike.setImageResource(R.drawable.ic_corazon_lleno);
+
+                        ivLike.animate()
+                                .scaleX(1.3f).scaleY(1.3f) // aumenta tamaño
+                                .setDuration(150)
+                                .withEndAction(() -> ivLike.animate()
+                                        .scaleX(1f).scaleY(1f) // vuelve a su tamaño original
+                                        .setDuration(150))
+                                .start();
+
+                    } else if (status.equals("unliked")) {
+                        publicacion.setLiked(false);
+                        publicacion.setTotalInteracciones(publicacion.getTotalInteracciones() - 1);
+                        ivLike.setImageResource(R.drawable.ic_corazon);
+                    }
+
+                    // actualizar solo el contador
+                    tvLikes.setText(publicacion.getTotalInteracciones() + " Me gusta");
+
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void registrarLikeComentario(int idComentario, int idEstudiante, Comentario comentario, ImageView imgLike, TextView textLikeCount) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idComentario", idComentario);
+
+        String url = ServidorConfig.URL_SERVIDOR + "comentario/comentario_registrar_like.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+                    String status = json.getString("status");
+
+                    if (status.equals("liked")) {
+                        comentario.setLiked(true);
+                        comentario.setTotalLikes(comentario.getTotalLikes() + 1);
+                        imgLike.setImageResource(R.drawable.ic_corazon_lleno);
+                    } else if (status.equals("unliked")) {
+                        comentario.setLiked(false);
+                        comentario.setTotalLikes(comentario.getTotalLikes() - 1);
+                        imgLike.setImageResource(R.drawable.ic_corazon);
+                    }
+
+                    // Actualizar contador
+                    if (comentario.getTotalLikes() > 0) {
+                        textLikeCount.setVisibility(View.VISIBLE);
+                        textLikeCount.setText(String.valueOf(comentario.getTotalLikes()));
+                    } else {
+                        textLikeCount.setVisibility(View.GONE);
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error de parsing", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void cargarTiposReporte(Context context) {
+        String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_listar_tipos.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaTipoReporte.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int idTipoReporte = obj.getInt("id_tipo_reporte");
+                        String nomTipoReporte = obj.getString("nom_tipo_reporte");
+
+                        listaTipoReporte.add(new TipoReporte(idTipoReporte, nomTipoReporte));
+                    }
+
+                    tipoReporteAdapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    Toast.makeText(context, "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(context, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void registrarSeguimiento(int idEstudiante, int idEmprendimiento, MaterialButton btnFollow) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idEmprendimiento", idEmprendimiento);
+
+        String url = ServidorConfig.URL_SERVIDOR + "seguimiento/seguimiento_registrar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    String status = json.getString("status");
+
+                    if (status.equals("seguido")) {
+                        // Animación: escala y cambio suave de color
+                        btnFollow.animate()
+                                .scaleX(0.9f)
+                                .scaleY(0.9f)
+                                .setDuration(100)
+                                .withEndAction(() -> {
+                                    btnFollow.setText("Siguiendo");
+                                    btnFollow.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FBAE3C")));
+                                    btnFollow.setStrokeWidth(0);
+                                    btnFollow.setTextColor(Color.WHITE);
+
+                                    // Vuelve al tamaño normal con efecto rebote
+                                    btnFollow.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .setDuration(100)
+                                            .start();
+
+                                    Toast.makeText(getContext(), "Ahora sigues este emprendimiento", Toast.LENGTH_SHORT).show();
+                                }).start();
+
+                    } else if (status.equals("no_seguido")) {
+                        // Animación: pequeña escala antes de cambiar estilo
+                        btnFollow.animate()
+                                .scaleX(0.9f)
+                                .scaleY(0.9f)
+                                .setDuration(100)
+                                .withEndAction(() -> {
+                                    btnFollow.setText("Seguir");
+                                    btnFollow.setBackgroundColor(Color.TRANSPARENT);
+                                    btnFollow.setStrokeWidth(1);
+                                    btnFollow.setStrokeColor(ColorStateList.valueOf(getResources().getColor(R.color.gray_light)));
+                                    btnFollow.setTextColor(getResources().getColor(R.color.gray_dark));
+
+                                    btnFollow.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .setDuration(100)
+                                            .start();
+
+                                    Toast.makeText(getContext(), "Has dejado de seguir", Toast.LENGTH_SHORT).show();
+                                }).start();
+
+                    } else {
+                        Toast.makeText(getContext(), "Error: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void registrarReporte(int idPublicacion, int idTipoReporte) {
+        int idEstudiante = session.getIdEstudiante();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+        params.put("idTipoReporte", idTipoReporte);
+
+        String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_registrar_reporte.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody);
+                    JSONObject json = new JSONObject(response);
+                    String status = json.getString("status");
+
+                    if ("reported".equals(status)) {
+                        mostrarDialogoExito("Hemos recibido tu reporte, gracias por reportar esta publicación", "Eliminaremos esta publicación si encontramos que va en contra de nuestras reglas. Gracias por ayudarnos a mantener StartUPN a salvo y apoyar nuestra comunidad");
+                    } else {
+                        String msg = json.has("message") ? json.getString("message") : "Error desconocido";
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void registrarColaboracion(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento, String mensaje, AlertDialog dialog) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idPublicacion", idPublicacion);
+        params.put("idEmprendimiento", idEmprendimiento);
+        params.put("menColaboracion", mensaje);
+
+        String url = ServidorConfig.URL_SERVIDOR + "colaboracion/colaboracion_registrar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                dialog.dismiss();
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    String status = json.optString("status");
+
+                    if ("success".equals(status)) {
+                        // Mensaje personalizado de éxito
+                        mostrarDialogoExito(
+                                "Solicitud enviada",
+                                "Tu solicitud ha sido enviada correctamente. El emprendedor recibirá tu mensaje y podrá contactarse contigo."
+                        );
+                    } else {
+                        String msg = json.has("message") ? json.getString("message") : "Error desconocido";
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void mostrarDialogoExito(String titulo, String mensaje) {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_res_positiva, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Referencias a las vistas
+        TextView tvTituloExito = dialogView.findViewById(R.id.tvTituloExito);
+        TextView tvMensajeExito = dialogView.findViewById(R.id.tvMensajeExito);
+        MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+
+        // Setear dinámicamente
+        tvTituloExito.setText(titulo);
+        tvMensajeExito.setText(mensaje);
+
+        // Acción del botón
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    private void mostrarDialogoSolicitud(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_solicitud_colaboracion, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Referencias a las vistas
+        TextInputEditText etMensaje = dialogView.findViewById(R.id.etMensajeSolicitud);
+        MaterialButton btnEnviar = dialogView.findViewById(R.id.btnEnviar);
+        ImageButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
+        // Acción botón cerrar
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+        // Acción enviar
+        btnEnviar.setOnClickListener(v -> {
+            String mensaje = etMensaje.getText().toString().trim();
+            if (mensaje.isEmpty()) {
+                Toast.makeText(context, "Por favor ingresa un mensaje", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            registrarColaboracion(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
+        });
+    }
+
+    private void mostrarDialogoComentarios(Context context, int idPublicacion) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_comentarios, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Referencias a vistas
+        RecyclerView recyclerComments = dialogView.findViewById(R.id.recycler_comments);
+        LinearLayout layoutEmpty = dialogView.findViewById(R.id.layout_empty_state);
+        ImageView btnClose = dialogView.findViewById(R.id.btn_close);
+        ImageView btnEnviarComentario = dialogView.findViewById(R.id.btnEnviarComentario);
+        EditText etComentario = dialogView.findViewById(R.id.etComentario);
+
+        // Lista y adapter
+        listaComentarios.clear();
+        ComentarioAdapter comentarioAdapter = new ComentarioAdapter(context, listaComentarios, session.getIdEstudiante());
+        recyclerComments.setAdapter(comentarioAdapter);
+        comentarioAdapter.setOnReportCommentListener(comentario -> {
+            mostrarDialogoReportarComentario(requireContext(), comentario.getIdComentario());
+        });
+
+        // Asignar el listener al adapter
+        comentarioAdapter.setOnCommentLikeClickListener((comentario, imgLike, textLikeCount) -> {
+            registrarLikeComentario(
+                    comentario.getIdComentario(),
+                    session.getIdEstudiante(), // estudiante logueado
+                    comentario,
+                    imgLike,
+                    textLikeCount
+            );
+        });
+
+        comentarioAdapter.setOnDeleteCommentListener(comentario -> {
+            eliminarComentario(comentario.getIdComentario(), idPublicacion,
+                    comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments);
+        });
+
+        // Layout manager y adapter
+        recyclerComments.setLayoutManager(new LinearLayoutManager(context));
+        recyclerComments.setAdapter(comentarioAdapter);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Cargar comentarios desde backend
+        cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments, session.getIdEstudiante());
+
+        btnEnviarComentario.setOnClickListener(v -> {
+            String textoComentario = etComentario.getText().toString().trim();
+            if (!textoComentario.isEmpty()) {
+                registrarComentario(idPublicacion, session.getIdEstudiante(), textoComentario);
+                etComentario.setText("");
+                cargarComentariosPublicacion(idPublicacion, comentarioAdapter, listaComentarios, layoutEmpty, recyclerComments, session.getIdEstudiante());
+            } else {
+                Toast.makeText(context, "Escribe un comentario primero", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void mostrarDialogoReportar(Context context, int idPublicacion) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Botón cerrar
+        ImageView ivClose = dialogView.findViewById(R.id.ivClose);
+        ivClose.setOnClickListener(v -> dialog.dismiss());
+
+        // RecyclerView dentro del diálogo
+        RecyclerView rvReportOptions = dialogView.findViewById(R.id.rvReportOptions);
+        rvReportOptions.setLayoutManager(new LinearLayoutManager(context));
+
+        // Adapter con callback de selección
+        tipoReporteAdapter = new TipoReporteAdapter(listaTipoReporte, tipo -> {
+            // 👉 en vez de registrar directamente, mostramos confirmación
+            mostrarDialogoConfirmar(context, idPublicacion, tipo.getIdTipoReporte());
+            dialog.dismiss(); // cerramos el dialogo de opciones
+        });
+
+        rvReportOptions.setAdapter(tipoReporteAdapter);
+
+        // Cargar opciones desde el backend
+        cargarTiposReporte(context);
+    }
+
+    private void mostrarDialogoConfirmar(Context context, int idPublicacion, int idTipoReporte) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_opciones, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Referencias a vistas
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btnNo);
+        MaterialButton btnSi = dialogView.findViewById(R.id.btnSi);
+
+        // Personalizar título
+        tvTitulo.setText("¿Seguro que deseas reportar esta publicación?");
+
+        // Botón No → cerrar
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        // Botón Sí → confirmar acción
+        btnSi.setOnClickListener(v -> {
+            registrarReporte(idPublicacion, idTipoReporte);
+            dialog.dismiss();
+        });
+    }
+
+    private void configurarBusqueda() {
+        searchTextWatcher = new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // si el cambio fue por código (limpiado manualmente), ignorar
+                if (manualTextChange) return;
+
+                // cancelar búsqueda anterior si existe
+                if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+
+                final String texto = s.toString().trim();
+
+                searchRunnable = () -> {
+                    // Si el texto está vacío → volver a la categoría seleccionada (si existe) o mostrar todo
+                    if (texto.isEmpty()) {
+                        if (categoriaSeleccionada != null) {
+                            filtrarPorCategoria(categoriaSeleccionada);
+                        } else {
+                            cargarPublicaciones(session.getIdEstudiante());
+                        }
+                    } else {
+                        // Texto no vacío → buscar, preferiblemente dentro de la categoría si hay una seleccionada
+                        buscarPublicaciones(session.getIdEstudiante(), texto, categoriaSeleccionada);
+                    }
+                };
+
+                searchHandler.postDelayed(searchRunnable, 500);
+            }
+
+            @Override public void afterTextChanged(Editable s) {}
+        };
+
+        etSearch.addTextChangedListener(searchTextWatcher);
+    }
+
+    private void buscarPublicaciones(int idEstudiante, String textoBusqueda, Integer idCategoria) {
+        try {
+            String encoded = java.net.URLEncoder.encode(textoBusqueda, "UTF-8");
+            String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_buscar.php?idEstudiante="
+                    + idEstudiante + "&textoBusqueda=" + encoded;
+            if (idCategoria != null) {
+                url += "&idCategoria=" + idCategoria;
+            }
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(url, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                    try {
+                        String respuesta = new String(responseBody, "UTF-8");
+                        JSONArray jsonArray = new JSONArray(respuesta);
+
+                        listaPublicacion.clear();
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.getJSONObject(i);
+
+                            // Filtro local por categoría (si el backend no lo aplica)
+                            if (idCategoria != null && obj.has("id_categoria")) {
+                                int itemCat = obj.getInt("id_categoria");
+                                if (itemCat != idCategoria) continue;
+                            }
+                            JSONObject pub = obj.getJSONObject("publicacion");
+                            JSONObject empr = obj.getJSONObject("emprendimiento");
+
+                            // Datos generales
+                            int idPublicacion = pub.optInt("id", 0); // Leer "id" de "publicacion"
+                            String titPublicacion = pub.optString("titulo", "");
+                            String conPublicacion = pub.optString("contenido", "");
+                            String imgPublicacion = pub.optString("imagen", "");
+                            int totalInteracciones = pub.optInt("likes", 0);
+                            int dioLike = pub.optBoolean("dio_like", false) ? 1 : 0; // El JSON retorna booleanos (false/true)
+                            int esFavorito = pub.optBoolean("es_favorito", false) ? 1 : 0; // El JSON retorna booleanos (false/true)
+                            int tipoPublicacion = pub.optInt("tipo_publicacion", 1);
+                            int esActualizado = pub.optInt("es_actualizado", 0);
+
+                            int idEmprendimiento = empr.optInt("id", 0);
+                            String nomEmprendimiento = empr.optString("nombre", "");
+                            String imgEmprendimiento = empr.optString("imagen_perfil", "");
+                            int siguiendo = empr.optBoolean("siguiendo", false) ? 1 : 0;
+
+                            // Variables específicas
+                            Publicacion.Producto producto = null;
+                            Publicacion.Promocion promocion = null;
+                            Publicacion.Evento evento = null;
+
+                            // Leer los datos específicos según el tipo
+                            if (tipoPublicacion == 1 && obj.has("producto")) {
+                                JSONObject prodObj = obj.getJSONObject("producto");
+                                double precio = prodObj.optDouble("precio", 0.0);
+                                int stock = prodObj.optInt("stock", 0);
+                                producto = new Publicacion.Producto(precio, stock);
+
+                            } else if (tipoPublicacion == 2 && obj.has("promocion")) {
+                                JSONObject promObj = obj.getJSONObject("promocion");
+                                String descripcion = promObj.optString("descripcion", "");
+                                String fechaInicio = promObj.optString("fecha_inicio", "");
+                                String fechaFin = promObj.optString("fecha_fin", "");
+                                promocion = new Publicacion.Promocion(descripcion, fechaInicio, fechaFin);
+
+                            } else if (tipoPublicacion == 3 && obj.has("evento")) {
+                                JSONObject eveObj = obj.getJSONObject("evento");
+                                String fecha = eveObj.optString("fecha", "");
+                                String lugar = eveObj.optString("lugar", "");
+                                evento = new Publicacion.Evento(fecha, lugar);
+                            }
+
+                            // Crear el objeto Publicacion completo
+                            Publicacion publicacion = new Publicacion(
+                                    idPublicacion,
+                                    idEmprendimiento,
+                                    nomEmprendimiento,
+                                    imgEmprendimiento,
+                                    titPublicacion,
+                                    conPublicacion,
+                                    imgPublicacion,
+                                    totalInteracciones,
+                                    dioLike,
+                                    siguiendo,
+                                    esFavorito,
+                                    tipoPublicacion,
+                                    producto,
+                                    evento,
+                                    promocion,
+                                    esActualizado
+                            );
+
+                            listaPublicacion.add(publicacion);
+                        }
+
+                        publicacionAdapter.notifyDataSetChanged();
+                        if (listaPublicacion.isEmpty()) {
+                            String titulo, subtitulo;
+
+                            if (!textoBusqueda.isEmpty()) {
+                                titulo = "No se encontraron resultados para \"" + textoBusqueda + "\"";
+                                subtitulo = "Intenta con otras palabras clave o verifica la ortografía.";
+                            } else if (idCategoria != null) {
+                                titulo = "No hay publicaciones con esta categoría";
+                                subtitulo = "Prueba seleccionando otra categoría o vuelve más tarde.";
+                            } else {
+                                titulo = "No hay publicaciones disponibles";
+                                subtitulo = "Vuelve más tarde para ver nuevas publicaciones.";
+                            }
+
+                            mostrarEstadoVacio(true, titulo, subtitulo);
+                        } else {
+                            mostrarEstadoVacio(false, null, null);
+                        }
+
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                    Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void filtrarPorCategoria(int idCategoria) {
+        if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
+
+        String url = ServidorConfig.URL_SERVIDOR + "publicacion/publicacion_filtrar_categoria.php?idEstudiante="
+                + session.getIdEstudiante() + "&idCategoria=" + idCategoria;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaPublicacion.clear();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject item = jsonArray.getJSONObject(i);
+
+                        JSONObject pub = item.getJSONObject("publicacion");
+                        int idPublicacion = pub.getInt("id");
+                        String titPublicacion = pub.getString("titulo");
+                        String conPublicacion = pub.getString("contenido");
+                        String imgPublicacion = pub.optString("imagen", null);
+                        int totalLikes = pub.getInt("likes");
+                        int esFavorito = pub.getBoolean("es_favorito") ? 1 : 0;
+                        int dioLike = pub.getBoolean("dio_like") ? 1 : 0;
+                        int tipoPublicacion = pub.getInt("tipo_publicacion");
+                        int esActualizado = pub.optInt("es_actualizado", 0);
+
+                        JSONObject emp = item.getJSONObject("emprendimiento");
+                        int idEmprendimiento = emp.getInt("id");
+                        String nomEmprendimiento = emp.getString("nombre");
+                        String imgEmprendimiento = emp.optString("imagen_perfil", null);
+                        int siguiendo = emp.getBoolean("siguiendo") ? 1 : 0;
+
+                        Publicacion.Producto producto = null;
+                        Publicacion.Promocion promocion = null;
+                        Publicacion.Evento evento = null;
+
+                        if (tipoPublicacion == 1 && item.has("producto")) {
+                            JSONObject prod = item.getJSONObject("producto");
+                            Double precio = prod.optDouble("precio", 0.0);
+                            Integer stock = prod.optInt("stock", 0);
+                            producto = new Publicacion.Producto(precio, stock);
+                        } else if (tipoPublicacion == 2 && item.has("promocion")) {
+                            JSONObject prom = item.getJSONObject("promocion");
+                            String descripcion = prom.optString("descripcion", "");
+                            String fechaInicio = prom.optString("fecha_inicio", "");
+                            String fechaFin = prom.optString("fecha_fin", "");
+                            promocion = new Publicacion.Promocion(descripcion, fechaInicio, fechaFin);
+                        } else if (tipoPublicacion == 3 && item.has("evento")) {
+                            JSONObject ev = item.getJSONObject("evento");
+                            String fecha = ev.optString("fecha", "");
+                            String lugar = ev.optString("lugar", "");
+                            evento = new Publicacion.Evento(fecha, lugar);
+                        }
+
+                        Publicacion publicacion = new Publicacion(
+                                idPublicacion,
+                                idEmprendimiento,
+                                nomEmprendimiento,
+                                imgEmprendimiento,
+                                titPublicacion,
+                                conPublicacion,
+                                imgPublicacion,
+                                totalLikes,
+                                dioLike,
+                                siguiendo,
+                                esFavorito,
+                                tipoPublicacion,
+                                producto,
+                                evento,
+                                promocion,
+                                esActualizado
+                        );
+
+                        listaPublicacion.add(publicacion);
+                    }
+
+                    publicacionAdapter.notifyDataSetChanged();
+
+                    // Mostrar u ocultar estado vacío con mensaje de categoría
+                    if (listaPublicacion.isEmpty()) {
+                        mostrarEstadoVacio(true,
+                                "No hay publicaciones con esta categoría",
+                                "Prueba seleccionando otra categoría o vuelve más tarde.");
+                    } else {
+                        mostrarEstadoVacio(false, null, null);
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                } finally {
+                    // Detener el indicador de refresh si está activo
+                    if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                        swipeRefresh.setRefreshing(false);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+
+                // Detener el indicador de refresh si está activo
+                if (swipeRefresh != null && swipeRefresh.isRefreshing()) {
+                    swipeRefresh.setRefreshing(false);
+                }
+            }
+        });
+    }
+
+    private void mostrarDialogoReportarComentario(Context context, int idComentario) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_reporte_comentario, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        ImageView ivClose = dialogView.findViewById(R.id.ivClose);
+        ivClose.setOnClickListener(v -> dialog.dismiss());
+
+        RecyclerView rvReportOptions = dialogView.findViewById(R.id.rvReportOptions);
+        rvReportOptions.setLayoutManager(new LinearLayoutManager(context));
+
+        tipoReporteAdapter = new TipoReporteAdapter(listaTipoReporte, tipo -> {
+            mostrarDialogoConfirmarReporteComentario(context, idComentario, tipo.getIdTipoReporte());
+            dialog.dismiss();
+        });
+        rvReportOptions.setAdapter(tipoReporteAdapter);
+
+        cargarTiposReporte(context);
+    }
+
+    private void mostrarDialogoConfirmarReporteComentario(Context context, int idComentario, int idTipoReporte) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_opciones, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloError);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btnNo);
+        MaterialButton btnSi = dialogView.findViewById(R.id.btnSi);
+
+        tvTitulo.setText("¿Deseas reportar este comentario?");
+
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+        btnSi.setOnClickListener(v -> {
+            registrarReporteComentario(idComentario, idTipoReporte);
+            dialog.dismiss();
+        });
+    }
+
+    private void registrarReporteComentario(int idComentario, int idTipoReporte) {
+        int idEstudiante = session.getIdEstudiante();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("idComentario", idComentario);
+        params.put("idTipoReporte", idTipoReporte);
+
+        String url = ServidorConfig.URL_SERVIDOR + "reporte/reporte_registrar_comentario.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody, "UTF-8"));
+                    String status = json.getString("status");
+
+                    if ("reported".equals(status)) {
+                        mostrarDialogoExito(
+                                "Reporte enviado",
+                                "Gracias por ayudarnos a mantener la comunidad segura. Revisaremos este comentario."
+                        );
+                    } else {
+                        String msg = json.optString("message", "Error al registrar el reporte");
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void eliminarComentario(int idComentario, int idPublicacion, ComentarioAdapter adapter,
+                                    List<Comentario> lista, LinearLayout layoutEmpty, RecyclerView recycler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idComentario", idComentario);
+        params.put("idEstudiante", session.getIdEstudiante()); // ← Enviar ID del usuario actual
+
+        String url = ServidorConfig.URL_SERVIDOR + "comentario/comentario_eliminar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody, "UTF-8"));
+                    String status = json.getString("status");
+
+                    if ("success".equals(status)) {
+                        Toast.makeText(getContext(), "Comentario eliminado", Toast.LENGTH_SHORT).show();
+                        // Recargar comentarios
+                        cargarComentariosPublicacion(idPublicacion, adapter, lista, layoutEmpty, recycler, session.getIdEstudiante());
+                    } else {
+                        String msg = json.optString("message", "Error al eliminar");
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void mostrarEstadoVacio(boolean mostrar, String titulo, String subtitulo) {
+        if (layoutEmptyState == null || rvPublicaciones == null) return;
+
+        if (mostrar) {
+            rvPublicaciones.setVisibility(View.GONE);
+            layoutEmptyState.setVisibility(View.VISIBLE);
+
+            // Personalizar mensajes
+            if (titulo != null && tvEmptyTitle != null) {
+                tvEmptyTitle.setText(titulo);
+            }
+            if (subtitulo != null && tvEmptySubtitle != null) {
+                tvEmptySubtitle.setText(subtitulo);
+            }
+        } else {
+            rvPublicaciones.setVisibility(View.VISIBLE);
+            layoutEmptyState.setVisibility(View.GONE);
+        }
+    }
+}

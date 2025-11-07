@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF">
+
+        <!-- Header con acento de color -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="12dp">
+
+            <!-- Barra de acento superior -->
+            <View
+                android:id="@+id/accentBar"
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:background="#FBAE3C"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="16dp" />
+
+        </RelativeLayout>
+
+        <!-- Contenido Principal -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="24dp"
+            android:gravity="center">
+
+            <!-- Contenedor del ícono con elevación moderna -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <ImageView
+                    android:id="@+id/ivEmprendimientoIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Imagen del emprendimiento" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Nombre del emprendimiento con estilo mejorado -->
+            <TextView
+                android:id="@+id/tvEmprendimientoName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Plantas"
+                android:textColor="#212121"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:paddingHorizontal="8dp" />
+
+            <!-- Divider sutil -->
+            <View
+                android:layout_width="60dp"
+                android:layout_height="2dp"
+                android:background="#F5F5F5"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Botones de acción modernos -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="2">
+
+                <!-- Botón Editar con Material Design -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditar"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text=""
+                    android:contentDescription="Editar"
+                    app:strokeColor="#4CAF50"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_editar_perfil"
+                    app:iconGravity="textStart"
+                    app:iconTint="#4CAF50"
+                    app:iconSize="20dp"
+                    app:iconPadding="0dp"
+                    app:rippleColor="#4CAF50" />
+
+                <!-- Botón Eliminar con Material Design -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEliminar1"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text=""
+                    android:contentDescription="Eliminar"
+                    app:strokeColor="#F44336"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_delete"
+                    app:iconGravity="textStart"
+                    app:iconTint="#F44336"
+                    app:iconSize="20dp"
+                    app:iconPadding="0dp"
+                    app:rippleColor="#F44336" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Estado para cuando el ítem está seleccionado (marcado) -->
+    <item android:state_checked="true" android:color="@color/orange_primary" />
+
+    <!-- Estado por defecto (para todos los demás casos) -->
+    <item android:color="@android:color/darker_gray" />
+</selector>
+    

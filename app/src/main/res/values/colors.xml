@@ -5,6 +5,54 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Colores principales -->
+    <color name="orange_button">#FF9500</color>
+    <color name="input_background">#F5F5F5</color>
+    <color name="hint_color">#999999</color>
+    <color name="cancel_text">#666666</color>
+    <color name="background_light">#FFFFFF</color>
+
+    <!-- Colores para círculos decorativos -->
+    <color name="yellow_circle">#FFE4B5</color>
+    <color name="orange_circle">#FBAE3C</color>
+    <color name="darker_gray">#757575</color>
+    <color name="blue_primary">#2196F3</color>
+    <color name="button_orange">#FF9800</color>
+    <color name="error_color">#F44336</color>
+    <color name="primary_text_color">#212121</color>
+    <color name="secondary_text_color">#757575</color>
+    <color name="dialog_background">#FFFFFF</color>
+    <color name="circle_background">#FFEBEE</color>
+    <color name="circle_green">#01C880</color>
+    <color name="circle_backgroung_gris">#C7C7C7</color>
+    <!-- Colores principales del diseño -->
+    <color name="orange_primary">#FF9500</color>
+    <color name="orange_secondary">#FF6B35</color>
+    <color name="orange_light">#FFB366</color>
+
+    <color name="success_color">#4CAF50</color> <!-- Verde principal -->
+    <color name="circle_success_background">#E8F5E9</color> <!-- Verde clarito de fondo -->
+    <color name="light_gray">#F5F5F5</color>
+    <color name="background_overlay">#33FF9500</color>
+    <!-- Grises -->
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray_medium">#9E9E9E</color>
+    <color name="gray_dark">#424242</color>
+
+    <!-- Colores de categorías -->
+    <color name="pink_light">#FFB3BA</color>
+    <color name="brown_light">#D2B48C</color>
+    <color name="blue_light">#87CEEB</color>
+    <color name="orange_red">#FF6B35</color>
+
+    <!-- Color de fondo amarillo para la imagen -->
+    <color name="yellow_light">#FFF3A0</color>
+    <color name="mint_green">#98FB98</color>
+
+    <color name="primary_dark">#1976D2</color>
+    <color name="red_background">#FFF0F0</color>
+    <color name="category_plants_1">#FF6B6B</color>
 </resources>
