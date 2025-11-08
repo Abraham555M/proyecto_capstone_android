@@ -1,6 +1,10 @@
 package com.example.projectcapstone;
 
 import android.app.Dialog;
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -28,14 +32,14 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
+
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 
 import cz.msebera.android.httpclient.Header;
-import android.content.Intent; // Necesario para Intent
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,9 +58,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         session = new SessionManager(this);
 
-        // -------------------------------
-        // 🔹 Configuración de navegación
-        // -------------------------------
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavInflater navInflater = navController.getNavInflater();
         NavGraph navGraph = navInflater.inflate(R.navigation.mobile_navigation);
@@ -85,12 +86,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        // 🚨 CRÍTICO: Manejar el intent al CREAR la actividad
         handleIntent(getIntent());
-
-        // -------------------------------
-        // 🔹 Control de visibilidad ADMIN
-        // -------------------------------
         navigationView.post(() -> {
             int tipoUsuario = session.getTipoUsuario();
             Log.d("TIPO_USUARIO", "Tipo de usuario: " + tipoUsuario);
@@ -138,23 +134,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        // 🚨 Manejar el intent si la app ya estaba abierta y recibe una notificación
         handleIntent(intent);
     }
 
-    /**
-     * Lógica de redirección cuando la actividad se lanza o se reanuda desde una notificación.
-     */
     private void handleIntent(Intent intent) {
         if (intent == null) {
             return;
         }
 
-        // Claves definidas en MiFirebaseMessagingService.java
         String action = intent.getStringExtra("NAVIGATE_TO_ACTION");
         String postId = intent.getStringExtra("NAVIGATE_TO_POST_ID");
         String emprendimientoId = intent.getStringExtra("NAVIGATE_TO_EMPRENDIMIENTO_ID");
@@ -163,35 +153,29 @@ public class MainActivity extends AppCompatActivity {
             Log.d("FCM_NAV", "Redirigiendo a emprendimiento ID: " + emprendimientoId + " (Publicación: " + postId + ")");
 
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-
             Bundle bundle = new Bundle();
 
-            // Pasamos los IDs necesarios para que el fragmento receptor los maneje
             if (emprendimientoId != null) {
                 bundle.putString("id_emprendimiento", emprendimientoId);
             } else if (postId != null) {
-                // Si solo tenemos el PostId, lo enviamos. El fragmento debe manejar la carga.
                 bundle.putString("id_publicacion", postId);
             }
 
             try {
-                // ✅ Usamos el destino existente que muestra el perfil del emprendedor
                 navController.navigate(R.id.nav_perfil_emprendedor, bundle);
             } catch (Exception e) {
-                // Esto te ayudará a diagnosticar si el fragmento no está recibiendo los argumentos correctamente
-                Log.e("FCM_NAV", "Error al navegar: Asegúrate que el fragmento 'nav_perfil_emprendedor' exista y espere los argumentos. " + e.getMessage());
+                Log.e("FCM_NAV", "Error al navegar: " + e.getMessage());
             }
 
-            // Limpiar Intent para evitar la doble navegación
             intent.removeExtra("NAVIGATE_TO_ACTION");
             intent.removeExtra("NAVIGATE_TO_POST_ID");
             intent.removeExtra("NAVIGATE_TO_EMPRENDIMIENTO_ID");
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // ... (Tu código se mantiene igual) ...
         getMenuInflater().inflate(R.menu.main, menu);
         try {
             Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
@@ -205,9 +189,145 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // ... (Tu código existente para el menú) ...
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            session.cerrarSesion();
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(navController.getGraph().getStartDestinationId(), true)
+                    .build();
+            navController.navigate(R.id.nav_start_upn, null, navOptions);
+            Toast.makeText(this, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        if (id == R.id.action_notificaciones) {
+            mostrarDialogoConfiguracionNotificaciones();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
+
+    private void mostrarDialogoConfiguracionNotificaciones() {
+        Dialog dialog = new Dialog(MainActivity.this);
+        dialog.setContentView(R.layout.alert_dialog_configuracion_notificaciones);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        dialog.setCancelable(false);
+
+        // Referencias de vistas
+        ImageView btnCerrar = dialog.findViewById(R.id.btnCerrarNotificaciones);
+        MaterialButton btnCancelar = dialog.findViewById(R.id.btnCancelarNotificaciones);
+        MaterialButton btnGuardar = dialog.findViewById(R.id.btnGuardarNotificaciones);
+
+        SwitchMaterial switchTodas = dialog.findViewById(R.id.switchTodasNotificaciones);
+        SwitchMaterial switchPublicaciones = dialog.findViewById(R.id.switchPublicaciones);
+        SwitchMaterial switchComentarios = dialog.findViewById(R.id.switchComentarios);
+        SwitchMaterial switchLikes = dialog.findViewById(R.id.switchLikes);
+
+        // Deshabilitar botón de guardar hasta que carguen los datos
+        btnGuardar.setEnabled(false);
+
+        // --- Lógica de Sincronización del Switch "Todas" ---
+        switchTodas.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            switchPublicaciones.setChecked(isChecked);
+            switchComentarios.setChecked(isChecked);
+            switchLikes.setChecked(isChecked);
+        });
+
+        // --- Cargar configuraciones actuales desde el servidor ---
+        cargarConfiguracionActual(switchPublicaciones, switchComentarios, switchLikes, btnGuardar);
+
+        // Acciones de botones
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnGuardar.setOnClickListener(v -> {
+            // Recolectar valores
+            boolean publicaciones = switchPublicaciones.isChecked();
+            boolean comentarios = switchComentarios.isChecked();
+            boolean likes = switchLikes.isChecked();
+
+            // Enviar al servidor
+            guardarConfiguracionServidor(publicaciones, comentarios, likes, dialog);
+        });
+
+        dialog.show();
+    }
+    private void cargarConfiguracionActual(SwitchMaterial switchPublicaciones, SwitchMaterial switchComentarios, SwitchMaterial switchLikes, MaterialButton btnGuardar) {
+        int idEstudiante = session.getIdEstudiante();
+        String url = ServidorConfig.URL_SERVIDOR + "notificacion/configuracion_leer.php?idEstudiante=" + idEstudiante;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody, StandardCharsets.UTF_8));
+                    if ("success".equals(json.getString("status"))) {
+                        JSONObject config = json.getJSONObject("config");
+
+                        switchPublicaciones.setChecked(config.getBoolean("publicaciones"));
+                        switchComentarios.setChecked(config.getBoolean("comentarios"));
+                        switchLikes.setChecked(config.getBoolean("likes"));
+
+                        btnGuardar.setEnabled(true);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error al leer config: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e("CONFIG_NOTIF", "Error de parsing (Lectura): " + e.getMessage());
+                    Toast.makeText(MainActivity.this, "Error de parsing (Lectura)", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("CONFIG_NOTIF", "Error de conexión (Lectura): " + statusCode);
+                Toast.makeText(MainActivity.this, "Error de conexión al leer config", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void guardarConfiguracionServidor(boolean publicaciones, boolean comentarios, boolean likes, Dialog dialog) {
+        int idEstudiante = session.getIdEstudiante();
+        String url = ServidorConfig.URL_SERVIDOR + "notificacion/configuracion_guardar.php";
+
+        RequestParams params = new RequestParams();
+        params.put("idEstudiante", idEstudiante);
+        params.put("publicaciones", String.valueOf(publicaciones)); // "true" o "false"
+        params.put("comentarios", String.valueOf(comentarios));
+        params.put("likes", String.valueOf(likes));
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody, StandardCharsets.UTF_8));
+                    if ("success".equals(json.getString("status"))) {
+                        Toast.makeText(MainActivity.this, "Configuración guardada", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error al guardar: " + json.getString("message"), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e("CONFIG_NOTIF", "Error de parsing (Guardado): " + e.getMessage());
+                    Toast.makeText(MainActivity.this, "Error de parsing (Guardado)", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("CONFIG_NOTIF", "Error de conexión (Guardado): " + statusCode);
+                Toast.makeText(MainActivity.this, "Error de conexión al guardar", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void cargarInformacionPerfil() {
         int idEstudiante = session.getIdEstudiante();
@@ -244,6 +364,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();

@@ -49,6 +49,7 @@
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
                         android:padding="16dp"
+                        android:maxLength="100"
                         android:textColor="#1F2937"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -77,6 +78,7 @@
                         android:inputType="textPersonName"
                         android:padding="16dp"
                         android:textColor="#1F2937"
+                        android:maxLength="100"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -104,6 +106,7 @@
                         android:inputType="textPersonName"
                         android:padding="16dp"
                         android:textColor="#1F2937"
+                        android:maxLength="100"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -209,7 +212,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🇨🇦"
+                            android:text="🇵🇪"
                             android:textSize="20sp" />
 
                         <ImageView
@@ -230,6 +233,7 @@
                         android:hint="Número Celular"
                         android:inputType="phone"
                         android:padding="16dp"
+                        android:maxLength="9"
                         android:textColorHint="@color/hint_color"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -239,9 +243,9 @@
                     android:id="@+id/btnListo"
                     style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="44dp"
                     android:text="Actualizar"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:paddingHorizontal="24dp"
                     android:minWidth="0dp"
@@ -249,10 +253,11 @@
                     android:insetBottom="0dp"
                     android:backgroundTint="#FBAE3C"
                     android:textColor="@android:color/white"
-                    app:cornerRadius="28dp"
+                    app:cornerRadius="22dp"
                     app:rippleColor="@android:color/white"
-                    app:elevation="4dp"
-                    android:layout_marginBottom="16dp" />
+                    app:elevation="3dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp" />
 
             </LinearLayout>
 

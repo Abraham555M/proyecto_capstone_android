@@ -52,6 +52,10 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     private ImageView ivColaboraciones, ivEditar;
     private SessionManager session;
     private AlertDialog dialogColaboraciones;
+    private LinearLayout layoutEmptyState, layoutLoading;
+    private RecyclerView rvColaboradores;
+    private TextView tvTotalColaboradores;
+    private ColaboradoresPerfilAdapter adapterColaboradores;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -304,51 +308,52 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     private void mostrarDialogoColaboraciones(List<ColaboracionPerfil> listaColaboraciones, boolean cargando) {
         Context context = requireContext();
 
-        // Si ya existe un diálogo abierto, lo cerramos para evitar duplicados
-        if (dialogColaboraciones != null && dialogColaboraciones.isShowing()) {
-            dialogColaboraciones.dismiss();
+        // Si el diálogo no existe aún, créalo una sola vez
+        if (dialogColaboraciones == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            View view = LayoutInflater.from(context).inflate(R.layout.alert_dialog_colaboradores_perfil, null);
+            builder.setView(view);
+
+            rvColaboradores = view.findViewById(R.id.rvColaboradores);
+            layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
+            layoutLoading = view.findViewById(R.id.layoutLoading);
+            tvTotalColaboradores = view.findViewById(R.id.tvTotalColaboradores);
+            ImageButton btnCerrar = view.findViewById(R.id.btnCerrar);
+
+            rvColaboradores.setLayoutManager(new LinearLayoutManager(context));
+            adapterColaboradores = new ColaboradoresPerfilAdapter(context, new ArrayList<>());
+            rvColaboradores.setAdapter(adapterColaboradores);
+
+            btnCerrar.setOnClickListener(v -> dialogColaboraciones.dismiss());
+
+            dialogColaboraciones = builder.create();
+            dialogColaboraciones.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.alert_dialog_colaboradores_perfil, null);
-        builder.setView(view);
+        // Mostrar el diálogo (una sola vez)
+        if (!dialogColaboraciones.isShowing()) dialogColaboraciones.show();
 
-        RecyclerView rvColaboradores = view.findViewById(R.id.rvColaboradores);
-        LinearLayout layoutEmptyState = view.findViewById(R.id.layoutEmptyState);
-        LinearLayout layoutLoading = view.findViewById(R.id.layoutLoading);
-        TextView tvTotalColaboradores = view.findViewById(R.id.tvTotalColaboradores);
-        ImageButton btnCerrar = view.findViewById(R.id.btnCerrar);
-
-        rvColaboradores.setLayoutManager(new LinearLayoutManager(context));
-
-        // Configurar el adapter
-        ColaboradoresPerfilAdapter adapter = new ColaboradoresPerfilAdapter(context, listaColaboraciones);
-        rvColaboradores.setAdapter(adapter);
-
-        // Mostrar estado de carga o contenido
+        // Mostrar estado de carga
         if (cargando) {
             layoutLoading.setVisibility(View.VISIBLE);
             layoutEmptyState.setVisibility(View.GONE);
             rvColaboradores.setVisibility(View.GONE);
-        } else {
-            layoutLoading.setVisibility(View.GONE);
-
-            if (listaColaboraciones.isEmpty()) {
-                layoutEmptyState.setVisibility(View.VISIBLE);
-                rvColaboradores.setVisibility(View.GONE);
-                tvTotalColaboradores.setText("(0)");
-            } else {
-                layoutEmptyState.setVisibility(View.GONE);
-                rvColaboradores.setVisibility(View.VISIBLE);
-                tvTotalColaboradores.setText("(" + listaColaboraciones.size() + ")");
-            }
+            return;
         }
 
-        btnCerrar.setOnClickListener(v -> dialogColaboraciones.dismiss());
+        // Cuando se cargan los datos
+        layoutLoading.setVisibility(View.GONE);
 
-        dialogColaboraciones = builder.create();
-        dialogColaboraciones.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialogColaboraciones.show();
+        if (listaColaboraciones.isEmpty()) {
+            layoutEmptyState.setVisibility(View.VISIBLE);
+            rvColaboradores.setVisibility(View.GONE);
+            tvTotalColaboradores.setText("(0)");
+        } else {
+            layoutEmptyState.setVisibility(View.GONE);
+            rvColaboradores.setVisibility(View.VISIBLE);
+            tvTotalColaboradores.setText("(" + listaColaboraciones.size() + ")");
+            adapterColaboradores.actualizarLista(listaColaboraciones); // Método que tú puedes añadir
+        }
     }
 
     private void cargarInformacionPerfil() {

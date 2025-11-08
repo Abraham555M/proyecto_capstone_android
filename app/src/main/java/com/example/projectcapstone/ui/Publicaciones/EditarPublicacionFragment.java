@@ -1,5 +1,6 @@
 package com.example.projectcapstone.ui.Publicaciones;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,12 +22,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Publicaciones.Adapter.TipoPublicacion;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -43,7 +46,7 @@ public class EditarPublicacionFragment extends Fragment {
 
     private Spinner spTipoPublicacion;
     private EditText etNombrePublicacion, etDescripcion;
-    private Button btnActualizar;
+    private MaterialButton btnActualizar;
     private LinearLayout layoutProductoE, layoutEventoE, layoutPromocionE;
     private ArrayList<TipoPublicacion> listaTipos = new ArrayList<>();
     private ArrayAdapter<TipoPublicacion> adapter;
@@ -55,7 +58,6 @@ public class EditarPublicacionFragment extends Fragment {
     private String imagenUrl;
     private EditText etTitulo;
     private ImageView ivImagen;
-
 
     @Nullable
     @Override
@@ -295,11 +297,12 @@ public class EditarPublicacionFragment extends Fragment {
                 try {
                     JSONObject obj = new JSONObject(new String(b));
                     if (obj.optBoolean("success", false)) {
-                        Toast.makeText(requireContext(), "Publicación actualizada", Toast.LENGTH_SHORT).show();
-                        NavController nav = Navigation.findNavController(requireView());
-                        nav.popBackStack();
+                        mostrarDialogoExito("¡Publicación actualizada!",
+                                "La publicación se ha actualizado correctamente.");
                     } else {
-                        Toast.makeText(requireContext(), "Error: " + obj.optString("message"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(),
+                                "Error: " + obj.optString("message"),
+                                Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
@@ -310,6 +313,30 @@ public class EditarPublicacionFragment extends Fragment {
             public void onFailure(int s, Header[] h, byte[] b, Throwable e) {
                 Toast.makeText(requireContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void mostrarDialogoExito(String titulo, String mensaje) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+
+        TextView tvTitulo = view.findViewById(R.id.tvTituloExito);
+        TextView tvMensaje = view.findViewById(R.id.tvMensajeExito);
+        MaterialButton btnAceptar = view.findViewById(R.id.btnFuncionalidadExito);
+
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.show();
+
+        btnAceptar.setOnClickListener(v -> {
+            dialog.dismiss();
+            NavController nav = Navigation.findNavController(requireView());
+            nav.popBackStack();
         });
     }
 

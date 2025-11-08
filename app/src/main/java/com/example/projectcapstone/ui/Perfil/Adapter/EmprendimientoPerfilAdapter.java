@@ -14,6 +14,7 @@ import com.example.projectcapstone.ui.Clases.EmprendimientoPerfil;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.PublicacionPerfil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmprendimientoPerfilAdapter extends RecyclerView.Adapter<EmprendimientoPerfilAdapter.EmprendimientoViewHolder> {
@@ -57,13 +58,11 @@ public class EmprendimientoPerfilAdapter extends RecyclerView.Adapter<Emprendimi
 
             List<PublicacionPerfil> publicaciones = emprendimiento.getPublicaciones();
 
-            if (publicaciones == null || publicaciones.isEmpty()) {
-                // Mostrar placeholders cuando no hay publicaciones
-                binding.recyclerPosts.setVisibility(View.GONE);
-                binding.layoutEmptyPosts.setVisibility(View.VISIBLE);
-                binding.tvMasPublicaciones.setVisibility(View.GONE);
-                return;
-            }
+            if (publicaciones == null) publicaciones = new ArrayList<>();
+
+            binding.recyclerPosts.setVisibility(View.VISIBLE);
+            binding.layoutEmptyPosts.setVisibility(View.GONE);
+
 
             // Ocultar placeholders y mostrar publicaciones reales
             binding.recyclerPosts.setVisibility(View.VISIBLE);

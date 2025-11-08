@@ -1,12 +1,14 @@
 package com.example.projectcapstone.ui.Emprendimiento;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -315,10 +317,7 @@ public class NuevoEmprendimientoFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
-                Toast.makeText(getContext(), "Éxito: " + response, Toast.LENGTH_LONG).show();
-
-                NavController navController = Navigation.findNavController(requireView());
-                navController.popBackStack();
+                mostrarDialogoExito("Registro exitoso", "Tu emprendimiento ha sido agregado correctamente.");
             }
 
             @Override
@@ -328,4 +327,39 @@ public class NuevoEmprendimientoFragment extends Fragment {
             }
         });
     }
+
+    private void mostrarDialogoExito(String titulo, String mensaje) {
+        // Inflar el diseño personalizado
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View vistaDialogo = inflater.inflate(R.layout.alert_dialog_res_positiva, null);
+
+        // Referencias a los elementos del layout
+        TextView tvTitulo = vistaDialogo.findViewById(R.id.tvTituloExito);
+        TextView tvMensaje = vistaDialogo.findViewById(R.id.tvMensajeExito);
+        MaterialButton btnAceptar = vistaDialogo.findViewById(R.id.btnFuncionalidadExito);
+
+        // Asignar texto dinámico
+        tvTitulo.setText(titulo);
+        tvMensaje.setText(mensaje);
+
+        // Crear el diálogo
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(vistaDialogo);
+
+        // Evitar que se cierre al tocar fuera
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        // Acción del botón
+        btnAceptar.setOnClickListener(v -> {
+            dialog.dismiss();
+            // Si quieres volver atrás después del éxito:
+            NavController navController = Navigation.findNavController(requireView());
+            navController.popBackStack();
+        });
+
+        dialog.show();
+    }
+
 }

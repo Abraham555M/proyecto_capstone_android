@@ -70,6 +70,12 @@ public class ColaboradoresPerfilAdapter extends RecyclerView.Adapter<Colaborador
                 .into(holder.ivAvatarColaborador);
     }
 
+    public void actualizarLista(List<ColaboracionPerfil> nuevaLista) {
+        colaboraciones.clear();
+        colaboraciones.addAll(nuevaLista);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return colaboraciones.size();

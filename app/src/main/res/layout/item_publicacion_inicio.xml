@@ -214,15 +214,6 @@
                     android:textColor="#212121"
                     tools:text="Titulo producto" />
 
-                <TextView
-                    android:id="@+id/tvPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#FBAE3C"
-                    android:layout_marginStart="10dp"
-                    tools:text="S/ 20.00" />
             </LinearLayout>
 
             <!-- 🔸 Descripción mejorada -->
