@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -44,10 +45,10 @@ public class SolicitudAdapter extends RecyclerView.Adapter<SolicitudAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Solicitud solicitud = lista.get(position);
-        holder.tvEstudiante.setText("👤 " + solicitud.getNom_estudiante());
+        holder.tvEstudiante.setText(solicitud.getNom_estudiante());
         holder.tvMensaje.setText(solicitud.getMen_soporte());
-        holder.tvFecha.setText("📅 " + solicitud.getFec_soporte());
-        holder.tvEstado.setText("Estado: " + solicitud.getEst_soporte());
+        holder.tvFecha.setText(solicitud.getFec_soporte());
+        holder.tvEstado.setText(solicitud.getEst_soporte());
 
         holder.btnAprobar.setOnClickListener(v -> actualizarEstado(solicitud.getId_soporte(), "Aceptado"));
         holder.btnRechazar.setOnClickListener(v -> actualizarEstado(solicitud.getId_soporte(), "Rechazado"));
@@ -73,7 +74,7 @@ public class SolicitudAdapter extends RecyclerView.Adapter<SolicitudAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvEstudiante, tvMensaje, tvFecha, tvEstado;
-        Button btnAprobar, btnRechazar;
+        MaterialButton btnAprobar, btnRechazar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

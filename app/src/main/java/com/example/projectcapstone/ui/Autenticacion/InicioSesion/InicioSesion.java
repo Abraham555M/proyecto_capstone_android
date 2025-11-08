@@ -29,7 +29,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,7 +44,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     MaterialButton btnSiguiente;
     TextView btnOlvidePassword, btnCancelar;
     View rootView;
-
+    // En tu código Java:
+    private final String URL_TOKEN_REGISTRAR = ServidorConfig.URL_SERVIDOR + "estudiante/token_registrar.php";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -91,18 +94,24 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     String response = new String(responseBody);
                     JSONObject json = new JSONObject(response);
 
-                    Log.d("LOGIN_RESPONSE", response); // ✅ Para ver la respuesta completa del servidor
+                    Log.d("LOGIN_RESPONSE", response);
 
                     if (json.getString("status").equals("success")) {
                         JSONObject user = json.getJSONObject("usuario");
 
-                        // Guardar sesión correctamente
+                        // 1. Guardar sesión correctamente
                         SessionManager sessionManager = new SessionManager(requireContext());
                         sessionManager.guardarSesion(user);
 
+                        // Obtenemos el ID del estudiante para el registro de token
+                        int idEstudiante = user.getInt("id_estudiante"); // 🚨 Asumimos que la clave es 'id_estudiante'
+
                         Log.d("SESION", "Sesión guardada con éxito para: " + user.getString("nombre"));
 
-                        // ✅ Lanzar MainActivity
+                        // 2. 🚨 INICIAR EL PROCESO DE REGISTRO DEL TOKEN FCM 🚨
+                        retrieveAndSaveFCMToken(idEstudiante);
+
+                        // 3. Lanzar MainActivity
                         Intent intent = new Intent(requireActivity(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -127,6 +136,39 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     mostrarAlertaPersonalizada("Error de servidor",
                             "Hubo un problema al intentar iniciar sesión. Código: " + statusCode, false);
                 }
+            }
+        });
+    }
+    private void retrieveAndSaveFCMToken(int studentId) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        String token = task.getResult();
+                        Log.d("FCM_TOKEN", "Token obtenido: " + token);
+                        sendRegistrationToServer(studentId, token);
+                    } else {
+                        Log.w("FCM_TOKEN", "Fallo al obtener el token FCM.", task.getException());
+                    }
+                });
+    }
+    private void sendRegistrationToServer(int studentId, String fcmToken) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+
+        params.put("idEstudiante", String.valueOf(studentId));
+        params.put("tokenFCM", fcmToken);
+
+        client.post(URL_TOKEN_REGISTRAR, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                Log.i("FCM_SERVER", "Token registrado en PHP. Respuesta: " + response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                String response = responseBody != null ? new String(responseBody) : "Unknown Error";
+                Log.e("FCM_SERVER", "Fallo al enviar token. Status: " + statusCode + ", Respuesta: " + response);
             }
         });
     }
