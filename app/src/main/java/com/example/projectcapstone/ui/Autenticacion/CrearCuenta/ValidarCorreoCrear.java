@@ -1,6 +1,7 @@
 package com.example.projectcapstone.ui.Autenticacion.CrearCuenta;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.projectcapstone.MainActivity;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
@@ -143,9 +145,12 @@ public class ValidarCorreoCrear extends Fragment implements View.OnClickListener
 
                             Toast.makeText(requireContext(), "Cuenta creada correctamente ✅", Toast.LENGTH_SHORT).show();
 
-                            // Redirigir al fragmento de inicio
-                            Navigation.findNavController(requireView())
-                                    .navigate(R.id.action_nav_validar_correo_crear_to_nav_inicio);
+                            // Reiniciar la MainActivity para que detecte la sesión activa
+                            Intent intent = new Intent(requireContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            requireActivity().finish();
+
                             break;
 
                         case "codigo_invalido":

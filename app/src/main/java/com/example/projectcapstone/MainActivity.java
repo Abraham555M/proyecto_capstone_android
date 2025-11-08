@@ -30,6 +30,7 @@ import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -133,6 +134,17 @@ public class MainActivity extends AppCompatActivity {
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             }
         });
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM_TOKEN", "❌ Error al obtener el token", task.getException());
+                        return;
+                    }
+                    // Obtener token
+                    String token = task.getResult();
+                    Log.d("FCM_TOKEN", "🔥 Token actual: " + token);
+                });
     }
     @Override
     protected void onNewIntent(Intent intent) {
