@@ -55,4 +55,12 @@
     <color name="primary_dark">#1976D2</color>
     <color name="red_background">#FFF0F0</color>
     <color name="category_plants_1">#FF6B6B</color>
+
+    <color name="estadoPendiente">#FFF59D</color> <!-- Amarillo claro -->
+    <color name="estadoAdvertido">#FFCC80</color> <!-- Naranja -->
+    <color name="estadoArchivado">#B0BEC5</color> <!-- Gris -->
+    <color name="estadoEliminado">#EF9A9A</color> <!-- Rojo claro -->
+    <color name="estadoDefault">#FFFFFF</color> <!-- Blanco -->
+
+
 </resources>

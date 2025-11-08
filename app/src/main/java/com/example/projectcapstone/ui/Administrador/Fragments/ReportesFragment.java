@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.projectcapstone.R;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -44,7 +45,7 @@ public class ReportesFragment extends Fragment {
 
         recyclerReportes = root.findViewById(R.id.recyclerReportes);
         recyclerReportes.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ReporteAdapter(listaReportes, this::mostrarOpcionesReporte);
+        adapter = new ReporteAdapter(listaReportes, (view, reporte) -> mostrarOpcionesReporte(view, reporte));
         recyclerReportes.setAdapter(adapter);
 
         cargarReportes();
@@ -93,24 +94,28 @@ public class ReportesFragment extends Fragment {
         });
     }
 
-    private void mostrarOpcionesReporte(ReporteModel reporte) {
-        String[] opciones = {"Eliminar publicación", "Advertir usuario", "Archivar reporte"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Acción sobre el reporte")
-                .setItems(opciones, (dialog, which) -> {
-                    switch (which) {
-                        case 0:
-                            actualizarEstado(reporte.getIdReporte(), "eliminado");
-                            break;
-                        case 1:
-                            actualizarEstado(reporte.getIdReporte(), "advertido");
-                            break;
-                        case 2:
-                            actualizarEstado(reporte.getIdReporte(), "archivado");
-                            break;
-                    }
-                })
-                .show();
+    private void mostrarOpcionesReporte(View anchorView, ReporteModel reporte) {
+        androidx.appcompat.widget.PopupMenu popupMenu = new androidx.appcompat.widget.PopupMenu(requireContext(), anchorView);
+        popupMenu.getMenuInflater().inflate(R.menu.menu_reporte, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.action_eliminar) {
+                actualizarEstado(reporte.getIdReporte(), "eliminado");
+                return true;
+            } else if (id == R.id.action_advertir) {
+                actualizarEstado(reporte.getIdReporte(), "advertido");
+                return true;
+            } else if (id == R.id.action_archivar) {
+                actualizarEstado(reporte.getIdReporte(), "archivado");
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        popupMenu.show();
     }
 
     private void actualizarEstado(int idReporte, String nuevoEstado) {

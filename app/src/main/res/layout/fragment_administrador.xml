@@ -8,42 +8,6 @@
     android:background="#F9F9F9"
     tools:context=".ui.Administrador.AdministradorFragment">
 
-    <!-- 🔵 AppBar superior con título y botón de perfil -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/orange_button"
-        android:elevation="4dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbarAdmin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <TextView
-                android:id="@+id/tvTituloAdmin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Panel de Administración"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/iconPerfilAdmin"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="end"
-                android:src="@drawable/ic_inicio"
-                android:contentDescription="Perfil"
-                app:tint="@android:color/white" />
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
-
     <!-- ⚙️ Contenedor principal con Tabs -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            tools:listitem="@layout/item_reporte_admin" />
+            tools:listitem="@layout/item_reporte" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
