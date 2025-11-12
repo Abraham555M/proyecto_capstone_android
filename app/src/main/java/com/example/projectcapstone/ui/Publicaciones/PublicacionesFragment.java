@@ -40,7 +40,6 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 
 public class PublicacionesFragment extends Fragment implements View.OnClickListener{
-
     private RecyclerView recyclerView;
     private RecyclerView recyclerEmprendimientos;
     public PublicacionAdapter adapter;
