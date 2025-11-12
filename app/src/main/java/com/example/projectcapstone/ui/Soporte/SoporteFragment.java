@@ -82,6 +82,32 @@ public class SoporteFragment extends Fragment {
         etSolicitud = rootView.findViewById(R.id.etSolicitud);
         btnEnviar = rootView.findViewById(R.id.btnEnviar);
 
+        // 🔹 Estado inicial del botón
+        btnEnviar.setEnabled(false);
+        btnEnviar.setBackgroundTintList(requireContext().getResources().getColorStateList(R.color.gray_dark)); // color plomo
+
+        // 🔹 Detectar cambios de texto en el campo de solicitud
+        etSolicitud.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().trim().isEmpty()) {
+                    // Si está vacío ➜ botón desactivado y color plomo
+                    btnEnviar.setEnabled(false);
+                    btnEnviar.setBackgroundTintList(requireContext().getResources().getColorStateList(R.color.gray_dark));
+                } else {
+                    // Si tiene texto ➜ botón activo y color original (amarillo)
+                    btnEnviar.setEnabled(true);
+                    btnEnviar.setBackgroundTintList(requireContext().getResources().getColorStateList(R.color.orange_circle));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
         // Configurar listeners para expandir/colapsar preguntas
         configurarAcordeon(layoutPregunta1, tvRespuesta1, iconExpand1);
         configurarAcordeon(layoutPregunta2, tvRespuesta2, iconExpand2);
@@ -155,7 +181,6 @@ public class SoporteFragment extends Fragment {
                     String status = json.getString("status");
                     String msg = json.getString("msg");
 
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
                     if(status.equals("success")) {
                         etSolicitud.setText(""); // Limpiar campo si fue exitoso
 

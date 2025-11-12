@@ -73,8 +73,8 @@
 
                             <!-- Ilustración -->
                             <ImageView
-                                android:layout_width="140dp"
-                                android:layout_height="140dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:src="@drawable/ic_empty_folder"
                                 android:alpha="0.8"
                                 app:tint="@color/darker_gray" />
@@ -114,7 +114,7 @@
                                 android:id="@+id/btnCrearPrimero"
                                 style="@style/Widget.MaterialComponents.Button"
                                 android:layout_width="match_parent"
-                                android:layout_height="56dp"
+                                android:layout_height="44dp"
                                 android:text="Crear Emprendimiento"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
