@@ -8,7 +8,6 @@
     android:background="#F5F5F5"
     tools:context=".ui.Notificaciones.NotificacionesFragment">
 
-    <!-- 🔹 Contenedor SwipeRefreshLayout -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="0dp"
@@ -18,8 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 🔹 Scroll general (para que puedas ver las dos secciones) -->
         <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -40,7 +39,6 @@
                     android:textColor="#333333"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Contenedor de Recycler + vacío -->
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -107,17 +105,18 @@
                     android:textColor="#333333"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Contenedor de Recycler + vacío -->
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="400dp">
+                    <!-- 🔹 ALTURA FIJA para scroll independiente -->
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerActividad"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
+                        android:layout_height="match_parent"
+                        android:nestedScrollingEnabled="true"
                         tools:listitem="@layout/item_actividad" />
+                    <!-- 🔹 nestedScrollingEnabled en true -->
 
                     <LinearLayout
                         android:id="@+id/emptyStateActividad"

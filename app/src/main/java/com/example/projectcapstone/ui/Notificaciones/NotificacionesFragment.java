@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +34,7 @@ public class NotificacionesFragment extends Fragment {
 
     // 🔹 SwipeRefresh
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ScrollView scrollView; // 🔹 Referencia al ScrollView
     private boolean soporteLoaded = false;
     private boolean actividadLoaded = false;
 
@@ -59,6 +61,9 @@ public class NotificacionesFragment extends Fragment {
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this::cargarTodo);
 
+        // 🔹 ScrollView
+        scrollView = rootView.findViewById(R.id.scrollView);
+
         // ----- RecyclerView de Soporte -----
         recyclerSolicitudes = rootView.findViewById(R.id.recyclerSolicitudes);
         recyclerSolicitudes.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -75,10 +80,39 @@ public class NotificacionesFragment extends Fragment {
         recyclerActividad.setAdapter(actividadAdapter);
         emptyStateActividad = rootView.findViewById(R.id.emptyStateActividad);
 
+        // 🔹 SOLUCIÓN: Controlar SwipeRefresh según posición del scroll
+        configurarSwipeRefreshConScroll();
+
         // Cargar datos al inicio
         cargarTodo();
 
         return rootView;
+    }
+
+    // 🔹 MÉTODO NUEVO: Controla cuándo el SwipeRefresh debe activarse
+    private void configurarSwipeRefreshConScroll() {
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(() -> {
+            // Solo permite SwipeRefresh si el ScrollView está en el tope
+            int scrollY = scrollView.getScrollY();
+            swipeRefreshLayout.setEnabled(scrollY == 0);
+        });
+
+        // También controlar cuando el RecyclerView de actividad hace scroll
+        recyclerActividad.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                // Si el RecyclerView puede scrollear hacia arriba, deshabilitar SwipeRefresh
+                boolean canScrollUp = recyclerView.canScrollVertically(-1);
+
+                // Solo habilitar SwipeRefresh si:
+                // 1. El ScrollView está en el tope (scrollY == 0)
+                // 2. El RecyclerView NO puede scrollear más hacia arriba
+                int scrollY = scrollView.getScrollY();
+                swipeRefreshLayout.setEnabled(scrollY == 0 && !canScrollUp);
+            }
+        });
     }
 
     private void cargarTodo() {
@@ -92,7 +126,7 @@ public class NotificacionesFragment extends Fragment {
 
     private void verificarSiTerminaron() {
         if (soporteLoaded && actividadLoaded) {
-            swipeRefreshLayout.setRefreshing(false); // 🔹 Detiene el spinner
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
