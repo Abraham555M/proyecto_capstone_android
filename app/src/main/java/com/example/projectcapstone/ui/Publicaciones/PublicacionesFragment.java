@@ -78,28 +78,28 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
         );
         categorias = new ArrayList<>();
         emprendimientoAdapter = new CategoriaPublicacionAdapter(
-            categorias, getContext(),
-            categoria -> {
-                int idCategoria = categoria.getIdCategoria();
-                int idEmprendimiento = categoria.getIdEmprendimiento();
+                categorias, getContext(),
+                categoria -> {
+                    int idCategoria = categoria.getIdCategoria();
+                    int idEmprendimiento = categoria.getIdEmprendimiento();
 
-                // Si el usuario toca la misma categoría que ya estaba seleccionada, limpiar filtro
-                if (idCategoriaSeleccionada == idCategoria) {
-                    idCategoriaSeleccionada = -1;
-                    idEmprendimientoSeleccionado = -1;
-                    filtroActivo = false;
+                    // Si el usuario toca la misma categoría que ya estaba seleccionada, limpiar filtro
+                    if (idCategoriaSeleccionada == idCategoria) {
+                        idCategoriaSeleccionada = -1;
+                        idEmprendimientoSeleccionado = -1;
+                        filtroActivo = false;
 
-                    // 🔥 Limpia selección visual en el adapter
-                    emprendimientoAdapter.clearSelection();
+                        // 🔥 Limpia selección visual en el adapter
+                        emprendimientoAdapter.clearSelection();
 
-                    cargarPublicaciones();
-                } else {
-                    idCategoriaSeleccionada = idCategoria;
-                    idEmprendimientoSeleccionado = idEmprendimiento;
-                    filtroActivo = true;
-                    cargarPublicacionesPorCategoria(idCategoria, idEmprendimiento);
-                }
-            });
+                        cargarPublicaciones();
+                    } else {
+                        idCategoriaSeleccionada = idCategoria;
+                        idEmprendimientoSeleccionado = idEmprendimiento;
+                        filtroActivo = true;
+                        cargarPublicacionesPorCategoria(idCategoria, idEmprendimiento);
+                    }
+                });
 
         recyclerEmprendimientos.setAdapter(emprendimientoAdapter);
         session = new SessionManager(requireContext());
@@ -114,8 +114,8 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
         recyclerView.setAdapter(adapter);
         btnAgregarPublicacion.setOnClickListener(this);
 
+        // 🔥 PRIMERO cargar emprendimientos, luego publicaciones
         cargarEmprendimientos();
-        cargarPublicaciones();
 
         return rootView;
     }
@@ -166,28 +166,26 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
                     adapter.notifyDataSetChanged();
 
-                    // 🔥 MOSTRAR/OCULTAR TODO EL CONTENIDO
+                    // 🔥 CONTROLAR VISIBILIDAD INTERNA (no del contenido principal)
                     if (publicaciones.isEmpty()) {
-                        contenidoPrincipal.setVisibility(View.GONE);
-                        emptyStatePublicaciones.setVisibility(View.VISIBLE);
+                        tvSinPublicaciones.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
                     } else {
-                        contenidoPrincipal.setVisibility(View.VISIBLE);
-                        emptyStatePublicaciones.setVisibility(View.GONE);
-
-                        // Controlar visibilidad interna de publicaciones
                         tvSinPublicaciones.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    tvSinPublicaciones.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                contenidoPrincipal.setVisibility(View.GONE);
-                emptyStatePublicaciones.setVisibility(View.VISIBLE);
+                tvSinPublicaciones.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             }
         });
     }
@@ -221,29 +219,36 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
                     }
                     emprendimientoAdapter.notifyDataSetChanged();
 
-                    // ✅ Controlar visibilidad y posición
-                    TextView txtSinEmprendimientos = getView().findViewById(R.id.txtSinEmprendimientos);
-                    RecyclerView recyclerEmprendimientos = getView().findViewById(R.id.recyclerEmprendimientos);
-                    TextView tvMisPublicaciones = getView().findViewById(R.id.tvMisPublicaciones);
-
+                    // 🔥 CONTROLAR VISIBILIDAD GENERAL BASADO EN EMPRENDIMIENTOS
                     if (categorias.isEmpty()) {
-                        recyclerEmprendimientos.setVisibility(View.GONE);
-                        txtSinEmprendimientos.setVisibility(View.VISIBLE);
+                        // NO HAY EMPRENDIMIENTOS → Mostrar estado vacío global
+                        contenidoPrincipal.setVisibility(View.GONE);
+                        emptyStatePublicaciones.setVisibility(View.VISIBLE);
                     } else {
+                        // SÍ HAY EMPRENDIMIENTOS → Mostrar contenido y cargar publicaciones
+                        contenidoPrincipal.setVisibility(View.VISIBLE);
+                        emptyStatePublicaciones.setVisibility(View.GONE);
+
+                        // Controlar visibilidad interna de emprendimientos
                         recyclerEmprendimientos.setVisibility(View.VISIBLE);
-                        txtSinEmprendimientos.setVisibility(View.GONE);
+                        tvSinEmprendimientos.setVisibility(View.GONE);
+
+                        // Ahora sí cargar las publicaciones
+                        cargarPublicaciones();
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error procesando categorías", Toast.LENGTH_SHORT).show();
+                    contenidoPrincipal.setVisibility(View.GONE);
+                    emptyStatePublicaciones.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                tvSinEmprendimientos.setVisibility(View.VISIBLE);
-                recyclerEmprendimientos.setVisibility(View.GONE);
+                contenidoPrincipal.setVisibility(View.GONE);
+                emptyStatePublicaciones.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -285,10 +290,8 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
                     adapter.notifyDataSetChanged();
 
-                    // 🔥 MOSTRAR/OCULTAR TODO EL CONTENIDO
+                    // 🔥 CONTROLAR VISIBILIDAD INTERNA
                     if (publicaciones.isEmpty()) {
-                        // Cuando filtras y no hay resultados, mantener el contenido visible
-                        // pero mostrar mensaje interno
                         tvSinPublicaciones.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
                     } else {

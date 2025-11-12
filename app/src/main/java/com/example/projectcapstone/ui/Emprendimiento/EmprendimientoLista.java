@@ -284,7 +284,7 @@ public class EmprendimientoLista extends Fragment implements View.OnClickListene
                         mostrarDialogExito("Actualización exitosa", message, true);
                         cargarEmprendimientos(); // Recargar lista
                     } else {
-                        mostrarDialogExito("Error", message, false);
+                        mostrarDialogExito("Sin cambios", "No realizaste ninguna modificación.", false);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
