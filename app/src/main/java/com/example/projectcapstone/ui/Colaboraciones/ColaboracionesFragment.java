@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
@@ -29,6 +30,7 @@ public class ColaboracionesFragment extends Fragment {
     private ColaboracionAdapter adapter;
     private List<Colaboracion> listaColaboraciones;
     private LinearLayout emptyStateColaboraciones;
+    private TextView tvColaboracionesActivas; // 🆕 NUEVA VARIABLE
     private SessionManager session;
 
     @Override
@@ -38,6 +40,7 @@ public class ColaboracionesFragment extends Fragment {
 
         recyclerColaboraciones = view.findViewById(R.id.recyclerColaboraciones);
         emptyStateColaboraciones = view.findViewById(R.id.emptyStateColaboraciones);
+        tvColaboracionesActivas = view.findViewById(R.id.tvColaboracionesActivas); // 🆕 INICIALIZAR
         recyclerColaboraciones.setLayoutManager(new LinearLayoutManager(getContext()));
 
         listaColaboraciones = new ArrayList<>();
@@ -93,11 +96,13 @@ public class ColaboracionesFragment extends Fragment {
 
                         adapter.notifyDataSetChanged();
 
-                        // Mostrar u ocultar el mensaje vacío
+                        // 🔥 CONTROLAR VISIBILIDAD DEL TÍTULO Y ESTADO VACÍO
                         if (listaColaboraciones.isEmpty()) {
+                            tvColaboracionesActivas.setVisibility(View.GONE); // 🆕 OCULTAR TÍTULO
                             emptyStateColaboraciones.setVisibility(View.VISIBLE);
                             recyclerColaboraciones.setVisibility(View.GONE);
                         } else {
+                            tvColaboracionesActivas.setVisibility(View.VISIBLE); // 🆕 MOSTRAR TÍTULO
                             emptyStateColaboraciones.setVisibility(View.GONE);
                             recyclerColaboraciones.setVisibility(View.VISIBLE);
                         }
@@ -119,6 +124,7 @@ public class ColaboracionesFragment extends Fragment {
     }
 
     private void mostrarEstadoVacio() {
+        tvColaboracionesActivas.setVisibility(View.GONE); // 🆕 OCULTAR TÍTULO
         recyclerColaboraciones.setVisibility(View.GONE);
         emptyStateColaboraciones.setVisibility(View.VISIBLE);
     }

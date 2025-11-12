@@ -12,12 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- 🔴 CONTENIDO PRINCIPAL (Oculto al inicio) -->
         <LinearLayout
+            android:id="@+id/layoutContenidoFavoritos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingVertical="16dp"
-            android:paddingHorizontal="8dp">
+            android:paddingHorizontal="8dp"
+            android:visibility="gone">
 
             <!-- 🔍 Barra de búsqueda -->
             <LinearLayout
@@ -101,7 +104,6 @@
                 android:layout_marginBottom="20dp" />
 
             <!-- 📄 Sección de publicaciones favoritas -->
-            <!-- 📄 Sección de publicaciones favoritas -->
             <LinearLayout
                 android:id="@+id/layoutPublicacionesSection"
                 android:layout_width="match_parent"
@@ -177,7 +179,7 @@
 
         </LinearLayout>
 
-        <!-- 💬 Vista vacía -->
+        <!-- 💬 Vista vacía GLOBAL (Visible al inicio) -->
         <LinearLayout
             android:id="@+id/layoutEmptyFavoritos"
             android:layout_width="match_parent"
@@ -185,7 +187,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:padding="24dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <ImageView
                 android:layout_width="90dp"

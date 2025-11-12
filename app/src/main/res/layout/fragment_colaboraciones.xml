@@ -21,6 +21,7 @@
 
             <!-- Sección: Colaboraciones Activas -->
             <TextView
+                android:id="@+id/tvColaboracionesActivas"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Colaboraciones Activas"
