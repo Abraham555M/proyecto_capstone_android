@@ -69,6 +69,8 @@ public class FavoritosFragment extends Fragment {
     private LinearLayout layoutEmptyPublicaciones;
     private TextView tvEmptyPublicacionesTitle;
     private TextView tvEmptyPublicacionesSubtitle;
+    private LinearLayout layoutContenidoFavoritos;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -91,6 +93,7 @@ public class FavoritosFragment extends Fragment {
         layoutEmptyPublicaciones = view.findViewById(R.id.layoutEmptyPublicaciones);
         tvEmptyPublicacionesTitle = view.findViewById(R.id.tvEmptyPublicacionesTitle);
         tvEmptyPublicacionesSubtitle = view.findViewById(R.id.tvEmptyPublicacionesSubtitle);
+        layoutContenidoFavoritos = view.findViewById(R.id.layoutContenidoFavoritos);  // ← AGREGAR ESTA LÍNEA
 
         session = new SessionManager(requireContext());
 
@@ -1177,13 +1180,11 @@ public class FavoritosFragment extends Fragment {
 
     private void actualizarEstadoFavoritos() {
         if (tieneFavoritosEnTotal) {
-            // Mostrar controles cuando hay favoritos
-            rvCategoriaFavoritos.setVisibility(View.VISIBLE);
-            layoutSearchFavoritos.setVisibility(View.VISIBLE);
-            layoutCategoriasSection.setVisibility(View.VISIBLE);
-            dividerFavoritos.setVisibility(View.VISIBLE);
-            layoutPublicacionesSection.setVisibility(View.VISIBLE);
-            layoutEmptyFavoritos.setVisibility(View.GONE); // Ocultar vacío global
+            // Mostrar el contenedor principal y ocultar mensaje vacío global
+            if (layoutContenidoFavoritos != null) {
+                layoutContenidoFavoritos.setVisibility(View.VISIBLE);
+            }
+            layoutEmptyFavoritos.setVisibility(View.GONE);
 
             if (listaFavoritos.isEmpty()) {
                 // Mostrar mensaje vacío LOCAL (en área de publicaciones)
@@ -1202,17 +1203,14 @@ public class FavoritosFragment extends Fragment {
                 rvPublicacionesFavoritos.setVisibility(View.VISIBLE);
             }
         } else {
-            // Ocultar TODO y mostrar solo el mensaje vacío GLOBAL (pantalla completa)
+            // Ocultar contenedor principal y mostrar mensaje vacío GLOBAL
+            if (layoutContenidoFavoritos != null) {
+                layoutContenidoFavoritos.setVisibility(View.GONE);
+            }
             tvEmptyFavoritosTitle.setText("Aún no tienes favoritos");
             tvEmptyFavoritosSubtitle.setText("Guarda las publicaciones que te gusten para verlas más tarde");
             layoutEmptyFavoritos.setVisibility(View.VISIBLE);
             layoutEmptyPublicaciones.setVisibility(View.GONE);
-            rvPublicacionesFavoritos.setVisibility(View.GONE);
-            rvCategoriaFavoritos.setVisibility(View.GONE);
-            layoutSearchFavoritos.setVisibility(View.GONE);
-            layoutCategoriasSection.setVisibility(View.GONE);
-            dividerFavoritos.setVisibility(View.GONE);
-            layoutPublicacionesSection.setVisibility(View.GONE);
         }
     }
 }
