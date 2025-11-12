@@ -68,7 +68,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:backgroundTint="@color/button_orange"
+            android:backgroundTint="@color/orange_circle"
             android:fontFamily="sans-serif-medium"
             app:cornerRadius="8dp"
             app:elevation="2dp" />

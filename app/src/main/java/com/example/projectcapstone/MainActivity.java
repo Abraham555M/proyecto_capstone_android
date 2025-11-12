@@ -352,11 +352,12 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String respuesta = new String(responseBody, StandardCharsets.UTF_8);
                     JSONObject jsonObject = new JSONObject(respuesta);
-
+                    /*
                     if (jsonObject.has("error")) {
                         Toast.makeText(MainActivity.this, "No se encontró el estudiante", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    */
                     String nombre = jsonObject.optString("nombre", "Sin nombre");
                     tvNombreEstudiante.setText(nombre);
 
