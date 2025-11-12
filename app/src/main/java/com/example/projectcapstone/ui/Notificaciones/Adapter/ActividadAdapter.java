@@ -1,6 +1,7 @@
 package com.example.projectcapstone.ui.Notificaciones.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.ViewHolder>  {
@@ -108,6 +110,10 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
     // ---------------------------
     private String calcularTiempoTranscurrido(String fechaStr) {
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        formato.setTimeZone(TimeZone.getTimeZone("America/Lima"));
+        Log.d("DEBUG_FECHA", "Fecha servidor: " + fechaStr);
+        Log.d("DEBUG_HORA_LOCAL", "Hora dispositivo local: " + new Date().toString());
+
         try {
             Date fecha = formato.parse(fechaStr);
             long diffMillis = new Date().getTime() - fecha.getTime();

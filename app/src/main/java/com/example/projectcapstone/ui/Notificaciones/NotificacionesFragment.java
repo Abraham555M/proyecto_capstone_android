@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.Notificacion;
@@ -30,6 +31,11 @@ import cz.msebera.android.httpclient.Header;
 public class NotificacionesFragment extends Fragment {
     private SessionManager session;
 
+    // 🔹 SwipeRefresh
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean soporteLoaded = false;
+    private boolean actividadLoaded = false;
+
     // 🔹 Soporte
     private RecyclerView recyclerSolicitudes;
     private SoporteAdapter soporteAdapter;
@@ -49,6 +55,10 @@ public class NotificacionesFragment extends Fragment {
 
         session = new SessionManager(requireContext());
 
+        // 🔹 SwipeRefresh
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this::cargarTodo);
+
         // ----- RecyclerView de Soporte -----
         recyclerSolicitudes = rootView.findViewById(R.id.recyclerSolicitudes);
         recyclerSolicitudes.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -65,11 +75,25 @@ public class NotificacionesFragment extends Fragment {
         recyclerActividad.setAdapter(actividadAdapter);
         emptyStateActividad = rootView.findViewById(R.id.emptyStateActividad);
 
-        // Cargar datos
-        cargarNotificacionesSoporte();
-        cargarNotificacionesActividad();
+        // Cargar datos al inicio
+        cargarTodo();
 
         return rootView;
+    }
+
+    private void cargarTodo() {
+        swipeRefreshLayout.setRefreshing(true);
+        soporteLoaded = false;
+        actividadLoaded = false;
+
+        cargarNotificacionesSoporte();
+        cargarNotificacionesActividad();
+    }
+
+    private void verificarSiTerminaron() {
+        if (soporteLoaded && actividadLoaded) {
+            swipeRefreshLayout.setRefreshing(false); // 🔹 Detiene el spinner
+        }
     }
 
     // 🔹 NOTIFICACIONES DE SOPORTE
@@ -87,10 +111,8 @@ public class NotificacionesFragment extends Fragment {
                     JSONArray jsonArray = new JSONArray(response);
 
                     listaSoportes.clear();
-
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
-
                         Soporte soporte = new Soporte(
                                 obj.getInt("id_soporte"),
                                 obj.getInt("id_estudiante"),
@@ -98,13 +120,11 @@ public class NotificacionesFragment extends Fragment {
                                 obj.getString("fec_soporte"),
                                 obj.getString("est_soporte")
                         );
-
                         listaSoportes.add(soporte);
                     }
 
                     soporteAdapter.notifyDataSetChanged();
 
-                    // 🔸 Mostrar/ocultar mensaje vacío
                     if (listaSoportes.isEmpty()) {
                         recyclerSolicitudes.setVisibility(View.GONE);
                         emptyStateSolicitudes.setVisibility(View.VISIBLE);
@@ -114,9 +134,11 @@ public class NotificacionesFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
                     recyclerSolicitudes.setVisibility(View.GONE);
                     emptyStateSolicitudes.setVisibility(View.VISIBLE);
+                } finally {
+                    soporteLoaded = true;
+                    verificarSiTerminaron();
                 }
             }
 
@@ -124,6 +146,8 @@ public class NotificacionesFragment extends Fragment {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 recyclerSolicitudes.setVisibility(View.GONE);
                 emptyStateSolicitudes.setVisibility(View.VISIBLE);
+                soporteLoaded = true;
+                verificarSiTerminaron();
             }
         });
     }
@@ -143,10 +167,8 @@ public class NotificacionesFragment extends Fragment {
                     JSONArray jsonArray = new JSONArray(response);
 
                     listaNotificaciones.clear();
-
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
-
                         Notificacion noti = new Notificacion(
                                 obj.getInt("id_notificacion"),
                                 obj.getString("titulo"),
@@ -157,13 +179,11 @@ public class NotificacionesFragment extends Fragment {
                                 obj.getString("nombre_emisor"),
                                 obj.getString("correo_emisor")
                         );
-
                         listaNotificaciones.add(noti);
                     }
 
                     actividadAdapter.notifyDataSetChanged();
 
-                    // 🔸 Mostrar/ocultar mensaje vacío
                     if (listaNotificaciones.isEmpty()) {
                         recyclerActividad.setVisibility(View.GONE);
                         emptyStateActividad.setVisibility(View.VISIBLE);
@@ -173,9 +193,11 @@ public class NotificacionesFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
                     recyclerActividad.setVisibility(View.GONE);
                     emptyStateActividad.setVisibility(View.VISIBLE);
+                } finally {
+                    actividadLoaded = true;
+                    verificarSiTerminaron();
                 }
             }
 
@@ -183,6 +205,8 @@ public class NotificacionesFragment extends Fragment {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 recyclerActividad.setVisibility(View.GONE);
                 emptyStateActividad.setVisibility(View.VISIBLE);
+                actividadLoaded = true;
+                verificarSiTerminaron();
             }
         });
     }

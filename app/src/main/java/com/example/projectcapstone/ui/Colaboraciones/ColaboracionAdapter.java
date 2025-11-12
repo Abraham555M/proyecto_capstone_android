@@ -21,7 +21,14 @@ import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -168,26 +175,26 @@ public class ColaboracionAdapter extends RecyclerView.Adapter<ColaboracionAdapte
     }
 
     private String obtenerTiempoTranscurrido(String fechaColaboracion) {
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        formato.setTimeZone(TimeZone.getTimeZone("America/Lima")); // Ajuste de zona horaria
+
         try {
-            java.text.SimpleDateFormat formato = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            java.util.Date fecha = formato.parse(fechaColaboracion);
-            java.util.Date ahora = new java.util.Date();
+            Date fecha = formato.parse(fechaColaboracion);
+            long diffMillis = new Date().getTime() - fecha.getTime();
 
-            long diffMillis = ahora.getTime() - fecha.getTime();
-            long diffMin = diffMillis / (1000 * 60);
-            long diffHoras = diffMin / 60;
-            long diffDias = diffHoras / 24;
+            long minutos = TimeUnit.MILLISECONDS.toMinutes(diffMillis);
+            long horas = TimeUnit.MILLISECONDS.toHours(diffMillis);
+            long dias = TimeUnit.MILLISECONDS.toDays(diffMillis);
 
-            if (diffDias > 0) {
-                return "Hace " + diffDias + (diffDias == 1 ? " día" : " días");
-            } else if (diffHoras > 0) {
-                return "Hace " + diffHoras + (diffHoras == 1 ? " hora" : " horas");
-            } else if (diffMin > 0) {
-                return "Hace " + diffMin + (diffMin == 1 ? " minuto" : " minutos");
-            } else {
-                return "Hace menos de un minuto";
+            if (minutos < 1) return "Hace un momento";
+            else if (minutos < 60) return "Hace " + minutos + " min";
+            else if (horas < 24) return "Hace " + horas + " h";
+            else if (dias < 7) return "Hace " + dias + " días";
+            else {
+                // Si tiene más de una semana, mostrar la fecha completa
+                return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(fecha);
             }
-        } catch (Exception e) {
+        } catch (ParseException e) {
             e.printStackTrace();
             return "";
         }
