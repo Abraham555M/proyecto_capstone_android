@@ -1,118 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
     tools:context=".ui.Publicaciones.PublicacionesFragment">
 
-    <!-- 🟠 Sección de categorías / emprendimientos -->
+    <!-- 🔴 CONTENIDO PRINCIPAL (se oculta cuando no hay publicaciones) -->
     <LinearLayout
+        android:id="@+id/contenidoPrincipal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tvMisEmprendimientos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mis Emprendimientos"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:textColor="@color/black"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp" />
-
-        <!-- 🔹 Scroll horizontal solo para categorías -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerEmprendimientos"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            tools:listitem="@layout/item_categoria_publicacion" />
-
-        <TextView
-            android:id="@+id/txtSinEmprendimientos"
+        <!-- 🟠 Sección de categorías / emprendimientos -->
+        <LinearLayout
+            android:id="@+id/seccionEmprendimientos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Aún no tienes emprendimientos registrados."
-            android:textSize="14sp"
-            android:textColor="#777777"
-            android:gravity="center"
-            android:visibility="gone"
-            android:padding="8dp"
-            android:layout_marginTop="8dp" />
-    </LinearLayout>
+            android:orientation="vertical"
+            android:padding="8dp">
 
-    <!-- 🔵 Sección de publicaciones con scroll vertical -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="8dp">
+            <TextView
+                android:id="@+id/tvMisEmprendimientos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Emprendimientos"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
 
-        <TextView
-            android:id="@+id/tvMisPublicaciones"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mis Publicaciones"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:textColor="@color/black"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp" />
+            <!-- 🔹 Scroll horizontal solo para categorías -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerEmprendimientos"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                tools:listitem="@layout/item_categoria_publicacion" />
 
-        <!-- 🔸 RecyclerView vertical con su propio scroll -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerPublicaciones"
+            <TextView
+                android:id="@+id/txtSinEmprendimientos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Aún no tienes emprendimientos registrados."
+                android:textSize="14sp"
+                android:textColor="#777777"
+                android:gravity="center"
+                android:visibility="gone"
+                android:padding="8dp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- 🔵 Sección de publicaciones con scroll vertical -->
+        <LinearLayout
+            android:id="@+id/seccionPublicaciones"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:scrollbars="vertical"
-            android:layout_marginTop="8dp"
-            tools:listitem="@layout/item_publicacion" />
+            android:orientation="vertical"
+            android:padding="8dp">
 
-        <TextView
-            android:id="@+id/txtSinPublicaciones"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Aún no has realizado publicaciones."
+            <TextView
+                android:id="@+id/tvMisPublicaciones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Publicaciones"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <!-- 🔸 RecyclerView vertical con su propio scroll -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPublicaciones"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scrollbars="vertical"
+                android:layout_marginTop="8dp"
+                tools:listitem="@layout/item_publicacion" />
+
+            <TextView
+                android:id="@+id/txtSinPublicaciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Aún no has realizado publicaciones."
+                android:textSize="14sp"
+                android:textColor="#777777"
+                android:gravity="center"
+                android:visibility="gone"
+                android:padding="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
+        </LinearLayout>
+
+        <!-- 🟤 Botón para agregar publicación -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAgregarPublicacion"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:text="Agregar Publicación"
             android:textSize="14sp"
-            android:textColor="#777777"
-            android:gravity="center"
-            android:visibility="gone"
-            android:padding="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp" />
+            android:textStyle="bold"
+            android:paddingHorizontal="24dp"
+            android:minWidth="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:backgroundTint="#FBAE3C"
+            android:textColor="@android:color/white"
+            app:cornerRadius="22dp"
+            app:rippleColor="@android:color/white"
+            app:elevation="3dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="16dp" />
+
     </LinearLayout>
 
-    <!-- 🟤 Botón para agregar publicación -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAgregarPublicacion"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:text="Agregar Publicación"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:paddingHorizontal="24dp"
-        android:minWidth="0dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:backgroundTint="#FBAE3C"
-        android:textColor="@android:color/white"
-        app:cornerRadius="22dp"
-        app:rippleColor="@android:color/white"
-        app:elevation="3dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="16dp" />
+    <!-- ⭐ ESTADO VACÍO (se muestra cuando no hay publicaciones) -->
+    <LinearLayout
+        android:id="@+id/emptyStatePublicaciones"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="visible">
 
-</LinearLayout>
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:alpha="0.6"
+            android:contentDescription="Sin publicaciones"
+            android:src="@drawable/ic_empty_folder"
+            app:tint="#BDBDBD" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="No hay publicaciones registradas"
+            android:textColor="#757575"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Crea un nuevo emprendimiento para verlo aquí y puedas crear publicaciones"
+            android:textAlignment="center"
+            android:textColor="#9E9E9E"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</FrameLayout>

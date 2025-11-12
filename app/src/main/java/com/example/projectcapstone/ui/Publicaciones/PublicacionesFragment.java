@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,8 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
     private TextView tvMisEmprendimientos;
     private boolean filtroActivo = false;
     private int idCategoriaSeleccionada = -1;
-
+    private LinearLayout emptyStatePublicaciones;
+    private LinearLayout contenidoPrincipal;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -61,6 +63,9 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
         tvSinPublicaciones = rootView.findViewById(R.id.txtSinPublicaciones);
         tvSinEmprendimientos = rootView.findViewById(R.id.txtSinEmprendimientos);
+        emptyStatePublicaciones = rootView.findViewById(R.id.emptyStatePublicaciones);
+        contenidoPrincipal = rootView.findViewById(R.id.contenidoPrincipal);
+
         idEmprendimientoSeleccionado = -1;
         recyclerEmprendimientos = rootView.findViewById(R.id.recyclerEmprendimientos);
         recyclerView = rootView.findViewById(R.id.recyclerPublicaciones);
@@ -73,28 +78,28 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
         );
         categorias = new ArrayList<>();
         emprendimientoAdapter = new CategoriaPublicacionAdapter(
-        categorias, getContext(),
-        categoria -> {
-            int idCategoria = categoria.getIdCategoria();
-            int idEmprendimiento = categoria.getIdEmprendimiento();
+            categorias, getContext(),
+            categoria -> {
+                int idCategoria = categoria.getIdCategoria();
+                int idEmprendimiento = categoria.getIdEmprendimiento();
 
-            // Si el usuario toca la misma categoría que ya estaba seleccionada, limpiar filtro
-            if (idCategoriaSeleccionada == idCategoria) {
-                idCategoriaSeleccionada = -1;
-                idEmprendimientoSeleccionado = -1;
-                filtroActivo = false;
+                // Si el usuario toca la misma categoría que ya estaba seleccionada, limpiar filtro
+                if (idCategoriaSeleccionada == idCategoria) {
+                    idCategoriaSeleccionada = -1;
+                    idEmprendimientoSeleccionado = -1;
+                    filtroActivo = false;
 
-                // 🔥 Limpia selección visual en el adapter
-                emprendimientoAdapter.clearSelection();
+                    // 🔥 Limpia selección visual en el adapter
+                    emprendimientoAdapter.clearSelection();
 
-                cargarPublicaciones();
-            } else {
-                idCategoriaSeleccionada = idCategoria;
-                idEmprendimientoSeleccionado = idEmprendimiento;
-                filtroActivo = true;
-                cargarPublicacionesPorCategoria(idCategoria, idEmprendimiento);
-            }
-        });
+                    cargarPublicaciones();
+                } else {
+                    idCategoriaSeleccionada = idCategoria;
+                    idEmprendimientoSeleccionado = idEmprendimiento;
+                    filtroActivo = true;
+                    cargarPublicacionesPorCategoria(idCategoria, idEmprendimiento);
+                }
+            });
 
         recyclerEmprendimientos.setAdapter(emprendimientoAdapter);
         session = new SessionManager(requireContext());
@@ -161,11 +166,15 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
                     adapter.notifyDataSetChanged();
 
-                    // Mostrar u ocultar mensaje
+                    // 🔥 MOSTRAR/OCULTAR TODO EL CONTENIDO
                     if (publicaciones.isEmpty()) {
-                        tvSinPublicaciones.setVisibility(View.VISIBLE);
-                        recyclerView.setVisibility(View.GONE);
+                        contenidoPrincipal.setVisibility(View.GONE);
+                        emptyStatePublicaciones.setVisibility(View.VISIBLE);
                     } else {
+                        contenidoPrincipal.setVisibility(View.VISIBLE);
+                        emptyStatePublicaciones.setVisibility(View.GONE);
+
+                        // Controlar visibilidad interna de publicaciones
                         tvSinPublicaciones.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
@@ -177,8 +186,8 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                tvSinPublicaciones.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                contenidoPrincipal.setVisibility(View.GONE);
+                emptyStatePublicaciones.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -238,6 +247,7 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
             }
         });
     }
+
     private void cargarPublicacionesPorCategoria(int idCategoria, int idEmprendimiento) {
         String URL = ServidorConfig.URL_SERVIDOR + "publicacion/listar_publicaciones_categoria.php";
         AsyncHttpClient client = new AsyncHttpClient();
@@ -275,8 +285,10 @@ public class PublicacionesFragment extends Fragment implements View.OnClickListe
 
                     adapter.notifyDataSetChanged();
 
-                    // Mostrar u ocultar mensaje
+                    // 🔥 MOSTRAR/OCULTAR TODO EL CONTENIDO
                     if (publicaciones.isEmpty()) {
+                        // Cuando filtras y no hay resultados, mantener el contenido visible
+                        // pero mostrar mensaje interno
                         tvSinPublicaciones.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
                     } else {
