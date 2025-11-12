@@ -237,6 +237,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
+
     private void cargarColaboracionesDesdeBackend() {
         int idEstudiante = session.getIdEstudiante();
         String url = ServidorConfig.URL_SERVIDOR + "colaboracion/colaboracion_listar_perfil.php?idEmprendedor=" + idEstudiante;

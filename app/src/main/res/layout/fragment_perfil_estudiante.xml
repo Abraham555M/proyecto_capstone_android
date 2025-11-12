@@ -14,17 +14,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
-
             <!-- Contenido principal -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
-
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <!-- Campo Nombres -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -32,13 +30,13 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nombres"
                     android:layout_marginBottom="10dp"
+                    android:hint="Nombres"
                     app:boxBackgroundColor="#F3F4F6"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="#E5E7EB"
                     app:boxStrokeWidth="0dp"
                     app:hintTextColor="#9CA3AF">
@@ -47,9 +45,10 @@
                         android:id="@+id/etNombresEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúÁÉÍÓÚñÑ "
                         android:inputType="textPersonName"
-                        android:padding="16dp"
                         android:maxLength="100"
+                        android:padding="16dp"
                         android:textColor="#1F2937"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -60,13 +59,13 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Apellido Paterno"
                     android:layout_marginBottom="10dp"
+                    android:hint="Apellido Paterno"
                     app:boxBackgroundColor="#F3F4F6"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="#E5E7EB"
                     app:boxStrokeWidth="0dp"
                     app:hintTextColor="#9CA3AF">
@@ -75,10 +74,11 @@
                         android:id="@+id/etApellidoPaEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúÁÉÍÓÚñÑ "
                         android:inputType="textPersonName"
+                        android:maxLength="100"
                         android:padding="16dp"
                         android:textColor="#1F2937"
-                        android:maxLength="100"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -88,13 +88,13 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Apellido Materno"
                     android:layout_marginBottom="10dp"
+                    android:hint="Apellido Materno"
                     app:boxBackgroundColor="#F3F4F6"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="#E5E7EB"
                     app:boxStrokeWidth="0dp"
                     app:hintTextColor="#9CA3AF">
@@ -103,10 +103,11 @@
                         android:id="@+id/etApellidoMaEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúÁÉÍÓÚñÑ "
                         android:inputType="textPersonName"
+                        android:maxLength="100"
                         android:padding="16dp"
                         android:textColor="#1F2937"
-                        android:maxLength="100"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -116,13 +117,13 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Sexo"
                     android:layout_marginBottom="10dp"
+                    android:hint="Sexo"
                     app:boxBackgroundColor="#F3F4F6"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="#E5E7EB"
                     app:boxStrokeWidth="0dp"
                     app:endIconMode="dropdown_menu">
@@ -131,10 +132,10 @@
                         android:id="@+id/spSexoEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:inputType="none"
                         android:padding="16dp"
                         android:textColor="#1F2937"
-                        android:textSize="16sp"
-                        android:inputType="none" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Spinner Sede -->
@@ -143,13 +144,13 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Sede"
                     android:layout_marginBottom="10dp"
+                    android:hint="Sede"
                     app:boxBackgroundColor="#F3F4F6"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="#E5E7EB"
                     app:boxStrokeWidth="0dp"
                     app:endIconMode="dropdown_menu">
@@ -158,10 +159,10 @@
                         android:id="@+id/spSedeEd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:inputType="none"
                         android:padding="16dp"
                         android:textColor="#1F2937"
-                        android:textSize="16sp"
-                        android:inputType="none" />
+                        android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Campo Correo -->
@@ -170,13 +171,13 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Correo"
                     android:layout_marginBottom="10dp"
+                    android:hint="Correo"
                     app:boxBackgroundColor="#F3F4F6"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
                     app:boxStrokeColor="#E5E7EB"
                     app:boxStrokeWidth="0dp"
                     app:hintTextColor="#9CA3AF">
@@ -232,8 +233,8 @@
                         android:background="@android:color/transparent"
                         android:hint="Número Celular"
                         android:inputType="phone"
-                        android:padding="16dp"
                         android:maxLength="9"
+                        android:padding="16dp"
                         android:textColorHint="@color/hint_color"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -244,20 +245,20 @@
                     style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:text="Actualizar"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="24dp"
-                    android:minWidth="0dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp"
+                    android:backgroundTint="#FBAE3C"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:backgroundTint="#FBAE3C"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="24dp"
+                    android:text="Actualizar"
                     android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     app:cornerRadius="22dp"
-                    app:rippleColor="@android:color/white"
                     app:elevation="3dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="16dp" />
+                    app:rippleColor="@android:color/white" />
 
             </LinearLayout>
 

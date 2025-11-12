@@ -146,10 +146,21 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("FCM_TOKEN", "🔥 Token actual: " + token);
                 });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cargarInformacionPerfil();
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         handleIntent(intent);
+    }
+
+    public void recargarHeaderDrawer() {
+        cargarInformacionPerfil(); // 🔄 vuelve a cargar el nombre desde el SessionManager
     }
 
     private void handleIntent(Intent intent) {

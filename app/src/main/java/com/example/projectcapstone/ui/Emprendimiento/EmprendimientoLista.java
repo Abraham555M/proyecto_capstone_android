@@ -26,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +36,7 @@ import com.example.projectcapstone.ui.Clases.Emprendimiento;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.example.projectcapstone.ui.Emprendimiento.Adapter.EmprendimientoAdapter;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.loopj.android.http.AsyncHttpClient;
@@ -50,7 +53,7 @@ import java.util.UUID;
 
 import cz.msebera.android.httpclient.Header;
 
-public class EmprendimientoLista extends Fragment {
+public class EmprendimientoLista extends Fragment implements View.OnClickListener {
     RecyclerView recyclerView;
     ProgressBar progressBar;
     LinearLayout layoutEmpty;
@@ -64,6 +67,7 @@ public class EmprendimientoLista extends Fragment {
     private Uri nuevaImagenUri;
     private Emprendimiento emprendimientoActual;
     private ProgressDialog progressDialog;
+    private MaterialButton btnCrearPrimero;
 
     // Lanzador para seleccionar imagen
     private ActivityResultLauncher<Intent> imagePickerLauncher;
@@ -78,7 +82,8 @@ public class EmprendimientoLista extends Fragment {
         recyclerView = root.findViewById(R.id.recyclerViewEmprendimientos);
         progressBar = root.findViewById(R.id.progressBar);
         layoutEmpty = root.findViewById(R.id.layoutEmptyState);
-
+        btnCrearPrimero = root.findViewById(R.id.btnCrearPrimero);
+        btnCrearPrimero.setOnClickListener(this);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         // Configurar el lanzador de selección de imagen
@@ -508,5 +513,13 @@ public class EmprendimientoLista extends Fragment {
                 layoutEmpty.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == btnCrearPrimero){
+            NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.action_nav_emprendimiento_lista_to_nav_emprendimiento);
+        }
     }
 }

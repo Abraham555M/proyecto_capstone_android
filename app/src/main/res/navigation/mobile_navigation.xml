@@ -179,7 +179,11 @@
         android:id="@+id/nav_emprendimiento_lista"
         android:name="com.example.projectcapstone.ui.Emprendimiento.EmprendimientoLista"
         android:label="Lista de Emprendimientos"
-        tools:layout="@layout/fragment_emprendimiento_lista" />
+        tools:layout="@layout/fragment_emprendimiento_lista" >
+        <action
+            android:id="@+id/action_nav_emprendimiento_lista_to_nav_emprendimiento"
+            app:destination="@id/nav_emprendimiento" />
+    </fragment>
     <fragment
         android:id="@+id/nav_perfil_emprendedor"
         android:name="com.example.projectcapstone.ui.Inicio.PerfilEmprendedorFragment"
@@ -203,7 +207,11 @@
         android:id="@+id/nav_perfil_estudiante"
         android:name="com.example.projectcapstone.ui.Perfil.PerfilEstudianteFragment"
         android:label="Perfil"
-        tools:layout="@layout/fragment_perfil_estudiante" />
+        tools:layout="@layout/fragment_perfil_estudiante" >
+        <action
+            android:id="@+id/action_nav_perfil_estudiante_to_nav_perfil"
+            app:destination="@id/nav_perfil" />
+    </fragment>
     <fragment
         android:id="@+id/editarPublicacionFragment"
         android:name="com.example.projectcapstone.ui.Publicaciones.EditarPublicacionFragment"

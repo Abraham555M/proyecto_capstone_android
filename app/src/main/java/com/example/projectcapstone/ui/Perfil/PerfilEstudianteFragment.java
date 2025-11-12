@@ -1,6 +1,8 @@
 package com.example.projectcapstone.ui.Perfil;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +17,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.projectcapstone.MainActivity;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Configuracion.ServidorConfig;
 import com.example.projectcapstone.ui.Configuracion.SessionManager;
@@ -70,6 +74,36 @@ public class PerfilEstudianteFragment extends Fragment {
         btnListo = view.findViewById(R.id.btnListo);
         loaderContainer = view.findViewById(R.id.loaderContainer);
 
+        // 🔹 Estado inicial
+        btnListo.setEnabled(false);
+        btnListo.setBackgroundTintList(requireContext().getColorStateList(R.color.gray_dark));
+
+        // 🔹 TextWatcher para detectar cambios en los campos de texto
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validarCampos();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        // Añadimos el listener a los campos de texto
+        etNombresEd.addTextChangedListener(textWatcher);
+        etApellidoPaEd.addTextChangedListener(textWatcher);
+        etApellidoMaEd.addTextChangedListener(textWatcher);
+        etCorreoEd.addTextChangedListener(textWatcher);
+        etTelefonoEd.addTextChangedListener(textWatcher);
+
+        // Detectar cambios en los AutoCompleteTextView (spinners)
+        spSexoEd.setOnItemClickListener((parent, view1, position, id) -> validarCampos());
+        spSedeEd.setOnItemClickListener((parent, view1, position, id) -> validarCampos());
+
+
         session = new SessionManager(requireContext());
         client = new AsyncHttpClient();
 
@@ -78,6 +112,29 @@ public class PerfilEstudianteFragment extends Fragment {
         btnListo.setOnClickListener(v -> actualizarPerfil());
 
         return view;
+    }
+
+    private void validarCampos() {
+        String nombres = etNombresEd.getText().toString().trim();
+        String apePat = etApellidoPaEd.getText().toString().trim();
+        String apeMat = etApellidoMaEd.getText().toString().trim();
+        String correo = etCorreoEd.getText().toString().trim();
+        String telefono = etTelefonoEd.getText().toString().trim();
+        String sexo = spSexoEd.getText().toString().trim();
+        String sede = spSedeEd.getText().toString().trim();
+
+        boolean camposCompletos = !nombres.isEmpty() && !apePat.isEmpty() && !apeMat.isEmpty()
+                && !correo.isEmpty() && !telefono.isEmpty() && !sexo.isEmpty() && !sede.isEmpty();
+
+        if (camposCompletos) {
+            btnListo.setEnabled(true);
+            btnListo.setBackgroundTintList(requireContext().getColorStateList(R.color.orange_circle));
+            btnListo.setTextColor(Color.WHITE);
+        } else {
+            btnListo.setEnabled(false);
+            btnListo.setBackgroundTintList(requireContext().getColorStateList(R.color.darker_gray));
+            btnListo.setTextColor(Color.parseColor("#9CA3AF"));
+        }
     }
 
     private void cargarDatosIniciales() {
@@ -219,10 +276,26 @@ public class PerfilEstudianteFragment extends Fragment {
                     JSONObject json = new JSONObject(respuesta);
 
                     if (json.optBoolean("success", false)) {
+
+                        // 🔹 Actualiza el SessionManager con los nuevos datos
+                        JSONObject nuevoUsuario = new JSONObject();
+                        nuevoUsuario.put("id_estudiante", idEstudiante);
+                        nuevoUsuario.put("nombre", etNombresEd.getText().toString().trim());
+                        nuevoUsuario.put("apellidos", etApellidoPaEd.getText().toString().trim() + " " + etApellidoMaEd.getText().toString().trim());
+                        nuevoUsuario.put("tipo_usuario", session.getTipoUsuario());
+
+                        session.guardarSesion(nuevoUsuario);
+
+                        // 🔹 Llama a MainActivity para refrescar el header del Drawer
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).recargarHeaderDrawer();
+                        }
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+                        navController.navigate(R.id.action_nav_perfil_estudiante_to_nav_perfil);
+
                         Toast.makeText(getContext(), "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show();
-                        NavController navController = NavHostFragment.findNavController(PerfilEstudianteFragment.this);
-                        navController.navigate(R.id.nav_perfil);
-                    } else {
+                    }
+                    else {
                         Toast.makeText(getContext(), "No se pudo actualizar el perfil", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
