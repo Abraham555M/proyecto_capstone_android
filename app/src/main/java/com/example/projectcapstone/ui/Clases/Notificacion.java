@@ -9,6 +9,7 @@ public class Notificacion {
     private String tipo;
     private String nombre_emisor;
     private String correo_emisor;
+    private int id_ref_notificacion;
 
     // Constructor vacío (necesario para Gson, Jackson, etc.)
     public Notificacion() {
@@ -16,7 +17,7 @@ public class Notificacion {
 
     // Constructor con parámetros (opcional)
     public Notificacion(int id_notificacion, String titulo, String mensaje, String fecha,
-                        int leida, String tipo, String nombre_emisor, String correo_emisor) {
+                        int leida, String tipo, String nombre_emisor, String correo_emisor, int id_ref_notificacion) {
         this.id_notificacion = id_notificacion;
         this.titulo = titulo;
         this.mensaje = mensaje;
@@ -25,6 +26,7 @@ public class Notificacion {
         this.tipo = tipo;
         this.nombre_emisor = nombre_emisor;
         this.correo_emisor = correo_emisor;
+        this.id_ref_notificacion = id_ref_notificacion;
     }
 
     // Getters y Setters

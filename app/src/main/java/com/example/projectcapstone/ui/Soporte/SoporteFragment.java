@@ -115,7 +115,7 @@ public class SoporteFragment extends Fragment {
         configurarAcordeon(layoutPregunta4, tvRespuesta4, iconExpand4);
         configurarAcordeon(layoutPregunta5, tvRespuesta5, iconExpand5);
 
-        // ✅ Inicializar lista para búsqueda
+        // Inicializar lista para búsqueda
         listaPreguntas = new ArrayList<>();
         listaPreguntas.add(new ItemFAQ("¿Qué información es obligatoria para completar mi registro de emprendimiento?", layoutPregunta1));
         listaPreguntas.add(new ItemFAQ("¿Cómo puedo registar mi emprendimiento?", layoutPregunta2));
@@ -127,20 +127,9 @@ public class SoporteFragment extends Fragment {
         session = new SessionManager(requireContext());
 
         // Acción del botón Enviar
-        btnEnviar.setOnClickListener(v -> enviarSolicitud());
+        btnEnviar.setOnClickListener(v -> mostrarDialogoConfirmacion());
 
         return rootView;
-    }
-
-    private void filtrarPreguntas(String query) {
-        String textoBusqueda = query.toLowerCase();
-        for (ItemFAQ item : listaPreguntas) {
-            if (item.texto.contains(textoBusqueda)) {
-                item.layout.setVisibility(View.VISIBLE);
-            } else {
-                item.layout.setVisibility(View.GONE);
-            }
-        }
     }
 
     private void configurarAcordeon(LinearLayout layoutPregunta, TextView respuesta, ImageView icono) {
@@ -158,7 +147,7 @@ public class SoporteFragment extends Fragment {
     private void enviarSolicitud() {
         String men_soporte = etSolicitud.getText().toString().trim();
 
-        // ⚠️ Aquí deberías obtener el ID del estudiante logueado desde tu sesión o SharedPreferences
+        // Aquí deberías obtener el ID del estudiante logueado desde tu sesión o SharedPreferences
         int idEstudiante = session.getIdEstudiante(); // ejemplo temporal
 
         if (men_soporte.isEmpty()) {
@@ -228,4 +217,37 @@ public class SoporteFragment extends Fragment {
 
         dialog.show();
     }
+
+    private void mostrarDialogoConfirmacion() {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View vistaDialogo = inflater.inflate(R.layout.alert_dialog_opciones, null);
+
+        // Referencias
+        TextView tvTitulo = vistaDialogo.findViewById(R.id.tvTituloError);
+        MaterialButton btnNo = vistaDialogo.findViewById(R.id.btnNo);
+        MaterialButton btnSi = vistaDialogo.findViewById(R.id.btnSi);
+
+        // Personalizar contenido
+        tvTitulo.setText("¿Deseas enviar tu solicitud?");
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(vistaDialogo)
+                .setCancelable(false)
+                .create();
+
+        // Acciones de botones
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        btnSi.setOnClickListener(v -> {
+            dialog.dismiss();
+            enviarSolicitud();  // 🔹 Aquí recien se envía
+        });
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
+    }
+
 }

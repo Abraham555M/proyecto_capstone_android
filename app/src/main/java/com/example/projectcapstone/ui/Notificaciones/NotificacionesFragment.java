@@ -211,7 +211,8 @@ public class NotificacionesFragment extends Fragment {
                                 obj.getInt("leida"),
                                 obj.getString("tipo"),
                                 obj.getString("nombre_emisor"),
-                                obj.getString("correo_emisor")
+                                obj.getString("correo_emisor"),
+                                obj.getInt("id_ref_notificacion")
                         );
                         listaNotificaciones.add(noti);
                     }
