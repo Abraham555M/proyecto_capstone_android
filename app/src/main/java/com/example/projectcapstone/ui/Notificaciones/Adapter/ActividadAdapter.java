@@ -51,18 +51,18 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
         holder.indicadorNoLeida.setVisibility(noti.getLeida() == 0 ? View.VISIBLE : View.GONE);
 
         // Cambiar icono e imagen según el tipo de notificación
-        switch (noti.getTipo().toLowerCase()) {
-            case "like":
+        switch (noti.getTipo()) {
+            case "likeComentario":
                 holder.ivIconoTipo.setImageResource(R.drawable.ic_corazon);
                 holder.cvIconoTipo.setCardBackgroundColor(context.getColor(R.color.blue_light));
                 holder.ivIconoTipo.setColorFilter(context.getColor(R.color.blue_primary));
                 break;
-            case "comentario":
+            case "nuevoComentario":
                 holder.ivIconoTipo.setImageResource(R.drawable.ic_comentario);
                 holder.cvIconoTipo.setCardBackgroundColor(context.getColor(R.color.pink_light));
                 holder.ivIconoTipo.setColorFilter(context.getColor(R.color.purple_200));
                 break;
-            case "mensaje":
+            case "likePublicacion":
                 holder.ivIconoTipo.setImageResource(R.drawable.ic_mensaje);
                 holder.cvIconoTipo.setCardBackgroundColor(context.getColor(R.color.mint_green));
                 holder.ivIconoTipo.setColorFilter(context.getColor(R.color.circle_green));
