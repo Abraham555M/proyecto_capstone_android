@@ -213,6 +213,7 @@ public class FavoritosFragment extends Fragment {
                         // --- Datos generales ---
                         int idPublicacion = pubObj.getInt("id");
                         int idEmprendimiento = empObj.getInt("id");
+                        int idEstudiante = empObj.optInt("id_estudiante", 0);
                         String nomEmprendimiento = empObj.getString("nombre");
                         String imgEmprendimiento = empObj.optString("imagen_perfil", null);
                         String titPublicacion = pubObj.getString("titulo");
@@ -269,7 +270,8 @@ public class FavoritosFragment extends Fragment {
                                 producto,
                                 evento,
                                 promocion,
-                                esActualizado
+                                esActualizado,
+                                idEstudiante
                         );
 
                         listaFavoritos.add(publicacion);
@@ -337,6 +339,7 @@ public class FavoritosFragment extends Fragment {
                         // --- Datos generales ---
                         int idPublicacion = pubObj.getInt("id");
                         int idEmprendimiento = empObj.getInt("id");
+                        int idEstudiante = empObj.optInt("id_estudiante");
                         String nomEmprendimiento = empObj.getString("nombre");
                         String imgEmprendimiento = empObj.optString("imagen_perfil", null);
                         String titPublicacion = pubObj.getString("titulo");
@@ -392,7 +395,8 @@ public class FavoritosFragment extends Fragment {
                                 producto,
                                 evento,
                                 promocion,
-                                esActualizado
+                                esActualizado,
+                                idEstudiante
                         );
 
                         listaFavoritos.add(publicacion);
@@ -495,7 +499,8 @@ public class FavoritosFragment extends Fragment {
                                 producto,
                                 evento,
                                 promocion,
-                                esActualizado
+                                esActualizado,
+                                idEstudiante
                         );
 
                         listaFavoritos.add(publicacion);

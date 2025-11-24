@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.projectcapstone.R;
 import com.example.projectcapstone.ui.Clases.Publicacion;
+import com.example.projectcapstone.ui.Configuracion.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
@@ -39,6 +40,8 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     private OnFollowClickListener followListener;
     private OnFavoriteClickListener favoriteListener;
     private OnEntrepreneurClickListener entrepreneurClickListener;
+    private int idEstudianteLogueado;
+    private SessionManager sessionManager;
 
     public interface OnLikeClickListener {
         void onLikeClicked(Publicacion publicacion, ImageView ivLike, TextView tvLikes);
@@ -81,6 +84,10 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
         this.solicitudListener = solicitudListener;
         this.commentListener = commentListener;
         this.favoriteListener = favoriteClickListener;
+
+        // Inicializar SessionManager
+        sessionManager = new SessionManager(context);
+        idEstudianteLogueado = sessionManager.getIdEstudiante();
     }
 
     public void setFollowListener(OnFollowClickListener followListener) {
@@ -109,7 +116,17 @@ public class PublicacionAdapter extends RecyclerView.Adapter<PublicacionAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Publicacion publicacion = listaPublicaciones.get(position);
 
-        // 🔹 Datos generales
+        // ===== Mostrar/ocultar Más opciones =====
+        if (publicacion.getIdEstudiante() == idEstudianteLogueado) {
+            holder.ivMoreOptions.setVisibility(View.GONE);
+            holder.btnFollow.setVisibility(View.GONE);
+
+        } else {
+            holder.ivMoreOptions.setVisibility(View.VISIBLE);
+            holder.btnFollow.setVisibility(View.VISIBLE);
+        }
+
+        // Datos generales
         holder.tvEntrepreneurName.setText(publicacion.getNomEmprendimiento());
         Glide.with(context)
                 .load(publicacion.getImgEmprendimiento())

@@ -4,6 +4,7 @@ public class Publicacion {
 
     // 🔹 Campos generales
     private Integer idPublicacion;
+    private Integer idEstudiante;
     private Integer idEmprendimiento;
     private String nomEmprendimiento;
     private String imgEmprendimiento;
@@ -24,7 +25,7 @@ public class Publicacion {
     public Publicacion(Integer idPublicacion, Integer idEmprendimiento, String nomEmprendimiento, String imgEmprendimiento,
                        String titPublicacion, String conPublicacion, String imgPublicacion, Integer totalInteracciones,
                        Integer dioLike, Integer dioSeguimiento, Integer esFavorito, Integer tipoPublicacion,
-                       Producto producto, Evento evento, Promocion promocion, Integer esActualizado) {
+                       Producto producto, Evento evento, Promocion promocion, Integer esActualizado, Integer idEstudiante) {
         this.idPublicacion = idPublicacion;
         this.idEmprendimiento = idEmprendimiento;
         this.nomEmprendimiento = nomEmprendimiento;
@@ -41,6 +42,7 @@ public class Publicacion {
         this.evento = evento;
         this.promocion = promocion;
         this.esActualizado = esActualizado;
+        this.idEstudiante = idEstudiante;
     }
 
     // Constructor para métricas
@@ -54,6 +56,14 @@ public class Publicacion {
         this.conPublicacion = conPublicacion;
         this.imgPublicacion = imgPublicacion;
         this.totalInteracciones = totalInteracciones;
+    }
+
+    public Integer getIdEstudiante() {
+        return idEstudiante;
+    }
+
+    public void setIdEstudiante(Integer idEstudiante) {
+        this.idEstudiante = idEstudiante;
     }
 
     public Integer getEsActualizado() {

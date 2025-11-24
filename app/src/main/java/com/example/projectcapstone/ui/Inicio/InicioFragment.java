@@ -335,6 +335,7 @@ public class InicioFragment extends Fragment {
 
                         int idPublicacion = pub.optInt("id", 0);
                         int idEmprendimiento = empr.optInt("id", 0);
+                        int idEstudiante = empr.optInt("id_estudiante", 0);
                         String nomEmprendimiento = empr.optString("nombre", "");
                         String imgEmprendimiento = empr.optString("imagen_perfil", "");
                         String titPublicacion = pub.optString("titulo", "");
@@ -397,7 +398,8 @@ public class InicioFragment extends Fragment {
                                 producto,
                                 evento,
                                 promocion,
-                                esActualizado
+                                esActualizado,
+                                idEstudiante
                         ));
 
                         Log.d("DEBUG", "Llamando a cargarPublicaciones() tipo=" + tipoPublicacion);
@@ -1046,6 +1048,7 @@ public class InicioFragment extends Fragment {
 
                             // Datos generales
                             int idPublicacion = pub.optInt("id", 0); // Leer "id" de "publicacion"
+                            int idEstudiante = empr.optInt("id_estudiante", 0);
                             String titPublicacion = pub.optString("titulo", "");
                             String conPublicacion = pub.optString("contenido", "");
                             String imgPublicacion = pub.optString("imagen", "");
@@ -1103,7 +1106,8 @@ public class InicioFragment extends Fragment {
                                     producto,
                                     evento,
                                     promocion,
-                                    esActualizado
+                                    esActualizado,
+                                    idEstudiante
                             );
 
                             listaPublicacion.add(publicacion);
@@ -1167,6 +1171,7 @@ public class InicioFragment extends Fragment {
 
                         JSONObject pub = item.getJSONObject("publicacion");
                         int idPublicacion = pub.getInt("id");
+                        int idEstudiante = pub.optInt("id_estudiante", 0);
                         String titPublicacion = pub.getString("titulo");
                         String conPublicacion = pub.getString("contenido");
                         String imgPublicacion = pub.optString("imagen", null);
@@ -1220,7 +1225,8 @@ public class InicioFragment extends Fragment {
                                 producto,
                                 evento,
                                 promocion,
-                                esActualizado
+                                esActualizado,
+                                idEstudiante
                         );
 
                         listaPublicacion.add(publicacion);
