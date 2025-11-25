@@ -95,7 +95,14 @@ public class ReportesFragment extends Fragment {
     }
 
     private void mostrarOpcionesReporte(View anchorView, ReporteModel reporte) {
-        androidx.appcompat.widget.PopupMenu popupMenu = new androidx.appcompat.widget.PopupMenu(requireContext(), anchorView);
+        // ✔ Si ya está eliminado, NO mostrar opciones
+        if (reporte.getEstado().equals("2")) {
+            Toast.makeText(requireContext(), "Este reporte ya fue eliminado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        androidx.appcompat.widget.PopupMenu popupMenu =
+                new androidx.appcompat.widget.PopupMenu(requireContext(), anchorView);
         popupMenu.getMenuInflater().inflate(R.menu.menu_reporte, popupMenu.getMenu());
 
         popupMenu.setOnMenuItemClickListener(item -> {
@@ -104,9 +111,8 @@ public class ReportesFragment extends Fragment {
             if (id == R.id.action_eliminar) {
                 actualizarEstado(reporte.getIdReporte(), "eliminado");
                 return true;
-            } else {
-                return false;
             }
+            return false;
         });
 
         popupMenu.show();

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,15 +11,53 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="📋 Reportes de Publicaciones y Comentarios"
+        android:text="Reportes de Publicaciones"
         android:textStyle="bold"
         android:textColor="#333"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:layout_marginBottom="8dp"/>
+
+    <!-- 🔽 FILTRO BONITO, QUE COMBINA CON EL DISEÑO DE TUS CARDS -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardFiltroEstado"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="5dp"
+        android:layout_marginBottom="12dp"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvFiltroEstado"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Todos"
+                android:textSize="14sp"
+                android:textColor="#333" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_flecha_abajo"
+                app:tint="#666"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerReportes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        tools:listitem="@layout/item_reporte"
         android:scrollbars="vertical"/>
+
 </LinearLayout>

@@ -13,10 +13,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📊 Dashboard de Actividad"
+            android:text="Dashboard de Actividad"
             android:textStyle="bold"
             android:textColor="#333"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:layout_marginBottom="12dp"/>
 
         <!-- Filtro de fechas -->
