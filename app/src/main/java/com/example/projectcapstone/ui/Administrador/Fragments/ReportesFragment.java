@@ -104,12 +104,6 @@ public class ReportesFragment extends Fragment {
             if (id == R.id.action_eliminar) {
                 actualizarEstado(reporte.getIdReporte(), "eliminado");
                 return true;
-            } else if (id == R.id.action_advertir) {
-                actualizarEstado(reporte.getIdReporte(), "advertido");
-                return true;
-            } else if (id == R.id.action_archivar) {
-                actualizarEstado(reporte.getIdReporte(), "archivado");
-                return true;
             } else {
                 return false;
             }

@@ -8,18 +8,4 @@
         android:icon="@drawable/ic_flag"
         app:iconTint="@color/black"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_advertir"
-        android:orderInCategory="100"
-        android:title="Advertir usuario"
-        android:icon="@drawable/ic_colaboraciones"
-        app:iconTint="@color/black"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_archivar"
-        android:orderInCategory="100"
-        android:title="Archivar reporte"
-        android:icon="@drawable/ic_colaboraciones"
-        app:iconTint="@color/black"
-        app:showAsAction="never" />
 </menu>
