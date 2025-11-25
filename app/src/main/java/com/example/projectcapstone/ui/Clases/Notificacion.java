@@ -9,7 +9,8 @@ public class Notificacion {
     private String tipo;
     private String nombre_emisor;
     private String correo_emisor;
-    private int id_ref_notificacion;
+    private int id_ref_notificacion; // ID de la publicación referenciada
+
 
     // Constructor vacío (necesario para Gson, Jackson, etc.)
     public Notificacion() {
@@ -30,10 +31,17 @@ public class Notificacion {
     }
 
     // Getters y Setters
+
+
+    public int getId_ref_notificacion() {
+        return id_ref_notificacion;
+    }
+    public void setId_ref_notificacion(int id_ref_notificacion) {
+        this.id_ref_notificacion = id_ref_notificacion;
+    }
     public int getId_notificacion() {
         return id_notificacion;
     }
-
     public void setId_notificacion(int id_notificacion) {
         this.id_notificacion = id_notificacion;
     }

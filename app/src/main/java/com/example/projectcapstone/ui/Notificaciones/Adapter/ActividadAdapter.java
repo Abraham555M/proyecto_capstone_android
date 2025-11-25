@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.ViewHolder>  {
     private final Context context;
     private final List<Notificacion> listaNotificaciones;
+    private OnNotificacionClickListener listener;
 
     public ActividadAdapter(Context context, List<Notificacion> listaNotificaciones) {
         this.context = context;
@@ -36,6 +37,15 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
         View view = LayoutInflater.from(context).inflate(R.layout.item_actividad, parent, false);
         return new ViewHolder(view);
     }
+
+    public interface OnNotificacionClickListener {
+        void onClick(Notificacion noti);
+    }
+
+    public void setOnNotificacionClickListener(OnNotificacionClickListener listener) {
+        this.listener = listener;
+    }
+
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
@@ -84,12 +94,10 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
                 break;
         }
 
-        // Puedes implementar aquí un onClickListener si quieres abrir una actividad detallada
         holder.itemView.setOnClickListener(v -> {
-            // Ejemplo:
-            // Intent intent = new Intent(context, DetalleNotificacionActivity.class);
-            // intent.putExtra("id_notificacion", noti.getId_notificacion());
-            // context.startActivity(intent);
+            if (listener != null) {
+                listener.onClick(noti);
+            }
         });
     }
 
