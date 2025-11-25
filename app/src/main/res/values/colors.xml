@@ -62,5 +62,8 @@
     <color name="estadoEliminado">#EF9A9A</color> <!-- Rojo claro -->
     <color name="estadoDefault">#FFFFFF</color> <!-- Blanco -->
 
+    <color name="notificacion_no_leida">#E8E8E8</color> <!-- gris más oscuro -->
+    <color name="notificacion_leida">#FFFFFF</color>      <!-- blanco -->
+
 
 </resources>

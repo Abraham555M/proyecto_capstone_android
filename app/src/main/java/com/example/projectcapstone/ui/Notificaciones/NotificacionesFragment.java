@@ -31,6 +31,7 @@ import com.example.projectcapstone.ui.Notificaciones.Adapter.SoporteAdapter;
 import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -97,7 +98,18 @@ public class NotificacionesFragment extends Fragment {
                 Toast.makeText(requireContext(), "No hay publicación asociada", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // abrir dialog con la publicación referenciada
+
+            // 👉 1. Marcar como leída en el servidor
+            marcarNotificacionLeida(noti.getId_notificacion());
+
+            // 👉 2. Marcar como leída en memoria
+            noti.setLeida(1);
+
+            // 👉 3. Actualizar UI SOLO del item que cambió
+            int index = listaNotificaciones.indexOf(noti);
+            if (index != -1) actividadAdapter.notifyItemChanged(index);
+
+            // 👉 4. Abrir la publicación
             abrirDialogPublicacion(noti.getId_ref_notificacion());
         });
 
@@ -243,7 +255,6 @@ public class NotificacionesFragment extends Fragment {
         TextView tvDescripcionPromocion = dialog.findViewById(R.id.tvDescripcionPromocion);
         TextView tvFechasPromocion = dialog.findViewById(R.id.tvFechasPromocion);
 
-
         // ======== Llamado al backend ========
         int idEstudiante = session.getIdEstudiante();
 
@@ -355,8 +366,26 @@ public class NotificacionesFragment extends Fragment {
         dialog.show();
     }
 
+    private void marcarNotificacionLeida(int idNotificacion) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("idNotificacion", idNotificacion);
 
-    // 🔹 NOTIFICACIONES DE ACTIVIDAD
+        client.post(ServidorConfig.URL_SERVIDOR + "notificacion/marcar_notificacion_leida.php",
+            params, new AsyncHttpResponseHandler() {
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Log.e("LEIDO", "Marcado como leído: " + idNotificacion);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.e("LEIDO_ERROR", "Error al marcar leído: " + error.getMessage());
+                }
+            });
+    }
+
     public void cargarNotificacionesActividad() {
         int idEstudiante = session.getIdEstudiante();
         String url = ServidorConfig.URL_SERVIDOR + "soporte/sosporte_listar_actividad.php?idEmprendedor=" + idEstudiante;

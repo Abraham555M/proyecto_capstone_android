@@ -60,6 +60,8 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
         // Mostrar el punto solo si la notificación no está leída
         holder.indicadorNoLeida.setVisibility(noti.getLeida() == 0 ? View.VISIBLE : View.GONE);
 
+        CardView cardRoot = holder.itemView.findViewById(R.id.cardRoot);
+
         // Cambiar icono e imagen según el tipo de notificación
         switch (noti.getTipo()) {
 
@@ -99,6 +101,16 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
                 listener.onClick(noti);
             }
         });
+
+        // Cambiar color según si está leída o no
+        if (noti.getLeida() == 0) {
+            // NO LEÍDA → fondo gris oscuro
+            cardRoot.setCardBackgroundColor(context.getColor(R.color.notificacion_no_leida));
+        } else {
+            // LEÍDA → fondo blanco
+            cardRoot.setCardBackgroundColor(context.getColor(R.color.notificacion_leida));
+        }
+
     }
 
     @Override
@@ -110,7 +122,7 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
         TextView tvMensajeNotificacion, tvTiempoNotificacion;
         ImageView ivFotoUsuario, ivIconoTipo;
         View indicadorNoLeida;
-        CardView cvIconoTipo;
+        CardView cvIconoTipo, cardRoot;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -120,6 +132,7 @@ public class ActividadAdapter extends RecyclerView.Adapter<ActividadAdapter.View
             ivIconoTipo = itemView.findViewById(R.id.ivIconoTipo);
             indicadorNoLeida = itemView.findViewById(R.id.indicadorNoLeida);
             cvIconoTipo = itemView.findViewById(R.id.cvIconoTipo);
+            cardRoot = itemView.findViewById(R.id.cardRoot);
         }
     }
 
