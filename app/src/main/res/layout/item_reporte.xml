@@ -69,6 +69,17 @@
             android:textColor="#616161"
             android:layout_marginBottom="6dp" />
 
+        <TextView
+            android:id="@+id/tvVerMas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver más"
+            android:textColor="@color/orange_circle"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:paddingTop="4dp"
+            android:visibility="gone" />
+
         <!-- Footer con fecha y estado -->
         <LinearLayout
             android:layout_width="match_parent"

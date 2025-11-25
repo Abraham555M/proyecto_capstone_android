@@ -8,7 +8,7 @@ public class ReporteModel {
     private String contenido;
     private String fecha;
     private String estado;
-
+    private boolean expandido = false;
     public ReporteModel(int idReporte, String usuarioReporta, String motivo, String titulo,
                         String contenido, String fecha, String estado) {
         this.idReporte = idReporte;
@@ -19,7 +19,12 @@ public class ReporteModel {
         this.fecha = fecha;
         this.estado = estado;
     }
-
+    public boolean isExpandido() {
+        return expandido;
+    }
+    public void setExpandido(boolean expandido) {
+        this.expandido = expandido;
+    }
     public int getIdReporte() { return idReporte; }
     public String getUsuarioReporta() { return usuarioReporta; }
     public String getMotivo() { return motivo; }

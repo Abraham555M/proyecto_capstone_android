@@ -1,6 +1,7 @@
 package com.example.projectcapstone.ui.Administrador.Adapter;
 
 import android.graphics.drawable.GradientDrawable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,43 @@ public class ReporteAdapter extends RecyclerView.Adapter<ReporteAdapter.ViewHold
         holder.tvMotivo.setText("Motivo: " + reporte.getMotivo());
         holder.tvTitulo.setText("Publicación: " + reporte.getTitulo());
         holder.tvContenido.setText(reporte.getContenido());
-        holder.tvFecha.setText(reporte.getFecha());
+
+        // Reseteamos visibilidad porque el RecyclerView recicla vistas
+        holder.tvVerMas.setVisibility(View.GONE);
+
+        // Esperar a que se midan las líneas
+        holder.tvContenido.setMaxLines(3);
+        holder.tvContenido.setEllipsize(TextUtils.TruncateAt.END);
+        holder.tvVerMas.setVisibility(View.GONE);
+
+        holder.tvContenido.post(() -> {
+            int lineCount = holder.tvContenido.getLineCount();
+            android.text.Layout layout = holder.tvContenido.getLayout();
+
+            // Si el texto fue cortado o si tiene más líneas de las permitidas
+            if (layout != null && (lineCount > 3 || layout.getEllipsisCount(lineCount - 1) > 0)) {
+                holder.tvVerMas.setVisibility(View.VISIBLE);
+            } else {
+                holder.tvVerMas.setVisibility(View.GONE);
+            }
+
+            // Estado expandido o no
+            if (reporte.isExpandido()) {
+                holder.tvContenido.setMaxLines(Integer.MAX_VALUE);
+                holder.tvContenido.setEllipsize(null);
+                holder.tvVerMas.setText("Ver menos");
+            } else {
+                holder.tvContenido.setMaxLines(3);
+                holder.tvContenido.setEllipsize(TextUtils.TruncateAt.END);
+                holder.tvVerMas.setText("Ver más");
+            }
+        });
+
+        // SIEMPRE aplicar el click aquí
+        holder.tvVerMas.setOnClickListener(v -> {
+            reporte.setExpandido(!reporte.isExpandido());
+            notifyItemChanged(holder.getAdapterPosition());
+        });
 
         // Determinar texto y color del estado
         String estadoTexto;
@@ -89,7 +126,7 @@ public class ReporteAdapter extends RecyclerView.Adapter<ReporteAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUsuario, tvMotivo, tvFecha, tvContenido, tvEstado, tvTitulo;
+        TextView tvUsuario, tvMotivo, tvFecha, tvContenido, tvEstado, tvTitulo, tvVerMas;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -99,6 +136,7 @@ public class ReporteAdapter extends RecyclerView.Adapter<ReporteAdapter.ViewHold
             tvFecha = itemView.findViewById(R.id.tvFecha);
             tvContenido = itemView.findViewById(R.id.tvContenido);
             tvEstado = itemView.findViewById(R.id.tvEstado);
+            tvVerMas = itemView.findViewById(R.id.tvVerMas);
         }
     }
 }
