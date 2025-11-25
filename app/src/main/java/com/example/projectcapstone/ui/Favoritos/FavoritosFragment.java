@@ -446,6 +446,7 @@ public class FavoritosFragment extends Fragment {
 
                         int idPublicacion = pubObj.getInt("id");
                         int idEmprendimiento = empObj.getInt("id");
+                        int idEstudiante = empObj.getInt("id_estudiante");
                         String nomEmprendimiento = empObj.getString("nombre");
                         String imgEmprendimiento = empObj.optString("imagen_perfil", null);
                         String titPublicacion = pubObj.getString("titulo");

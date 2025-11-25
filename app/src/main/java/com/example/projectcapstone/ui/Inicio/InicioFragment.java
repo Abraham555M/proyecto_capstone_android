@@ -77,6 +77,7 @@ public class InicioFragment extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
     private TextView tvEmptyTitle;
     private TextView tvEmptySubtitle;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -745,11 +746,21 @@ public class InicioFragment extends Fragment {
                     String status = json.getString("status");
 
                     if ("reported".equals(status)) {
-                        mostrarDialogoExito("Hemos recibido tu reporte, gracias por reportar esta publicación", "Eliminaremos esta publicación si encontramos que va en contra de nuestras reglas. Gracias por ayudarnos a mantener StartUPN a salvo y apoyar nuestra comunidad");
+                        mostrarDialogoExito(
+                                "Hemos recibido tu reporte",
+                                "Gracias por ayudarnos a mantener StartUPN a salvo."
+                        );
+                    } else if ("limit_exceeded".equals(status)) {
+                        mostrarDialogoExito(
+                                "Limite alcanzado",
+                                "Realizaste el máximo de 2 reportes para esta publicación."
+                        );
+
                     } else {
                         String msg = json.has("message") ? json.getString("message") : "Error desconocido";
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(getContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
