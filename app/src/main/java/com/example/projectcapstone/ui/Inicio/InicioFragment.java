@@ -793,15 +793,19 @@ public class InicioFragment extends Fragment {
                     String status = json.optString("status");
 
                     if ("success".equals(status)) {
-                        // Mensaje personalizado de éxito
                         mostrarDialogoExito(
                                 "Solicitud enviada",
-                                "Tu solicitud ha sido enviada correctamente. El emprendedor recibirá tu mensaje y podrá contactarse contigo."
+                                "Tu solicitud ha sido enviada correctamente. El emprendedor recibirá tu mensaje."
                         );
+
+                    } else if ("exists".equals(status)) {
+                        mostrarDialogoExito("Solicitud existente",
+                                "Ya enviaste una colaboración para esta publicación, espera confirmación del emprendimiento.");
                     } else {
                         String msg = json.has("message") ? json.getString("message") : "Error desconocido";
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
                     }
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -814,29 +818,6 @@ public class InicioFragment extends Fragment {
                 Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void mostrarDialogoExito(String titulo, String mensaje) {
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_res_positiva, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        // Referencias a las vistas
-        TextView tvTituloExito = dialogView.findViewById(R.id.tvTituloExito);
-        TextView tvMensajeExito = dialogView.findViewById(R.id.tvMensajeExito);
-        MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
-
-        // Setear dinámicamente
-        tvTituloExito.setText(titulo);
-        tvMensajeExito.setText(mensaje);
-
-        // Acción del botón
-        btnAceptar.setOnClickListener(v -> dialog.dismiss());
     }
 
     private void mostrarDialogoSolicitud(Context context, int idEstudiante, int idPublicacion, int idEmprendimiento) {
@@ -868,6 +849,30 @@ public class InicioFragment extends Fragment {
             registrarColaboracion(context, idEstudiante, idPublicacion, idEmprendimiento, mensaje, dialog);
         });
     }
+
+    private void mostrarDialogoExito(String titulo, String mensaje) {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_res_positiva, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        // Referencias a las vistas
+        TextView tvTituloExito = dialogView.findViewById(R.id.tvTituloExito);
+        TextView tvMensajeExito = dialogView.findViewById(R.id.tvMensajeExito);
+        MaterialButton btnAceptar = dialogView.findViewById(R.id.btnFuncionalidadExito);
+
+        // Setear dinámicamente
+        tvTituloExito.setText(titulo);
+        tvMensajeExito.setText(mensaje);
+
+        // Acción del botón
+        btnAceptar.setOnClickListener(v -> dialog.dismiss());
+    }
+
 
     private void mostrarDialogoComentarios(Context context, int idPublicacion) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.alert_dialog_comentarios, null);
